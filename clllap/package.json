@@ -1,0 +1,56 @@
+{
+  "name": "Mart_136",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "android": "react-native run-android",
+    "ios": "react-native run-ios",
+    "start": "react-native start",
+    "test": "jest",
+    "lint": "eslint ."
+  },
+  "dependencies": {
+    "@react-native-community/art": "^1.2.0",
+    "@react-native-community/cameraroll": "^4.1.2",
+    "@react-native-community/cli": "^4.13.0",
+    "@react-native-community/masked-view": "^0.1.6",
+    "@react-native-firebase/app": "^10.8.1",
+    "@react-native-firebase/messaging": "^10.8.1",
+    "@react-navigation/native": "^5.7.3",
+    "@react-navigation/stack": "^5.14.9",
+    "i": "^0.3.7",
+    "npm": "^8.3.0",
+    "react": "16.13.1",
+    "react-native": "0.63.3",
+    "react-native-beautiful-video-recorder": "2.0.1",
+    "react-native-camera": "4.2.1",
+    "react-native-extended-stylesheet": "^0.12.0",
+    "react-native-gesture-handler": "^1.9.0",
+    "react-native-image-picker": "^4.6.0",
+    "react-native-modal": "^13.0.0",
+    "react-native-reanimated": "^1.13.2",
+    "react-native-safe-area-context": "^3.1.8",
+    "react-native-screens": "^2.17.1",
+    "react-native-semi-circular-gauge": "^2.0.2",
+    "react-native-send-intent": "^1.2.2",
+    "react-native-simple-gauge": "^0.3.1",
+    "react-native-vector-icons": "^9.0.0",
+    "react-native-video": "^5.2.0",
+    "react-native-webview": "10.8.2",
+    "react-navigation": "^4.4.4",
+    "rn-fetch-blob": "^0.12.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.11.6",
+    "@babel/runtime": "^7.11.2",
+    "@react-native-community/eslint-config": "^2.0.0",
+    "babel-jest": "^26.3.0",
+    "eslint": "^7.9.0",
+    "jest": "^26.4.2",
+    "metro-react-native-babel-preset": "^0.62.0",
+    "react-test-renderer": "16.13.1"
+  },
+  "jest": {
+    "preset": "react-native"
+  }
+}

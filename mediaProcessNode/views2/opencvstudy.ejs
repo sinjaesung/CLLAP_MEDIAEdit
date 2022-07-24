@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        .display_none{
+            display:none;
+        }
+        canvas{
+            background-color:#808080
+        }
+        #imagesrc{
+            outline:1px solid black; width:400px;height:400px;display:block;
+        }
+
+        .OUTPUT{
+            width:100%;height:auto;border:1px solid blue;
+        }
+    </style>
+    <script src="/public/jquery.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <script src='/public/ffmpegwasm.js'></script>
+</head>
+<body>
+<h2>HELLO OEPNCV.JS</h2>
+<p id='status'>OPENCV IS JIS LOADING....</p>
+<div>
+    <button id='start'>START</button>
+    <p>Inputoutput</p>
+    <div class='inputoutput'>
+        <video id='video' width=320 height=240 alt='no image' src='resource/resource1.mp4' controls>
+    </div>
+    <div class='inputoutput'>
+        <div class='caption'>canvasinput</div>
+        <canvas id='canvasinput1'></canvas>
+        <canvas id='canvasinput2'></canvas>
+    </div>
+    <div class='inputoutput'>
+        <div class='caption'>canvasOutput</div>
+        <canvas id='canvasOutput'></canvas>
+        <canvas id='canvasOutput2'></canvas>
+        <canvas id='canvasOutput3'></canvas>
+        <canvas id='canvasOutput4'></canvas>
+        <canvas id='canvasOutput5'></canvas>
+        <canvas id='canvasOutput6'></canvas>
+        <canvas id='canvasOutput7'></canvas>
+        <canvas id='canvasOutput8'></canvas>
+        <canvas id='canvasOutput9'></canvas>
+        <canvas id='canvasOutput10'></canvas>
+        <canvas id='canvasOutput11'></canvas>
+    </div>
+    <textarea id='momentsoutput'>
+        ㄹㄹㄹㄹ
+    </textarea>
+    <textarea id='textareaouput2'>
+        ㄹㄹㄹㄹ
+    </textarea>
+    <textarea id='textareaouput3'>
+        ㄹㄹㄹㄹ
+    </textarea>
+    <textarea id='textareaouput4'>
+        ㄹㄹㄹㄹ
+    </textarea>
+</div>
+<script>
+//ffmpeg intialize
+const {createFFmpeg,fetchFile} = FFmpeg;
+let ffmpeg=null;
+let inputElement=document.getElementById('fileInput');
+let video=document.getElementById('video');
+
+let canvasinput1=document.getElementById('canvasinput1');
+let canvasinput2=document.getElementById('canvasinput2');
+let context1=canvasinput1.getContext('2d');
+
+let canvasoutput1=document.getElementById('canvasOutput');
+let canvasoutput2=document.getElementById('canvasOutput2');
+let canvasoutput3=document.getElementById('canvasOutput3');
+let canvasoutput4=document.getElementById('canvasOutput4');
+let canvasoutput5=document.getElementById('canvasOutput5');
+let canvasoutput6=document.getElementById('canvasOutput6');
+let canvasoutput7=document.getElementById('canvasOutput7');
+let canvasoutput8=document.getElementById('canvasOutput8');
+let canvasoutput9=document.getElementById('canvasOutput9');
+let canvasoutput10=document.getElementById('canvasOutput10');
+let canvasoutput11=document.getElementById('canvasOutput11');
+
+let momentsoutput=document.getElementById('momentsoutput');
+
+let src;
+let dst;
+let cap;
+
+
+function init_cv(){
+    src=new cv.Mat(video.height,video.width,cv.CV_8UC4);
+    dst=new cv.Mat(video.height,video.width,cv.CV_8UC1);
+    cap=new cv.VideoCapture(video);
+
+    cap.read(src);
+    cv.imshow('canvasinput1',src);
+    console.log('processing vidoess:',cap,dst,src);
+
+    let src_local=cv.imread('canvasinput1');
+    let dst_local=new cv.Mat();
+    cv.cvtColor(src_local,dst_local,cv.COLOR_RGB2GRAY,0);
+    cv.Canny(src_local,dst_local,50,100,3,false);
+    cv.imshow(canvasoutput1,dst_local);
+    src_local.delete();dst_local.delete();
+
+    let src_local2 = cv.imread('canvasinput1');
+    let dst_local2 = new cv.Mat();
+    cv.pyrDown(src_local2,dst_local2,new cv.Size(0,0),cv.BORDER_DEFAULT);
+    cv.imshow('canvasOutput2',dst_local2);
+    src_local2.delete();dst_local2.delete();
+
+    let src_local3 = cv.imread('canvasinput1');
+    let dst_local3 = new cv.Mat();
+    cv.pyrUp(src_local3,dst_local3,new cv.Size(0,0),cv.BORDER_DEFAULT);
+    cv.imshow("canvasOutput3",dst_local3);
+    src_local3.delete();dst_local3.delete();
+
+    let src_local4 = cv.imread("canvasinput1");
+    let dst_local4 = cv.Mat.zeros(src_local4.rows,src_local4.cols,cv.CV_8UC3);
+    cv.cvtColor(src_local4,src_local4,cv.COLOR_RGB2GRAY,0);
+    cv.threshold(src_local4,src_local4,120,200,cv.THRESH_BINARY);
+    let contours=new cv.MatVector();
+    let hierarchy=new cv.Mat();
+
+    cv.findContours(src_local4,contours,hierarchy,cv.RETR_CCOMP,cv.CHAIN_APPROX_SIMPLE);
+    console.log('controussh mmsmss,계층',contours,hierarchy)
+    for(let i=0; i<contours.size(); i++){
+        
+        let color=new cv.Scalar(Math.round(Math.random()*255),Math.round(Math.random()*255),Math.round(Math.random()*255));
+        cv.drawContours(dst_local4,contours,i,color,1,cv.LINE_8,hierarchy,100);
+    }
+    console.log('cadst olcoss4::',dst_local4);
+    cv.imshow('canvasOutput4',dst_local4);
+    src_local4.delete();dst_local4.delete();contours.delete();hierarchy.delete();
+
+
+    let src_local5 = cv.imread('canvasinput1');
+    let dst_local5 = cv.Mat.zeros(src_local5.rows,src_local5.cols, cv.CV_8UC3);
+    cv.cvtColor(src_local5,src_local5,cv.COLOR_RGBA2GRAY,0);
+    cv.threshold(src_local5,src_local5,177,200,cv.THRESH_BINARY);
+
+    let contours2=new cv.MatVector();
+    let hierarchy2=new cv.Mat();
+    cv.findContours(src_local5,contours2,hierarchy2,cv.RETR_CCOMP,cv.CHAIN_APPROX_SIMPLE);
+    console.log('img controusss findContours점수찾기:',contours2);
+    let cnt=contours2.get(20);
+
+    let Moments=cv.moments(cnt,false);
+    console.log('Mmmomenet swhatssssswhats???:',Moments);
+    momentsoutput.innerHTML=Moments.m00;
+    src_local5.delete();dst_local5.delete();contours2.delete();hierarchy2.delete();
+
+
+    let src_local6 = cv.imread('canvasinput1');
+    let dst_local6 = cv.Mat.zeros(src_local6.rows,src_local6.cols,cv.CV_8UC3);
+    cv.cvtColor(src_local6,src_local6,cv.COLOR_RGBA2GRAY,0);
+    cv.threshold(src_local6,src_local6,177,200,cv.THRESH_BINARY);
+    let contours3 = new cv.MatVector();
+    let hierarchy3 = new cv.Mat();
+    cv.findContours(src_local6,contours3,hierarchy3,cv.RETR_CCOMP,cv.CHAIN_APPROX_SIMPLE);
+    console.log('controus3관려 찾기:',contours3);
+    let cntt=contours3.get(20);
+    let area=cv.contourArea(cntt,false);
+    console.log('contours areasswhat what??:',area,cntt);
+
+    let perimeter=cv.arcLength(cntt,true);
+    momentsoutput.innerHTML=cntt;
+    textareaouput2.innerHTML=perimeter;
+    src_local6.delete();dst_local6.delete();contours3.delete();hierarchy3.delete();
+
+    
+    let src_local7 = cv.imread('canvasinput1');
+    let dst_local7 = cv.Mat.zeros(src_local7.rows,src_local7.cols,cv.CV_8UC3);
+    cv.cvtColor(src_local7,src_local7,cv.COLOR_RGBA2GRAY,0);
+    cv.threshold(src_local7,src_local7,100,200,cv.THRESH_BINARY);
+    let contours4 = new cv.MatVector();
+    let hierarchy4 = new cv.Mat();
+    let poly=new cv.MatVector();
+    cv.findContours(src_local7,contours4,hierarchy4,cv.RETR_CCOMP,cv.CHAIN_APPROX_SIMPLE);
+    for(let i=0; i<contours4.size(); ++i){
+        console.log('controussssss;;;',i);
+        let tmp=new cv.Mat();
+        let cnttt=contours4.get(i);
+        console.log('contours.get(i) hmmmsss:',cnttt);
+        cv.approxPolyDP(cnttt,tmp,3,true);
+        poly.push_back(tmp);
+        cnttt.delete();tmp.delete();
+    }
+    console.log('polysss:',poly);
+    for(let j=0; j<contours4.size(); j++){
+        let color = new cv.Scalar(Math.round(Math.random() * 255), Math.round(Math.random() * 255),
+        Math.round(Math.random() * 255));
+        cv.drawContours(dst_local7, poly, j, color, 1, 8, hierarchy4, 0);
+    }
+    cv.imshow('canvasOutput5',dst_local7);
+    src_local7.delete();dst_local7.delete();hierarchy4.delete(); contours4.delete();poly.delete();
+
+
+    
+    let src_local8=cv.imread('canvasinput1');
+    let dst_local8 = cv.Mat.zeros(src_local8.rows,src_local8.cols,cv.CV_8UC3);
+    cv.cvtColor(src_local8,src_local8,cv.COLOR_RGBA2GRAY,0);
+    cv.threshold(src_local8,src_local8,100,200,cv.THRESH_BINARY);
+    let contours5 = new cv.MatVector();
+    let hierarchy5 = new cv.Mat();
+    let hull=new cv.MatVector();
+    cv.findContours(src_local8,contours5,hierarchy5,cv.RETR_CCOMP,cv.CHAIN_APPROX_SIMPLE);
+    for(let i=0; i<contours5.size(); i++){
+        let tmp=new cv.Mat();
+        let cnt=contours5.get(i);
+        cv.convexHull(cnt,tmp,false,true);
+        hull.push_back(tmp);
+        cnt.delete();tmp.delete();
+    }
+    for (let i = 0; i < contours5.size(); ++i) {
+        let colorHull = new cv.Scalar(Math.round(Math.random() * 255), Math.round(Math.random() * 255),
+                                    Math.round(Math.random() * 255));
+        cv.drawContours(dst_local8, hull, i, colorHull, 1, 8, hierarchy5, 0);
+    }
+    cv.imshow('canvasOutput6',dst_local8);
+    src_local8.delete();dst_local8.delete();hierarchy5.delete(); contours5.delete();hull.delete();
+
+
+    let src_local9=cv.imread('canvasinput1');
+    let dst_local9 = cv.Mat.zeros(src_local9.rows,src_local9.cols,cv.CV_8UC3);
+    cv.cvtColor(src_local9,src_local9,cv.COLOR_RGBA2GRAY,0);
+    cv.threshold(src_local9,src_local9,177,200,cv.THRESH_BINARY);
+    let contours6 = new cv.MatVector();
+    let hierarchy6 = new cv.Mat();
+    cv.findContours(src_local9,contours6,hierarchy6,cv.RETR_CCOMP,cv.CHAIN_APPROX_SIMPLE);
+    let cnt5 = contours6.get(0);
+
+    let rect=cv.boundingRect(cnt);
+    let contoursColor=new cv.Scalar(255,255,255);
+    let rectangleColor=new cv.Scalar(255,0,0);
+
+    cv.drawContours(dst_local9,contours6,0,contoursColor,1,8,hierarchy6,100);
+    let point1 = new cv.Point(rect.x,rect.y);
+    let point2= new cv.Point(rect.x+rect.width,rect.y+rect.height);
+    cv.rectangle(dst_local9,point1,point2,rectangleColor,2,cv.LINE_AA,0);
+    cv.imshow('canvasOutput7',dst_local9);
+    src_local9.delete();dst_local9.delete();hierarchy6.delete(); contours6.delete();
+
+
+    let src_local10 = cv.imread('canvasinput1');
+    let dst_local10 = cv.Mat.zeros(src_local10.rows, src_local10.cols, cv.CV_8UC3);
+    cv.cvtColor(src_local10, src_local10, cv.COLOR_RGBA2GRAY, 0);
+    cv.threshold(src_local10, src_local10, 177, 200, cv.THRESH_BINARY);
+    let contours7 = new cv.MatVector();
+    let hierarchy7 = new cv.Mat();
+    cv.findContours(src_local10, contours7, hierarchy7, cv.RETR_CCOMP, cv.CHAIN_APPROX_SIMPLE);
+    let cnt4 = contours7.get(30);
+    // You can try more different parameters
+    let circle = cv.minEnclosingCircle(cnt4);
+    let contoursColor4 = new cv.Scalar(255, 255, 255);
+    let circleColor4 = new cv.Scalar(255, 0, 0);
+    cv.drawContours(dst_local10, contours7, 0, contoursColor4, 1, 8, hierarchy7, 100);
+    cv.circle(dst_local10, circle.center, circle.radius, circleColor4);
+    cv.imshow('canvasOutput8', dst_local10);
+    src_local10.delete(); dst_local10.delete(); contours7.delete(); hierarchy7.delete(); cnt4.delete();
+
+    let src_local11 = cv.imread('canvasinput1');
+    let dst_local11 = new cv.Mat();
+    cv.cvtColor(src_local11,src_local11,cv.COLOR_RGBA2GRAY,0);
+    cv.threshold(src_local11,src_local11,120,200,cv.THRESH_BINARY);
+    cv.transpose(src_local11,dst_local11);
+    cv.imshow('canvasOutput9',dst_local11);
+    src_local11.delete();dst_local11.delete();
+
+
+    let src_local12 = cv.imread('canvasinput1');
+    let dst_local12 = cv.Mat.zeros(src_local12.rows,src_local12.cols,cv.CV_8UC3);
+    cv.cvtColor(src_local12,src_local12,cv.COLOR_RGBA2GRAY,0);
+    cv.threshold(src_local12,src_local12,100,200,cv.THRESH_BINARY);
+    let contours9 = new cv.MatVector();
+    let hierarchy9=new cv.Mat();
+    cv.findContours(src_local12,contours9,hierarchy9,cv.RETR_CCOMP,cv.CHAIN_APPROX_SIMPLE);
+    let hull2=new cv.Mat();
+    let defect2=new cv.Mat();
+    let cnt00=contours9.get(0);
+    let lineColor=new cv.Scalar(255,0,0);
+    let circleColor=new cv.Scalar(255,255,255);
+    cv.convexHull(cnt00,hull2,false,false);
+    cv.convexityDefects(cnt00,hull2,defect2);
+    for(let i=0; i<defect2.rows;i++){
+        let start = new cv.Point(cnt00.data32S[defect2.data32S[i * 4] * 2],
+                             cnt00.data32S[defect2.data32S[i * 4] * 2 + 1]);
+        let end = new cv.Point(cnt00.data32S[defect2.data32S[i * 4 + 1] * 2],
+                            cnt00.data32S[defect2.data32S[i * 4 + 1] * 2 + 1]);
+        let far = new cv.Point(cnt00.data32S[defect2.data32S[i * 4 + 2] * 2],
+                            cnt00.data32S[defect2.data32S[i * 4 + 2] * 2 + 1]);
+
+        console.log("hmmssss:",cnt00,defect2);
+        cv.line(dst_local12,start,end,lineColor,2,cv.LINE_AA,0);
+        cv.circle(dst_local12,far,3,circleColor,-1);                 
+    }
+    cv.imshow('canvasOutput10',dst_local12);
+    src_local12.delete();dst_local12.delete();hierarchy9.delete(); contours9.delete();hull2.delete();defect2.delete();
+
+
+
+    let src_local13 = cv.imread('canvasinput1');
+    let dst_local13 = cv.Mat.zeros(src_local13.rows, src_local13.cols, cv.CV_8UC3);
+    cv.cvtColor(src_local13, src_local13, cv.COLOR_RGBA2GRAY, 0);
+    cv.threshold(src_local13, src_local13, 100, 100, cv.THRESH_BINARY);
+    let contours10 = new cv.MatVector();
+    let hierarchy10 = new cv.Mat();
+    cv.findContours(src_local13, contours10, hierarchy10, cv.RETR_CCOMP, cv.CHAIN_APPROX_SIMPLE);
+    let contourID0 = 20;
+    let contourID1 = 15;
+    let color0 = new cv.Scalar(255, 0, 0);
+    let color1 = new cv.Scalar(0, 0, 255);
+    // You can try more different parameters
+    let result = cv.matchShapes(contours10.get(contourID0), contours10.get(contourID1), 1, 0);
+    //matchShapesOutput.innerHTML = result;
+    cv.drawContours(dst_local13, contours10, contourID0, color0, 1, cv.LINE_8, hierarchy10, 100);
+    cv.drawContours(dst_local13, contours10, contourID1, color1, 1, cv.LINE_8, hierarchy10, 100);
+    cv.imshow('canvasOutput11', dst_local13);
+    src_local13.delete(); dst_local13.delete(); contours10.delete(); hierarchy10.delete();
+}
+
+function video_upload(e){
+    console.log('비디오업로드폼 데이터 제출:');
+    e.preventDefault();
+    let video_uploadform = document.getElementById('video_uploadform');
+    let form_data= new FormData(video_uploadform);
+    $.ajax({
+        url:'/upload_ver2',
+        type:'post',
+        data: form_data,
+        cache:false,
+        contentType:false,
+        processData:false,
+        error:function(jqxHR,textStatus,errorThrown){
+
+        },
+        beforeSend:function(){
+
+        },
+        complete:function(){
+
+        },
+        success:function(data){
+            console.log('result datatsss:',data);
+            
+            let image_extract_form_inputdata=document.getElementById('image_extract_form_data');
+            image_extract_form_inputdata.value=data.join(',');//문자열저장화
+            for(let r=0; r<data.length; r++){
+                let target_video = document.getElementById('upload_video'+r);
+                target_video.src=data[r];
+                target_video.load();
+            }
+        }
+    });
+    return false;
+}
+function onOpenCvReady(){
+    console.log('filesaverss saveAs:',saveAs);
+    document.getElementById('status').innerHTML ='OPENCV,.JS IS REaday';
+    document.getElementById('start').addEventListener('click',init_cv,false);
+
+}
+
+
+</script>
+<script async src='public/opencv.js' onload='onOpenCvReady()'></script>
+</body>
+</html>

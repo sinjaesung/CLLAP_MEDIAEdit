@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="description" content="">
+<meta name="author" content="">
+
+<title>We-up 관리자</title>
+
+<!-- Custom fonts for this template -->
+<link href="vendor/fontawesome-free/css/all.min.css" rel="stylesheet"
+	type="text/css">
+<link
+	href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
+	rel="stylesheet">
+
+<!-- Custom styles for this template -->
+<link href="css/sb-admin-2.min.css" rel="stylesheet">
+
+<!-- Custom styles for this page -->
+<link href="vendor/datatables/dataTables.bootstrap4.min.css"
+	rel="stylesheet">
+
+</head>
+
+<style>
+.search_top {
+	border-top: 1px solid #ccc;
+}
+
+.search_th {
+	width: 20%;
+	background: rgba(78, 125, 223, 0.2);
+	text-align: center;
+	border-bottom: 1px solid #ccc;
+}
+
+tr, td {
+	border: 1px solid #ccc;
+	padding: 7px;
+}
+
+table {
+	width: 100%;
+}
+
+.btn-search {
+	margin-top: 10px;
+	margin-left: 44%;
+}
+
+.btn-reset {
+	margin-top: 10px;
+}
+</style>
+
+<body id="page-top">
+
+	<!-- Page Wrapper -->
+	<div id="wrapper">
+
+		<th:block th:replace="/../hf/sidebar.html"></th:block>
+
+		<!-- Content Wrapper -->
+		<div id="content-wrapper" class="d-flex flex-column">
+
+			<!-- Main Content -->
+			<div id="content">
+				<th:block th:replace="/../hf/header.html"></th:block>
+
+				<!-- Begin Page Content -->
+				<div class="container-fluid">
+
+					<!-- Page Heading -->
+					<h1 class="h3 mb-2 text-gray-800">최근 7일 통계</h1>
+
+					<!-- DataTales Example -->
+					<div class="card shadow mb-4">
+						<div class="card-header py-3">
+							<div class="card-body">
+								<div class="table-responsive">
+										<table class="table table-bordered" width="100%"
+											cellspacing="0">
+											<thead>
+												<tr>
+													<th>DAU (순방문자)</th>
+													<th>총 방문자</th>
+													<th colspan="3" rowspan="2"></th>
+												</tr>
+												<tr>
+													<td
+														th:text="${#numbers.formatInteger(dailyVisit_count, 0, 'COMMA')} + '명'"></td>
+													<td
+														th:text="${#numbers.formatInteger(allVisit_count, 0, 'COMMA')} + '명'"></td>
+												</tr>
+												<tr>
+													<th>신규 회원가입</th>
+													<th>공유주방 (신규 / 전체)</th>
+													<th>샵인샵 (생성날짜 기준) - 배달아이템 (신규 / 전체)</th>
+													<th>샵인샵 (생성날짜 기준) - 무인 (신규 / 전체)</th>
+													<th>평균 방문횟수</th>
+												</tr>
+												<tr>
+													<td
+														th:text="${#numbers.formatInteger(count_userList, 0, 'COMMA')} + '명'"></td>
+													<td><span
+														th:text="${#numbers.formatInteger(week_spaceCount, 0, 'COMMA')} + '건 / '"></span>
+														<span
+														th:text="${#numbers.formatInteger(spaceCount, 0, 'COMMA')} + '건'"></span>
+													</td>
+													<td><span
+														th:text="${#numbers.formatInteger(week_deliveryShop_count, 0, 'COMMA')} +'건 / '"></span>
+														<span
+														th:text="${#numbers.formatInteger(all_deliveryShop, 0, 'COMMA')} + '건  '"></span>
+													</td>
+													<td><span
+														th:text="${#numbers.formatInteger(week_autoShop_count, 0, 'COMMA')} +'건 / '"></span>
+														<span
+														th:text="${#numbers.formatInteger(all_autoShop, 0, 'COMMA')} + '건 '"></span>
+													</td>
+													<td th:text="${weekVisit_avgCount}+ '회'"></td>
+												</tr>
+											</thead>
+										</table>
+								</div>
+							</div>
+						</div>
+						
+						<!-- chart -->
+							<div id="chart_div" style="width:content; height: 500px;"></div>
+
+						<div class="card-body">
+							<div class="search_area">
+								<div class="bd-top-gr pd_top_30"><span><h5>요약내역</h5></span></div>
+								<form action="get_statisticsTable" method="POST">
+									<table class="search">
+										<tbody>
+											<tr>
+												<th class="search_th search_top" style="width: 20%;">기간</th>
+												<td style="width: 60%;"><span><button
+															type="button" id="today" class="date_search_btn">오늘</button></span>
+													<span><button type="button" id="week"
+															class="date_search_btn">최근7일</button></span> <span><button
+															type="button" id="thisMonth" class="date_search_btn">당월</button></span>
+													<span><button type="button" id="prevMonth"
+															class="date_search_btn">전월</button></span> <span><button
+															type="button" id="3month" class="date_search_btn">3개월</button></span>
+													<span>
+														<input type="date" name="start_date" id="start_date">
+														</span> ~ <span>
+														<input type="date" name="end_date" id="end_date">
+													</span>
+												</td>
+												<td rowspan="2"><button type="button" id="search_statisticsBtn" class="search_btn">검색</button></td>
+											</tr>
+											<!-- <tr>
+												<th class="search_th search_top" style="width: 20%;">검색어</th>
+												<td style="width: 60%;">
+													<div class="rows">
+														<input type="text" id="detail_search" name="note_email"
+															style="width: 30%;">
+													</div>
+												</td>
+											</tr> -->
+										</tbody>
+									</table>
+								</form>
+							</div>
+							<th:block>
+								<div class="card-body">
+		                            <div class="table-responsive">
+		
+		                                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+		                                    <thead>
+		                                    <tr>
+		                                        <th>일자</th>
+		                                        <th>DAU</th>
+		                                        <th>회원가입</th>
+		                                        <th>탈퇴</th>
+		                                        <th>등록 공유공간</th>
+		                                        <th>등록 샵인샵(배달 아이템)</th>
+		                                        <th>등록 샵인샵(무인판매)</th>
+		                                    </tr>
+		                                    </thead>
+		                                    <tbody id="search_statisticsTable">
+		                                    <!-- <tr th:each="list : ${spaceList}">
+		                                        <td><span th:text="${list.share_id}"></span></td>
+		                                        <td><input type="checkbox"/></td>
+		                                        <td><span th:text="${list.share_biz_type}"></span></td>
+		                                        <td><span th:text="${list.share_title}"></span></td>
+		
+		                                        <td><span th:text="${list.share_address}"></span> / <span th:text="${list.share_address_detail}"></span></td>
+		
+		                                        <td><span th:text="${list.share_deposit}/10000"></span>만원 / <span th:text="${list.share_price}/10000"></span>만원</td>
+		                                        <td><span th:text="${list.share_sqft}"></span></td>
+		                                        <td><span th:text="${list.mem_email}"></span></td>
+		                                        <td><span th:text="${list.share_create_date}"></span></td>
+		                                        <td><a th:href="@{/detailSpace(share_id=${list.share_id})}">바로가기</a></td>
+		                                    </tr>-->
+		                                    <!-- <tr th:each="entry : ${dataMap}">
+		                                    	<td th:each="list : ${entry.value}"></td>
+		                                    </tr> -->
+		                                    </tbody>
+		                                </table>
+		                            </div>
+	                        	</div>
+	                        </th:block>
+						</div>
+					</div>
+				</div>
+				<!-- /.container-fluid -->
+
+			</div>
+			<!-- End of Main Content -->
+
+			<!-- Footer -->
+			<footer class="sticky-footer bg-white">
+				<div class="container my-auto">
+					<div class="copyright text-center my-auto">
+						<span>Copyright &copy; We-up 2021</span>
+					</div>
+				</div>
+			</footer>
+			<!-- End of Footer -->
+
+		</div>
+		<!-- End of Content Wrapper -->
+
+	</div>
+	<!-- End of Page Wrapper -->
+
+	<!-- Scroll to Top Button-->
+	<a class="scroll-to-top rounded" href="#page-top"> <i
+		class="fas fa-angle-up"></i>
+	</a>
+
+	<!-- Bootstrap core JavaScript-->
+	<script src="vendor/jquery/jquery.min.js"></script>
+	<script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+	<!-- Core plugin JavaScript-->
+	<script src="vendor/jquery-easing/jquery.easing.min.js"></script>
+
+	<!-- Custom scripts for all pages-->
+	<script src="js/sb-admin-2.min.js"></script>
+
+	<!-- Page level plugins -->
+	<script src="vendor/datatables/jquery.dataTables.min.js"></script>
+	<script src="vendor/datatables/dataTables.bootstrap4.min.js"></script>
+
+	<!-- Page level custom scripts -->
+	<script src="js/demo/datatables-demo.js"></script>
+
+	<script type="text/javascript"
+		src="https://www.gstatic.com/charts/loader.js"></script>
+
+<script>
+
+  //오늘
+  $('#today').click(function(){
+  	document.getElementById('start_date').valueAsDate = new Date();
+  	document.getElementById('end_date').valueAsDate = new Date();
+  });
+
+	//날짜 객체 받아서 문자열로 리턴하는 함수
+	function getDateStr(myDate){
+		var myMonth = myDate.getMonth() + 1;
+		var month = myMonth >= 10 ? myMonth : '0' + myMonth;
+		var fake_day = myDate.getDate(); 
+		var day = fake_day >= 10 ? fake_day : '0' + fake_day;
+		return (myDate.getFullYear() + '-' + month + '-' + day);
+	}
+
+  //어제
+  function lastYesterday() {
+  	 var d = new Date();
+  	  var dayOfMonth = d.getDate();
+  	  d.setDate(dayOfMonth - 1);
+  	  return getDateStr(d);
+  }
+
+  $('#yesterday').click(function(){
+  	$("#start_date").val(lastYesterday());
+  	document.getElementById('end_date').valueAsDate = new Date();
+  });
+
+  //일주일
+  function lastWeek() {
+    var d = new Date();
+    var dayOfMonth = d.getDate();
+    d.setDate(dayOfMonth - 7);
+    return getDateStr(d);
+  }
+
+  $('#week').click(function(){
+  	$("#start_date").val(lastWeek());
+  	document.getElementById('end_date').valueAsDate = new Date();
+  });
+
+  //당월
+  function thisMonth() {
+    var d = new Date();
+    var monthOfYear = d.getMonth();
+    d.setDate(d.getDate() - d.getDate() + 1);
+    return getDateStr(d);
+  }
+
+  $('#thisMonth').click(function(){
+  	$("#start_date").val(thisMonth());
+  	document.getElementById('end_date').valueAsDate = new Date();
+  });
+  
+  //3개월
+  function last3Month() {
+    var d = new Date();
+    var monthOfYear = d.getMonth();
+    d.setMonth(monthOfYear - 3);
+    return getDateStr(d);
+  }
+
+  $('#3month').click(function(){
+  	$("#start_date").val(last3Month());
+  	document.getElementById('end_date').valueAsDate = new Date();
+  });
+  
+  //전월
+  function prevMonth() {
+    var d = new Date();
+    var monthOfYear = d.getMonth();
+    d.setMonth(monthOfYear - 1);
+    return getDateStr(d);
+  }
+  
+  $('#prevMonth').click(function(){
+  	$("#start_date").val(prevMonth());
+  	document.getElementById('end_date').valueAsDate = new Date();
+  });
+  
+  $('#deleteNotice').click(()=>{
+	  var note_id = new Array()
+	  var checkbox = $("input[id=checkbox]:checked")
+	  
+	  checkbox.each((i)=>{
+		  var tr = checkbox.parent().parent().eq(i);
+		  var td = tr.children();
+		  
+		  var id = td.eq(0).text();
+		  note_id.push(id);
+	  })
+	  
+  })
+
+  $('#tempButton').click(()=>{
+	  alert('오늘 날짜 : ' + getDateStr(new Date()))
+  })
+  
+  
+  var dateList = new Array();
+  var DAU_visitList = new Array();
+  var spaceList = new Array();
+  var deliveryShop_list = new Array();
+  var autoShop_list = new Array();
+  var daily_newVisit_list= new Array();
+  var daily_existVisit_list = new Array();
+  var daily_signUp_userList = new Array(); 
+  
+  $.ajax({
+	  type:'post',
+	  url: '/get_chartData',
+	  contentType:'application/x-www-form-urlencoded;charset=utf-8',
+	  success:(data)=>{
+		 dateList = data.dateList
+		 DAU_visitList = data.DAU_visitList
+		 spaceList = data.spaceList
+		 deliveryShop_list = data.deliveryShop_list
+		 autoShop_list = data.autoShop_list
+		 daily_newVisit_list = data.daily_newVisit_list
+		 daily_existVisit_list = data.daily_existVisit_list
+		 daily_signUp_userList = data.daily_signUp_userList
+		 
+	  },error:(error)=>{
+		  alert('차트 데이터 가져오기 실패')
+	  }
+  })  
+  
+  google.charts.load('current', {'packages':['line', 'corechart']});
+/*   google.charts.load('current', {'packages': ['corechart', 'bar']}); */
+  google.charts.setOnLoadCallback(drawChart);
+
+function drawChart() {
+  var chartDiv = document.getElementById('chart_div');
+  var data = new google.visualization.DataTable();
+  
+  
+  data.addColumn('string', 'day');
+  data.addColumn('number', 'DAU');
+  data.addColumn('number', '공유주방');
+  data.addColumn('number', '샵인샵(배달 아이템)');
+  data.addColumn('number', '샵인샵(무인 아이템)');
+  data.addColumn('number', '신규방문자')
+  data.addColumn('number', '기존방문자')
+  data.addColumn('number', '신규회원가입')
+	
+  for(var i = dateList.length -1 ; i>=0; i--){
+	  /* data.addRows([
+		  [dateList[i], visitList[i].visit_count, spaceList[i].share_count, deliveryShop_list[i].week_registShop_count,autoShop_list[i].week_registShop_count]
+	  ]) */
+	  data.addRows([
+		  [dateList[i], DAU_visitList[i].visit_count, spaceList[i].share_count, 
+			deliveryShop_list[i].week_registShop_count, autoShop_list[i].week_registShop_count, 
+			daily_newVisit_list[i].visit_count, daily_existVisit_list[i].visit_count , daily_signUp_userList[i].mem_count]
+	  ])
+  }
+  
+
+  var options = {
+		  title : '승인된 날짜 기준',
+          seriesType: 'line',
+          series: {4: {type: 'bars'},5: {type: 'bars'},6: {type: 'bars'}},
+          isStacked: true,
+          bar: {groupWidth: "40%"}
+        };
+
+
+  function drawMaterialChart() {
+    /* var materialChart = new google.charts.Line(chartDiv); */
+    var materialChart = new google.visualization.ComboChart(document.getElementById('chart_div'));
+    materialChart.draw(data, options);
+  }
+  
+  
+
+  drawMaterialChart();
+  
+  $(window).resize(function(){
+	  drawMaterialChart()
+  })
+
+}
+
+// onload하자마자 한달 데이터 불러오도록
+$(document).ready(function () {
+	let html =''
+	let DAU	= new Array()
+	
+	let today = getDateStr(new Date());
+	let prev_month = prevMonth();
+	
+	$.ajax({
+		  type:'post',
+		  url: '/get_statisticsTable',
+		  contentType:'application/x-www-form-urlencoded;charset=utf-8',
+		  data : {
+			  'start_date' : prev_month,
+			  'end_date' : today
+		  },
+		  success:(data)=>{
+			 $('#search_statisticsTable').children().remove()
+			 
+			 let periodList = data.periodList 
+			 DAU = data.DAU_list
+			 let signupUser = data.signupUser_list
+			 let exitUser = data.exitUser_list
+			 let registSpace = data.regist_spaceList
+			 let regist_deliveryShop = data.regist_deliveryShop_list
+			 let regist_autoShop = data.regist_autoShop_list
+			 for(let i=periodList.length-1; 0<i; i--){
+				html += '<tr>'
+				html += '<td>' + periodList[i] + '</td>'
+				html += '<td>' + DAU[i] + '</td>'
+				html += '<td>' + signupUser[i]  + '</td>'
+				html += '<td>' + exitUser[i] + '</td>'
+				html += '<td>' + registSpace[i] + '</td>'
+				html += '<td>' + regist_deliveryShop[i] + '</td>'
+				html += '<td>' + regist_autoShop[i] + '</td>'
+				html += '</tr>'
+			 }
+			 $('#search_statisticsTable').append(html)
+		  },error:(error)=>{
+			  alert('통계요약 데이터 가져오기 실패')
+		  }
+	})
+})
+	
+
+	// 날짜 기간 통계 검색
+	$('#search_statisticsBtn').click(()=>{
+		let start_date = $('#start_date').val()
+		let end_date= $('#end_date').val()
+		
+		let html =''
+		let DAU	= new Array()
+		
+		$.ajax({
+			  type:'post',
+			  url: '/get_statisticsTable',
+			  contentType:'application/x-www-form-urlencoded;charset=utf-8',
+			  data : {
+				  'start_date' : start_date,
+				  'end_date' : end_date
+			  },
+			  success:(data)=>{
+				 $('#search_statisticsTable').children().remove()
+				 
+				 let periodList = data.periodList 
+				 DAU = data.DAU_list
+				 let signupUser = data.signupUser_list
+				 let exitUser = data.exitUser_list
+				 let registSpace = data.regist_spaceList
+				 let regist_deliveryShop = data.regist_deliveryShop_list
+				 let regist_autoShop = data.regist_autoShop_list
+				 for(let i=periodList.length-1; 0<i; i--){
+					html += '<tr>'
+					html += '<td>' + periodList[i] + '</td>'
+					html += '<td>' + DAU[i] + '</td>'
+					html += '<td>' + signupUser[i]  + '</td>'
+					html += '<td>' + exitUser[i] + '</td>'
+					html += '<td>' + registSpace[i] + '</td>'
+					html += '<td>' + regist_deliveryShop[i] + '</td>'
+					html += '<td>' + regist_autoShop[i] + '</td>'
+					html += '</tr>'
+				 }
+				 $('#search_statisticsTable').append(html)
+			  },error:(error)=>{
+				  alert('통계요약 데이터 가져오기 실패')
+			  }
+		})
+	})
+  
+</script>
+</body>
+
+</html>

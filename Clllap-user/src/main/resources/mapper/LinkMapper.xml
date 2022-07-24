@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.clllap.mapper.LinkMapper">
+
+    <select id="user_link" parameterType="int" resultType="Links">
+        SELECT *
+        FROM link
+        WHERE user_id = #{user_id}
+    </select>
+
+    <insert id="set_link" parameterType="Links">
+        INSERT INTO link
+            (user_id, link_fb, link_insta, link_kakao, link_twitter, link_etc,
+             link_fb_active, link_insta_active, link_kakao_active, link_twitter_active, link_etc_active)
+        VALUES
+            (#{user_id}, #{link_fb}, #{link_insta}, #{link_kakao}, #{link_twitter}, #{link_etc},
+                #{link_fb_active}, #{link_insta_active}, #{link_kakao_active}, #{link_twitter_active}, #{link_etc_active})
+    </insert>
+
+    <update id="update_link" parameterType="Links">
+        UPDATE link
+        SET link_fb = #{link_fb}, link_insta = #{link_insta}, link_kakao = #{link_kakao}, link_twitter = #{link_twitter}, link_etc = #{link_etc},
+            link_fb_active = #{link_fb_active}, link_insta_active = #{link_insta_active}, link_kakao_active = #{link_kakao_active}, link_twitter_active = #{link_twitter_active}, link_etc_active = #{link_etc_active}
+        WHERE user_id = #{user_id}
+    </update>
+    
+</mapper>

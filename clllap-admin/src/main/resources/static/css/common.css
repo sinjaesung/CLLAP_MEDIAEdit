@@ -1,0 +1,113 @@
+/*** 메인 ***/
+/*해더*/
+header#main_headder{
+     width:100%;height:auto;background-color:#ffffff;
+}
+header#main_headder .inner{
+     width:100%;height:auto;display:flex;
+}
+header#main_headder .inner ul{width:100%;height:calc(100vw  * (68.42 / 414));display:flex;flex-flow:row wrap;justify-content:space-between;align-items:center;margin: 0 calc(100vw  * (25.5 / 414));}
+header#main_headder .inner ul li span{margin-right: calc(100vw  * (6.99 / 414));line-height: calc(100vw * (24/414)); font-size: calc(100vw * (16/414));font-weight: 500;color: #000000;}
+header#main_headder .inner ul li:nth-child(1) img{width: calc(100vw * (60 / 414));height: calc(100vw * (45 / 414));}
+header#main_headder .inner ul li:nth-child(2) a{display: inline-block;height: calc(100vw * ( 24 / 414));line-height: calc(100vw * ( 24 / 414));}
+header#main_headder .inner ul li:nth-child(2) a img{width: calc(100vw * (6.61 / 414));height: calc(100vw * (6.61 / 414));margin: calc(100vw * (8.5 / 414)) 0 calc(100vw * (8.5 / 414)) calc(100vw * (7 / 414));}
+header#main_headder .inner ul li:nth-child(3) button{background: none;}
+header#main_headder .inner ul li:nth-child(3) img{width: calc(100vw * (31.46 / 414));height: calc(100vw * (31.46 / 414));}
+
+header#main_headder .category{width:100%;height:calc(100vw  * (48 / 414));}
+header#main_headder .category ul{width:100%;height:calc(100vw  * (48 / 414));padding: 0 calc(100vw  * (20 / 414)); white-space:nowrap;overflow-y:visible;overflow-x:auto;-webkit-overflow-scrolling:touch;-ms-overflow-style:none;}
+header#main_headder .category ul::-webkit-scrollbar{
+     display:none;
+}
+header#main_headder .category ul li{display: inline-block;line-height: calc(100vw  * (48 / 414));margin-right: calc(100vw * (33/414));}
+header#main_headder .category ul li:last-child{margin-right: 0;}
+header#main_headder .category ul li a{font-size: calc(100vw * (14/414));color: #D2D5DA;}
+header#main_headder .category ul li.active a{color: #0D2141;font-weight: bold;}
+
+/*네비게이션*/
+nav{
+     width:100%;height:calc(100vw * (100 / 414));background-color:#ffffff;position:fixed;bottom:0;left:0;z-index:100;
+}
+nav ul.nav_menu{
+     width:100%;padding:0 calc(100vw * (40 / 414));height:100%;display:flex;flex-flow:row wrap;justify-content:space-around;align-items:center;align-content:center;
+}
+nav ul.nav_menu li{
+     display:block;background-size:cover;background-repeat:no-repeat;background-position:center;
+}
+nav ul.nav_menu li>img{
+     display:block;width:100%;height:auto;
+}
+nav ul.nav_menu li.home_link{
+     width:calc(100vw * (18.53 / 414));height:calc(100vw * (19.68 / 414));
+}
+nav ul.nav_menu li.list_link{
+     width:calc(100vw * (19.11 / 414));height:calc(100vw * (15.89 / 414));
+}
+nav ul.nav_menu li.cardlist_link{
+     width:calc(100vw * (18.53 / 414));height:calc(100vw * (18.53 / 414));
+}
+nav ul.nav_menu li.cart_link{
+     width:calc(100vw * (22 / 414));height:calc(100vw * (20.68 / 414));
+}
+nav ul.nav_menu li.mypage_link{
+     width:calc(100vw * (20.11 / 414));height:calc(100vw * (19.72 / 414));
+}
+
+
+@media all and (min-width:800px){
+     /*** 메인 ***/
+     /*해더 기본형*/
+     header#main_headder{
+          max-width:768px;margin:0 auto;width:100%;height:auto;background-color:#ffffff;
+     }
+     header#main_headder .inner{
+          width:100%;height:auto;display:flex;
+     }
+     header#main_headder .inner ul{width:100%;height:calc(768px  * (68.42 / 414));display:flex;flex-flow:row wrap;justify-content:space-between;align-items:center;margin: 0 calc(768px  * (25.5 / 414));}
+     header#main_headder .inner ul li span{margin-right: calc(768px  * (6.99 / 414));line-height: calc(768px * (24/414)); font-size: calc(768px * (16/414));font-weight: 500;color: #000000;}
+     header#main_headder .inner ul li:nth-child(1) img{width: calc(768px * (60 / 414));height: calc(768px * (45 / 414));}
+     header#main_headder .inner ul li:nth-child(2) a{display: inline-block;height: calc(768px * ( 24 / 414));line-height: calc(768px * ( 24 / 414));}
+     header#main_headder .inner ul li:nth-child(2) a img{width: calc(768px * (6.61 / 414));height: calc(768px * (6.61 / 414));margin: calc(768px * (8.5 / 414)) 0 calc(768px * (8.5 / 414)) calc(768px * (7 / 414));}
+     header#main_headder .inner ul li:nth-child(3) button{background: none;}
+     header#main_headder .inner ul li:nth-child(3) img{width: calc(768px * (31.46 / 414));height: calc(768px * (31.46 / 414));}
+
+     header#main_headder .category{width:100%;height:calc(768px  * (48 / 414));}
+     header#main_headder .category ul{width:100%;height:calc(768px  * (48 / 414));padding: 0 calc(768px  * (20 / 414)); white-space:nowrap;overflow-y:visible;overflow-x:auto;-webkit-overflow-scrolling:touch;-ms-overflow-style:none;}
+     header#main_headder .category ul::-webkit-scrollbar{
+          display:none;
+     }
+     header#main_headder .category ul li{display: inline-block;line-height: calc(768px  * (48 / 414));margin-right: calc(768px * (33/414));}
+     header#main_headder .category ul li:last-child{margin-right: 0;}
+     header#main_headder .category ul li a{font-size: calc(768px * (14/414));color: #D2D5DA;}
+     header#main_headder .category ul li.active a{color: #0D2141;font-weight: bold;}
+
+     /*네비게이션 css*/
+     nav{
+          max-width:768px;width:100%;height:calc(768px * (100 / 414));background-color:white;position:fixed;bottom:0;left:0;right:0;margin:0 auto;z-index:98
+     }
+     nav ul.nav_menu{
+          width:100%;padding:0;height:100%;display:flex;flex-flow:row wrap;justify-content:space-around;align-items:center;align-content:center;
+     }
+     nav ul.nav_menu li{
+          display:block;background-size:cover;background-repeat:no-repeat;background-position:center;
+     }
+     nav ul.nav_menu li>img{
+          display:block;width:100%;height:auto;
+     }
+     nav ul.nav_menu li.home_link{
+          width:calc(768px * (18.53 / 414));height:calc(768px * (19.68 / 414));
+     }
+     nav ul.nav_menu li.list_link{
+          width:calc(768px * (19.11 / 414));height:calc(768px * (15.89 / 414));
+     }
+     nav ul.nav_menu li.cardlist_link{
+          width:calc(768px * (18.53 / 414));height:calc(768px * (18.53 / 414));
+     }
+     nav ul.nav_menu li.cart_link{
+          width:calc(768px * (22 / 414));height:calc(768px * (20.68 / 414));
+     }
+     nav ul.nav_menu li.mypage_link{
+          width:calc(768px * (20.11 / 414));height:calc(768px * (19.72 / 414));
+     }
+
+}

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.clllap.mapper.MediaMapper">
+
+    <insert id="regist_media" parameterType="Media">    	
+        INSERT INTO media
+            (user_id, link_id, media_title, media_type, media_location, media_create_date, media_source_path)
+        VALUES
+            (#{user_id}, #{link_id}, #{media_title}, #{media_type}, #{media_location}, Now(), #{media_source_path})
+    </insert>
+    <insert id="videomake_media" parameterType="Media" useGeneratedKeys="true" keyProperty="media_id">
+		INSERT INTO media
+		    (user_id, link_id, media_title, media_type, media_location, media_create_date, media_source_path,adapt_effect)
+		VALUES
+			(#{user_id}, #{link_id}, #{media_title}, #{media_type}, #{media_location}, Now(), #{media_source_path},#{adapt_effect})
+
+        <selectKey keyProperty="media_id" resultClass="int">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+	</insert>
+    <select id="user_media" resultType="Media">
+        SELECT *
+        FROM media
+        WHERE user_id = #{user_id}
+        <if test='media_type != "all"'>
+            AND media_type = #{media_type}
+        </if>
+		ORDER BY media_id DESC LIMIT 14
+    </select>
+    
+    <select id="media_list" parameterType="String" resultType="Media">
+        SELECT m.*, u.user_nickname
+        FROM media m LEFT JOIN user u
+            ON m.user_id = u.user_id Where media_type="makevideo"
+        <if test='category =="popular"'>
+            ORDER BY media_recommend_count DESC
+        </if>
+        <if test='category == "recent"'>
+            ORDER BY media_id DESC
+        </if>
+        LIMIT 10
+    </select>
+
+    <update id="videoshareWrite" parameterType="Media">
+        update media set media_description = #{media_description} where media_id=#{media_id}
+    </update>
+
+</mapper>

@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>We-up 관리자</title>
+
+    <!-- Custom fonts for this template -->
+    <link href="vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
+          rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="css/sb-admin-2.min.css" rel="stylesheet">
+
+    <!-- Custom styles for this page -->
+    <link href="vendor/datatables/dataTables.bootstrap4.min.css" rel="stylesheet">
+
+</head>
+
+<style>
+	.search_top {
+		border-top: 1px solid #ccc;
+	}
+	
+	.search_th {
+		width: 20%;
+		background: rgba(78, 125, 223, 0.2);
+		text-align: center;
+		border-bottom: 1px solid #ccc;
+	}
+	
+	tr, td {
+		border: 1px solid #ccc;
+		padding: 7px;
+	}
+	
+	table {
+		width: 100%;
+	}
+	
+	.btn-search {
+		margin-top: 10px;
+		margin-left: 44%;
+	}
+	
+	.btn-reset {
+		margin-top: 10px;
+	}
+
+</style>
+
+
+<body id="page-top">
+
+<!-- Page Wrapper -->
+<div id="wrapper">
+
+    <th:block th:replace="/../hf/sidebar.html"></th:block>
+
+    <!-- Content Wrapper -->
+    <div id="content-wrapper" class="d-flex flex-column">
+
+        <!-- Main Content -->
+        <div id="content">
+            <th:block th:replace="/../hf/header.html"></th:block>
+
+            <!-- Begin Page Content -->
+            <div class="container-fluid">
+
+                <!-- Page Heading -->
+                <h1 class="h3 mb-2 text-gray-800">공유 주방 & 공간 승인관리</h1>
+
+                <!-- DataTales Example -->
+                <div class="card shadow mb-4">
+                    <div class="card-header py-3">
+                        <div class="card-body">
+                            <div class="search_area">
+                                <form action="searchSpace" method="POST">
+                                    <table class="search">
+                                        <tbody>
+                                        <tr>
+                                            <th class="search_th search_top" style="width:5%;">기간</th>
+                                            <td style="width:45%;">
+                                                <span><button type="button" id="today"
+                                                              class="date_search_btn">오늘</button></span>
+                                                <span><button type="button" id="week"
+                                                              class="date_search_btn">최근7일</button></span>
+                                                <span><button type="button" id="thisMonth"
+                                                              class="date_search_btn">당월</button></span>
+                                                <span><button type="button" id="prevMonth"
+                                                              class="date_search_btn">전월</button></span>
+                                                <span><button type="button" id="3month"
+                                                              class="date_search_btn">3개월</button></span>
+                                                              
+                                                <span><input type="date" name="share_create_date1"
+                                                             id="start_date"></span>
+                                                ~
+                                                <span><input type="date" name="share_create_date2" id="end_date"></span>
+                                            </td>
+                                            <th class="search_th search_top" style="width:5%;">승인여부</th>
+                                            <td style="width:30%;">
+                                        		<input type="radio" id="share_approval" name="share_approval" value="2" checked="checked">전체 &nbsp;
+                                        		<input type="radio" id="share_approval" name="share_approval" value="1">승인 &nbsp;
+                                        		<input type="radio" id="share_approval" name="share_approval" value="0">미승인
+                                        	</td>
+                                        </tr>
+                                        <tr>
+                                            <th class="search_th search_top" style="width:20%;">검색어</th>
+                                            <td>
+                                                <div class="rows">
+                                                    <input type="text" id="keyword" name="keyword"
+                                                           style="width:30%;">
+                                                </div>
+                                            </td>
+                                            <th class="search_th search_top">업종 카테고리</th>
+                                            <td>
+                                                <select name="share_biz_type" id="share_biz_type" style="width:120px;height:30px;">
+                                                    <option value='전체'>전체</option>
+                                                    <option value='공유주방'>공유주방</option>
+                                                    <option value='요식업공간'>요식업 공간</option>
+                                                    <option value='미용&피부 공간'>미용&피부 공간</option>
+                                                    <option value='의류 공간'>의류 공간</option>
+                                                    <option value='애견샵 공간'>애견샵 공간</option>
+                                                    <option value='기타 공간'>기타 공간</option>
+                                                </select>
+                                            </td>
+                                        </tr>
+                                        <tr>
+	                                        <th class="search_th search_top" style="width:20%;">지역</th>
+	                                        <td>
+		                                        <select name="share_address" id="share_address" style="width:120px;height:30px;">
+		                                        	<option value='전체'>전체</option>
+		                                        	<option value='서울'>서울특별시</option>
+		                                        	<option value='인천'>인천광역시</option>
+		                                        	<option value='대전'>대전광역시</option>
+		                                        	<option value='광주'>광주광역시</option>
+		                                        	<option value='부산'>부산광역시</option>
+		                                        	<option value='대구'>대구광역시</option>
+		                                        	<option value='울산'>울산광역시</option>
+		                                        	<option value='세종'>세종특별자치시</option>
+		                                        	<option value='경기'>경기도</option>
+		                                        	<option value='강원'>강원도</option>
+		                                        	<option value='충북'>충청북도</option>
+		                                        	<option value='충남'>충청남도</option>
+		                                        	<option value='전북'>전라북도</option>
+		                                        	<option value='전남'>전라남도</option>
+		                                        	<option value='경북'>경상북도</option>
+		                                        	<option value='경남'>경상남도</option>
+		                                        	<option value='제주'>제주특별자치도</option>
+		                                        </select>
+	                                        </td>
+	                                        <th class="search_th search_top" style="width:20%;">세부 지역</th>
+	                                       <td>
+		                                        <select name="share_address_detail" id="share_address_detail" style="width:120px;height:30px;">
+		                                        <option value='전체'>전체</option>
+		                                        </select>
+	                                        </td>
+                                        </tr>
+
+                                        </tbody>
+                                    </table>
+                                    <div class="btn_list">
+                                        <button type="button" class="search_btn" id="search_approval_spaceBtn">검색</button>
+                                        <button type="button" class="reset_btn" onclick="location.replace('approveSpace_list')">초기화</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- <th:block th:if="${search_userData == null}"> -->
+                    <th:block>
+                     <div class="bd-top-gr pd_top_30" th:text='${"총 " + spaceList.size + "개의 게시글이 있습니다."}'>></div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                            
+								<form id="approval_spaceList" action="modify_approveSpace" mehtod="POST"> 
+	                                <table class="table table-bordered dataTable" id="dataTable" width="100%" cellspacing="0">
+	                                    <thead>
+	                                    <tr>
+	                                        <th>NO</th>
+	                                        <th>선택</th>
+	                                        <th>승인여부</th>
+	                                        <th>업종 카테 고리</th>
+	                                        <th>결제 유형</th>
+	                                        <th>제목</th>
+	                                        <th>지역 / 세부지역</th>
+	                                        <th>ID(이메일)</th>
+	                                        <th>등록일</th>
+	                                        <th>메모(비고)</th>
+	                                        <th>게시물 바로가기</th>
+	                                    </tr>
+	                                    </thead>
+	                                    <tbody>
+		                                    <tr th:each="list : ${spaceList}">
+		                                    	<!-- <input type="hidden" th:value="${list.mem_id}"> -->
+		                                        <td id="spaceList_td1">
+		                                        	<span id="share_id" th:text="${list.share_id}"></span>
+		                                        </td>
+		                                        <td><input type="checkbox" id="space_checked"/></td>
+		                                        <td>
+		                                        	<span th:if="${list.share_approval} == 0">미승인</span>
+		                                        	<span th:if="${list.share_approval} == 1">승인</span>
+		                                        </td>
+		                                        <td><span th:text="${list.share_biz_type}"></span></td>
+		                                        <td th:if="${list.share_payment} == 0">
+		                                        	<input type="checkbox" id="share_paid_free" class="share_paid" name="share_payment" value="0" checked="checked">무료
+		                                        	<input type="checkbox" id="share_paid_paid" class="share_paid" name="share_payment" value="1">유료
+		                                        </td>
+		                                        <td th:if="${list.share_payment} == 1">
+		                                        	<input type="checkbox" id="share_paid_free" class="share_paid" name="share_payment" value="0">무료
+		                                        	<input type="checkbox" id="share_paid_paid" class="share_paid" name="share_payment" value="1" checked="checked">유료
+		                                        </td>
+		                                        
+		                                        <td><span th:text="${list.share_title}"></span></td>
+		                                        <td><span th:text="${list.share_address}"></span> / <span th:text="${list.share_address_detail}"></span></td>
+		                                        <td><span th:text="${list.mem_email}"></span></td>
+		                                        <td><span th:text="${list.share_create_date}"></span></td>
+		                                        <td><input type="text" class="admin_memo" name="admin_memo" th:value="${list.share_admin_memo}"></td>
+		                                        <td><a th:href="@{https://becomeceo.net/ShareSpaceDetailsPage/}+${list.share_id}" target="_blank">게시글 바로가기</a></td>
+		                                    </tr>
+	 								    </tbody>
+	                                </table>
+		                            <div>
+										<button type="button" id="approved_btn" class="btn btn-primary">승인</button>
+										<button type="button" id="not_approved_btn" class="btn btn-primary">미승인</button>
+									</div>
+	                        	</form>
+                            </div>
+                        </div>
+                    </th:block>
+                </div>
+
+            </div>
+            <!-- /.container-fluid -->
+
+        </div>
+        <!-- End of Main Content -->
+
+        <!-- Footer -->
+        <footer class="sticky-footer bg-white">
+            <div class="container my-auto">
+                <div class="copyright text-center my-auto">
+                    <span>Copyright &copy; We-up 2021</span>
+                </div>
+            </div>
+        </footer>
+        <!-- End of Footer -->
+
+    </div>
+    <!-- End of Content Wrapper -->
+
+</div>
+<!-- End of Page Wrapper -->
+
+<!-- Scroll to Top Button-->
+<a class="scroll-to-top rounded" href="#page-top">
+    <i class="fas fa-angle-up"></i>
+</a>
+
+<!-- Logout Modal-->
+<div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Ready to Leave?</h5>
+                <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">Select "Logout" below if you are ready to end your current session.</div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+                <a class="btn btn-primary" href="login.html">Logout</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap core JavaScript-->
+<script src="vendor/jquery/jquery.min.js"></script>
+<script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+<!-- Core plugin JavaScript-->
+<script src="vendor/jquery-easing/jquery.easing.min.js"></script>
+
+<!-- Custom scripts for all pages-->
+<script src="js/sb-admin-2.min.js"></script>
+
+<!-- Page level plugins -->
+<script src="vendor/datatables/jquery.dataTables.min.js"></script>
+<script src="vendor/datatables/dataTables.bootstrap4.min.js"></script>
+
+<!-- Page level custom scripts -->
+<script src="js/demo/datatables-demo.js"></script>
+<script src="js/select_address.js"></script>
+
+<script>
+  //오늘
+  $('#today').click(function(){
+  	document.getElementById('start_date').valueAsDate = new Date();
+  	document.getElementById('end_date').valueAsDate = new Date();
+  });
+
+	//날짜 객체 받아서 문자열로 리턴하는 함수
+	function getDateStr(myDate){
+		var myMonth = myDate.getMonth() + 1;
+		var month = myMonth >= 10 ? myMonth : '0' + myMonth;
+		var fake_day = myDate.getDate(); 
+		var day = fake_day >= 10 ? fake_day : '0' + fake_day;
+		return (myDate.getFullYear() + '-' + month + '-' + day);
+	}
+
+  //어제
+  function lastYesterday() {
+  	 var d = new Date();
+  	  var dayOfMonth = d.getDate();
+  	  d.setDate(dayOfMonth - 1);
+  	  return getDateStr(d);
+  }
+
+  $('#yesterday').click(function(){
+  	$("#start_date").val(lastYesterday());
+  	document.getElementById('end_date').valueAsDate = new Date();
+  });
+
+  //일주일
+  function lastWeek() {
+    var d = new Date();
+    var dayOfMonth = d.getDate();
+    d.setDate(dayOfMonth - 7);
+    return getDateStr(d);
+  }
+
+  $('#week').click(function(){
+  	$("#start_date").val(lastWeek());
+  	document.getElementById('end_date').valueAsDate = new Date();
+  });
+
+  //당월
+  function thisMonth() {
+    var d = new Date();
+    var monthOfYear = d.getMonth();
+    d.setDate(d.getDate() - d.getDate() + 1);
+    return getDateStr(d);
+  }
+
+  $('#thisMonth').click(function(){
+  	$("#start_date").val(thisMonth());
+  	document.getElementById('end_date').valueAsDate = new Date();
+  });
+  
+  //3개월
+  function last3Month() {
+    var d = new Date();
+    var monthOfYear = d.getMonth();
+    d.setMonth(monthOfYear - 3);
+    return getDateStr(d);
+  }
+
+  $('#3month').click(function(){
+  	$("#start_date").val(last3Month());
+  	document.getElementById('end_date').valueAsDate = new Date();
+  });
+  
+  //전월
+  function prevMonth() {
+    var d = new Date();
+    var monthOfYear = d.getMonth();
+    d.setMonth(monthOfYear - 1);
+    return getDateStr(d);
+  }
+  
+  $('#prevMonth').click(function(){
+  	$("#start_date").val(prevMonth());
+  	document.getElementById('end_date').valueAsDate = new Date();
+  });
+  
+  // 체크 항목 변경
+ /*  $('.mem_paid').on('click', ()=>{
+	  $('input[type="checkbox"][name="mem_paid"]').prop('checked',false)
+  		$(this).prop('checked', true)
+  }) */
+  
+  // 승인 버튼 클릭
+  $('#approved_btn').click(()=>{
+
+	  var rowData = new Array();
+	  var share_id = new Array()
+	  var checkbox = $("input[id=space_checked]:checked")
+	  
+	  checkbox.each((i)=>{
+		  var tr = checkbox.parent().parent().eq(i);
+		  var td = tr.children();
+		  
+		  rowData.push(tr.text());
+		  
+		  var id = td.eq(0).text();
+		  share_id.push(id);
+	  })
+	  
+	  $.ajax({
+		  type:'post',
+		  url: '/modify_approvalSpace',
+		  contentType:'application/x-www-form-urlencoded;charset=utf-8',
+		  data : {
+			  'share_id' : share_id,
+			  'share_approval' : 1
+		  },
+		  success:(data)=>{
+			 if(data == 1){
+				  checkbox.each((i)=>{
+					  var tr = checkbox.parent().parent().eq(i);
+					  var td = tr.children();
+					  
+					  td.eq(2).text('승인');
+					  $("input:checkbox[id='space_checked']").prop('checked',false)
+				  })
+			 }
+		  },error:(error)=>{
+			  alert('승인 변경 실패')
+		  }
+	  })
+  })
+  
+  // 미승인 버튼 클릭
+  $('#not_approved_btn').click(()=>{
+
+	  var rowData = new Array();
+	  var share_id = new Array()
+	  var checkbox = $("input[id=space_checked]:checked")
+	  
+	  checkbox.each((i)=>{
+		  var tr = checkbox.parent().parent().eq(i);
+		  var td = tr.children();
+		  
+		  rowData.push(tr.text());
+		  
+		  var id = td.eq(0).text();
+		  share_id.push(id);
+	  })
+	  
+	  $.ajax({
+		  type:'post',
+		  url: '/modify_approvalSpace',
+		  contentType:'application/x-www-form-urlencoded;charset=utf-8',
+		  data : {
+			  'share_id' : share_id,
+			  'share_approval' : 0
+		  },
+		  success:(data)=>{
+			 if(data == 1){
+				  checkbox.each((i)=>{
+					  var tr = checkbox.parent().parent().eq(i);
+					  var td = tr.children();
+					  
+					  td.eq(2).text('미승인');
+					  $("input:checkbox[id='space_checked']").prop('checked',false)
+				  })
+			 }
+		  },error:(error)=>{
+			  alert('승인 변경 실패')
+		  }
+	  })
+  })
+  $('#dataTable').DataTable({
+		order: [1, 'desc'],
+		ordering: true,
+		serverSide: false
+	}) 
+
+	// 유료/무료 변경
+	$('.share_paid').on('click', function(){
+		let share_id = $(this).parent().parent().children().children().html()
+		let share_payment = $(this).val()
+		
+		$.ajax({
+		  type:'post',
+		  url: '/change_space_payment',
+		  contentType:'application/x-www-form-urlencoded;charset=utf-8',
+		  data : {
+			  'share_id' : share_id,
+			  'share_payment' : share_payment
+		  },
+		  success:(data)=>{
+			 if(data == 1){
+				 location.replace('/approveSpace_list')
+			 }else{
+				 alert('결제 유형 변경 실패')
+				 location.replace('/approveSpace_list')
+			 }
+		  },error:(error)=>{
+			  alert('유형 변경 실패')
+			  location.replace('/approveSpace_list')
+		  }
+	  })
+	})
+	
+	// 메모 저장
+	$('.admin_memo').on('focusout',function(){
+		let share_admin_memo = $(this).val()
+		let share_id = $(this).parent().parent().children().children().html()
+		
+		if(share_admin_memo.trim() == ""){
+			return false;
+		}
+		
+		$.ajax({
+			type:'post',
+			  url: '/change_share_memo',
+			  contentType:'application/x-www-form-urlencoded;charset=utf-8',
+			  data : {
+				  'share_admin_memo' : share_admin_memo,
+				  'share_id' : share_id
+			  },
+			  success:(data)=>{
+				alert('메모가 변경되었습니다.')
+				location.replace('/approveSpace_list')
+			  },error:(error)=>{
+				  alert('메모 변경 실패')
+				  location.replace('/approveSpace_list')
+			  }
+		})	
+  	})
+	
+  </script>
+</body>
+
+</html>

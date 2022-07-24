@@ -1,0 +1,434 @@
+<!--
+> Muaz Khan     - www.MuazKhan.com
+> MIT License   - www.WebRTC-Experiment.com/licence
+> Documentation - github.com/muaz-khan/Ffmpeg.js
+-->
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>RecordRTC WebM to mp4 using ffmpeg-asm.js ® Muaz Khan</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+        <link rel="author" type="text/html" href="https://plus.google.com/+MuazKhan">
+        <meta name="author" content="Muaz Khan">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <script src="public/ffmpegwasm.js"></script>
+
+        <style>
+            video {
+                vertical-align: bottom;
+                width: 300px;
+            }
+
+            input {
+                border: 1px solid #d9d9d9;
+                border-radius: 1px;
+                font-size: 2em;
+                margin: .2em;
+                width: 30%;
+            }
+
+            p, .inner { padding: 1em; }
+
+            li {
+                border-bottom: 1px solid rgb(189, 189, 189);
+                border-left: 1px solid rgb(189, 189, 189);
+                padding: .5em;
+            }
+
+            label {
+                display: inline-block;
+                width: 8em;
+            }
+        </style>
+        <script>
+            document.createElement('article');
+            document.createElement('footer');
+        </script>
+
+        <!-- script used for audio/video/gif recording -->
+    </head>
+
+    <body>
+        <article>
+            <header style="text-align: center;">
+                <h1>
+                    <a href="https://www.webrtc-experiment.com/RecordRTC/">RecordRTC</a> WebM to mp4 using <a href="http://bgrins.github.io/videoconverter.js/">ffmpeg-asm.js</a>!
+                </h1>
+                <p>
+                    <a href="https://www.webrtc-experiment.com/ffmpeg/">HOME</a>
+                    <span> &copy; </span>
+                    <a href="http://www.MuazKhan.com/" target="_blank">Muaz Khan</a>
+
+                    .
+                    <a href="http://twitter.com/WebRTCWeb" target="_blank" title="Twitter profile for WebRTC Experiments">@WebRTCWeb</a>
+
+                    .
+                    <a href="https://github.com/muaz-khan?tab=repositories" target="_blank" title="Github Profile">Github</a>
+
+                    .
+                    <a href="https://github.com/muaz-khan/Ffmpeg.js/issues?state=open" target="_blank">Latest issues</a>
+
+                    .
+                    <a href="https://github.com/muaz-khan/Ffmpeg.js/commits/master" target="_blank">What's New?</a>
+                </p>
+            </header>
+
+            <div class="github-stargazers"></div>
+
+            <section class="experiment">
+                <h2 class="header">Logs</h2>
+                <ol id="logs-preview">
+                    <li>
+                        <a href="https://www.webrtc-experiment.com/RecordRTC/">RecordRTC</a> experiment converting WebM to mp4 inside the browser!
+                    </li>
+                </ol>
+            </section>
+
+            <section class="experiment">
+                <h2 class="header">Record Video and convert into "mp4" using <a href="https://archive.org/download/ffmpeg_asm/ffmpeg_asm.js" download="ffmpeg-asm.js">ffmpeg-asm.js</a>!</h2>
+                <video src='public/resource1.mp4' id='videoTest'></video>
+                <video src='' id='videoTestoutput'></video>
+                <div class="inner">
+                    <video id='output-video' controls></video><br/>
+                    <input type='file' id='uploader'>
+                    <button onClick='cancel()'>Cancel</button>
+                </div>
+            </section>
+            <p id='message'></p>
+            <script>
+            var inner = document.querySelector('.inner');
+                //ffmpegasm관련 로직(이건 splice 통으로 자르는 용도로만 사용)
+                /*var inner = document.querySelector('.inner');
+                var sampleVideoData;
+                var oReq=new XMLHttpRequest();
+                oReq.open('GET','https://clllap.s3.ap-northeast-2.amazonaws.com/clllap/EZRrgAqzfAFYYu1CcNkF_encoded2.mp4',true);
+                //oReq.responseType='arraybuffer';
+                oReq.responseType='blob';//blobs? file blob , arraybuffer  blob->arraybfurrerssss  blob:url blob:url filess blob.arraybuffer();arraybuffersss
+                //arraybuffer blob->arraybuffer:innerIntarray->uint8array converstion
+                oReq.onreadystatechange=async function(oEvent){
+                    console.log('xmlhttpRequest readystathe sttuss:',oReq.readyState);
+
+                    if(oReq.readyState===oReq.DONE){
+                        if(oReq.status===200){
+                            var ressss=oReq.response;
+                            console.log('resssss :',ressss);
+                            console.log('get array bufferss!!:',new Blob([oReq.response],{type:'video/mp4'}));
+                            var blob= new Blob([oReq.response],{type:'video/mp4'});
+                            var url= URL.createObjectURL(blob);
+                            console.dir(blob);
+                            console.log(url);
+                            videoTestoutput.src= url;
+
+                            sampleVideoData=blob;
+
+                            //let tests=new Uint8Array(blob);
+                            var buffer = await blob.arrayBuffer();
+                            console.log('blob to buffer1!!!:',buffer);
+                            console.dir(buffer);
+
+                            sampleVideoData=buffer;
+                            console.dir(new Uint8Array(buffer));
+                            if(arrayBuffer){
+                                sampleVideoData=new Uint8Array(arrayBuffer);
+                                console.log('get new8intarray buffer to unit8arraysss:',sampleVideoData);
+                            }  
+                        }
+                    }                        
+                }
+                oReq.send();*/
+                
+                //var videoPreview = document.getElementById('video-preview');
+                //var videoTest=document.getElementById('videoTest');
+                //var fileReader=new FileReader();
+                //fileReader.readAsArrayBuffer(videoTest.src);
+                //videoTest.onloadeddata=function(event){
+                    //console.log('파일 다비디오 읽음!!:',event.target);
+                //}
+                /*document.querySelector('#record-video').onclick = function() {
+                    this.disabled = true;
+                    navigator.getUserMedia({
+                            video: true
+                        }, function(stream) {
+                            videoPreview.srcObject = stream;
+                            videoPreview.play();
+
+                            recordVideo = RecordRTC(stream, {
+                                type: 'video'
+                            });
+
+                            recordVideo.startRecording();
+                        }, function(error) { throw error;});
+                    document.querySelector('#stop-recording-video').disabled = false;
+                };*/
+
+                
+                //ffmpegwasm사용!!전체 프레임으로 분할하는 용도로 사용.
+                const {createFFmpeg,fetchFile} = FFmpeg;
+                const ffmpeg= createFFmpeg({log:true});
+
+                document.querySelector('#uploader').onchange = async function() {
+                    console.log('uploader변화시에!');
+                    this.disabled = true;  
+
+                    if(!ffmpeg.isLoaded()){
+                        await ffmpeg.load();
+                    }
+
+                    /*recordVideo.stopRecording(function(url) {
+                        videoPreview.src = url;
+                        videoPreview.download = 'video.webm';
+
+                        log('<a href="'+ workerPath +'" download="ffmpeg-asm.js">ffmpeg-asm.js</a> file download started. It is about 18MB in size; please be patient!');
+                        convertStreams(recordVideo.getBlob());
+                    });*/
+                    //convertStreams();
+
+                    /*var closure_worker=convertStreams();
+                    console.log('clsoure workerss!:',closure_worker);
+                    console.log('closureworkser refer childss:',closure_worker,closure_worker.worker);
+                    closure_worker();*/
+
+                    message.innerHTML='Loading data';
+                    ffmpeg.FS('writeFile','resource1.mp4',await fetchFile('https://clllap.s3.ap-northeast-2.amazonaws.com/clllap/EZRrgAqzfAFYYu1CcNkF_encoded2.mp4'));
+                    message.innerHTML='start processing?>???';
+                    await ffmpeg.run('-i','resource1.mp4','-ss','2','-t','6','-r','26','-f','image2','ssiitjjtjtTest_img_%d.png');
+                   
+                    for(let i=0; i<(26*6); i++){
+                        let read_index=i+1;//26*6 육초간 초당 26프레임씩의 이미지 개체수 생성되어있는것을 읽어온다.(메모리상)
+
+                        let data=ffmpeg.FS('readFile',`ssiitjjtjtTest_img_${read_index}.png`);
+                        console.log('분할된 이미지 관련된 처리!!!이미지별 이미지특정한개관련 리드파일관련 정보get:',data,data.buffer);
+                        console.dir(new Uint8Array(data.buffer));
+                        let arraybufferview=new Uint8Array(data.buffer);
+                        console.dir(arraybufferview);
+                        //console.dir(new ArrayBuffer(data.buffer));
+                        //let blob_conversion=new Blob(new Uint8Array(data),{type:"image/png"});
+                        let blob_convert=new Blob([arraybufferview],{type:"image/png"});
+                        var image_create = document.createElement('IMG');
+                        //video.controls = true;
+                        console.log('blob converssiona!!!:',blob_convert);
+                        //var source = document.createElement('source');
+                        console.log('create blob urlss:',URL.createObjectURL(blob_convert));
+                        image_create.src = URL.createObjectURL(blob_convert);
+                        //video.type = 'video/mp4; codecs=mpeg4';
+                        //video.appendChild(source);
+
+                        image_create.download = 'tttasersgsdsg.png';
+
+                        inner.appendChild(document.createElement('hr'));
+                        var h2 = document.createElement('h2');
+                        h2.innerHTML = '<a href="' + image_create.src + '" target="_blank" download="Play mp4 in VLC Player.mp4" style="font-size:200%;color:red;">Download Converted mp4 and play in VLC player!</a>';
+                        inner.appendChild(h2);
+                        h2.style.display = 'block';
+                        inner.appendChild(image_create);
+                    }
+                    for(let i=0; i<(26*6); i++){
+                        let read_index=i+1;//26*6 육초간 초당 26프레임씩의 이미지 개체수 생성되어있는것을 읽어온다.(메모리상)
+
+                        ffmpeg.FS('unlink',`ssiitjjtjtTest_img_${read_index}.png`);//언링크 작업. 메모리해제 delete file in MEMFS 
+                    }
+                    
+                    //video.tabIndex = 0;
+                   // video.focus();
+                    //video.play();
+
+                    setTimeout(()=>{
+                        ffmpeg.exit();
+                    },1000);
+                    //ffmpeg=null;
+                };
+
+                //global spaces...
+                var workerPath = 'https://archive.org/download/ffmpeg_asm/ffmpeg_asm.js';
+                if(document.domain == 'localhost') {
+                    //workerPath = location.href.replace(location.href.split('/').pop(), '') + 'ffmpeg_asm.js';
+                   // workerPath = 'ffmpeg_asm.js';
+                }
+                function processInWebWorker() {
+                    var blob = URL.createObjectURL(new Blob(['importScripts("' + workerPath + '");var now = Date.now;function print(text) {postMessage({"type" : "stdout","data" : text});};onmessage = function(event) {var message = event.data;if (message.type === "command") {var Module = {print: print,printErr: print,files: message.files || [],arguments: message.arguments || [],TOTAL_MEMORY: message.TOTAL_MEMORY || false};postMessage({"type" : "start","data" : Module.arguments.join(" ")});postMessage({"type" : "stdout","data" : "Received command: " +Module.arguments.join(" ") +((Module.TOTAL_MEMORY) ? ".  Processing with " + Module.TOTAL_MEMORY + " bits." : "")});var time = now();var result = ffmpeg_run(Module);var totalTime = now() - time;postMessage({"type" : "stdout","data" : "Finished processing (took " + totalTime + "ms)"});postMessage({"type" : "done","data" : result,"time" : totalTime});}};postMessage({"type" : "ready"});'], {
+                        type: 'application/javascript'
+                    }));
+
+                    var worker = new Worker(blob);
+                    URL.revokeObjectURL(blob);
+                    return worker;
+                }
+
+                var worker;
+
+                function convertStreams() {
+                    console.log('클로저 실행>>>');
+                    var aab;
+                    var buffersReady;
+                    var workerReady;
+                    var posted;
+
+                    if (!worker) {
+                        worker = processInWebWorker();
+                    }
+
+                    var postMessage = function() {
+                        console.log('postted message execute');
+                        posted = true;
+
+                        worker.postMessage({
+                            type: 'command',
+                            //arguments: '-i video.webm -c:v mpeg4 -b:v 6400k -strict experimental output.mp4'.split(' '),
+                            //arguments: '-i resource1.mp4 -c:v mpeg4 -b:v 6400k -strict experimental outputsshhhss.mp4'.split(' '),
+                            //arguments: '-i resource1.mp4 -ss 5 -t 20 -vcodec copy -acodec copy spclieTest.mp4'.split(' '),
+                            arguments: '-i resource1.mp4 -ss 0 -r 26 -f image2 sjsijsigigtest_img_%d.png'.split(' '),
+                            files: [
+                                {
+                                   // data: new Uint8Array(aab),
+                                    data:new Uint8Array(sampleVideoData),
+                                    name: 'resource1.mp4'
+                                }
+                            ]
+                        });
+                    };
+                    var closure_scope = function(){
+                        
+                        console.log('closure socep 실행!!!:',worker,postMessage);
+                        console.log('worker whhahahah:',worker);
+                        worker.onmessage = function(event) {
+                            var message = event.data;
+                            console.log('onmessage등록 이벤트 타입!!:',message);
+                            if (message.type == "ready") {
+                                log('<a href="'+ workerPath +'" download="ffmpeg-asm.js">ffmpeg-asm.js</a> file has been loaded.');
+
+                                workerReady = true;
+                                if (buffersReady)
+                                    postMessage();
+                            } else if (message.type == "stdout") {
+                                log(message.data);
+                            } else if (message.type == "start") {
+                                log('<a href="'+ workerPath +'" download="ffmpeg-asm.js">ffmpeg-asm.js</a> file received ffmpeg command.');
+                            } else if (message.type == "done") {
+                                log(JSON.stringify(message));
+
+                                //var result = message.data[0];
+                                //log(JSON.stringify(result));
+                                console.log('what result datsss:',message);
+                                /*var blob = new File([result.data], 'test.mp4', {
+                                    type: 'video/mp4'
+                                });
+
+                                log(JSON.stringify(blob));
+                                console.log('blogbsss:',blob);
+                                PostBlob(blob);*/
+                            }
+                        };     
+                        
+                        postMessage();
+                    }
+                    
+                  return closure_scope;  
+                }
+
+                function PostBlob(blob) {
+                    console.log('POST BLOB EXEUCTESS!!!');
+                    var video = document.createElement('video');
+                    video.controls = true;
+
+                    //var source = document.createElement('source');
+                    console.log('blobsss,sources:',blob);
+                    console.log(URL.createObjectURL(blob));
+                    video.src = URL.createObjectURL(blob);
+                    //video.type = 'video/mp4; codecs=mpeg4';
+                    //video.appendChild(source);
+
+                    video.download = 'Play mp4 in VLC Player.mp4';
+
+                    inner.appendChild(document.createElement('hr'));
+                    var h2 = document.createElement('h2');
+                    h2.innerHTML = '<a href="' + video.src + '" target="_blank" download="Play mp4 in VLC Player.mp4" style="font-size:200%;color:red;">Download Converted mp4 and play in VLC player!</a>';
+                    inner.appendChild(h2);
+                    h2.style.display = 'block';
+                    inner.appendChild(video);
+
+                    video.tabIndex = 0;
+                    video.focus();
+                    video.play();
+
+                    //document.querySelector('#record-video').disabled = false;
+                }
+
+                var logsPreview = document.getElementById('logs-preview');
+                function log(message) {
+                    var li = document.createElement('li');
+                    li.innerHTML = message;
+                    logsPreview.appendChild(li);
+
+                    li.tabIndex = 0;
+                    li.focus();
+                }
+
+                window.onbeforeunload = function() {
+                    document.querySelector('#record-video').disabled = false;
+                };
+            </script>
+
+            <section class="experiment own-widgets">
+                <h2 class="header" id="updates" style="color: red; padding-bottom: .1em;"><a href="https://github.com/muaz-khan/Ffmpeg.js/issues" target="_blank">Ffmpeg.js Issues</a>
+                </h2>
+                <div id="github-issues"></div>
+            </section>
+
+            <section class="experiment">
+                <h2 class="header" id="feedback">Feedback</h2>
+                <div>
+                    <textarea id="message" style="border: 1px solid rgb(189, 189, 189); height: 8em; margin: .2em; outline: none; resize: vertical; width: 98%;" placeholder="Have any message? Suggestions or something went wrong?"></textarea>
+                </div>
+                <button id="send-message" style="font-size: 1em;">Send Message</button><small style="margin-left: 1em;">Enter your email too; if you want "direct" reply!</small>
+            </section>
+
+
+            <section class="experiment">
+                <h2 class="header">Using ffmpeg-asm.js...</h2>
+                <ol>
+                    <li>
+                        WebM can be converted in mp4.
+                    </li>
+                    <li>
+                        WAV can be converted in ogg or mp3 (AAC/Vorbis).
+                    </li>
+                    <li>
+                        WAV can be merged in mp4.
+                    </li>
+                </ol>
+                <p style="margin-top: 0;">
+                    If WAV or WebM is 5MB in size; ogg, mp3 or mp4 will be 700kb!
+                </p>
+            </section>
+
+            <section class="experiment">
+                <p style="margin-top: 0;">
+                    Ffmpeg.js is MIT licensed on Github! <a href="https://github.com/muaz-khan/Ffmpeg.js" target="_blank">Documentation</a>
+                </p>
+            </section>
+
+            <section class="experiment own-widgets latest-commits">
+                <h2 class="header" id="updates" style="color: red; padding-bottom: .1em;"><a href="https://github.com/muaz-khan/WebRTC-Experiment/commits/master" target="_blank">Latest Updates</a></h2>
+                <div id="github-commits"></div>
+            </section>
+        </article>
+
+        <a href="https://github.com/muaz-khan/Ffmpeg.js" class="fork-right"></a>
+        <a href="https://github.com/muaz-khan/RecordRTC" class="fork-left"></a>
+
+        <footer>
+            <p>
+                <a href="https://www.webrtc-experiment.com/">WebRTC Experiments</a>
+                © <a href="https://plus.google.com/+MuazKhan" rel="author" target="_blank">Muaz Khan</a>
+                <a href="mailto:muazkh@gmail.com" target="_blank">muazkh@gmail.com</a>
+            </p>
+        </footer>
+
+        <!-- commits.js is useless for you! -->
+        <script>
+            window.useThisGithubPath = 'muaz-khan/Ffmpeg.js';
+        </script>
+    </body>
+</html>

@@ -1,0 +1,56 @@
+--------------------------- 유저 ----------------------------
+유저등록 Post - ("user/regist") user_email, user_password, user_name, user_age, user_country, user_region, user_gender,
+		user_nickname, user_phone, user_profile
+
+유저로그인 Post - ("user-login") user_email, user_password
+
+유저 정보 수정 Post - ("user/modify") user_gender, user_country, user_region, user_age
+		-- 추가 파라미터 user_password, user_phone
+	
+
+유저 회원 탈퇴 Post - ("user/secession")
+
+핸드폰 인증 Post - ("sms") user_phone
+
+첫 소셜 로그인 회원 정보 추가 Post - ("user/regist-social") user_nickname, user_phone, user_gender, user_age, user_country,
+						user_region
+
+유저 아이디 찾기 - Post ("user/find-id") user_name, user_phone
+
+유저 정보 - Get("user/info")
+
+유저 목록 - Get("user/list") category --> recent / popular
+
+-------------------------- 링크 -----------------------------
+
+유저 등록 링크 정보 Get - ("link")
+
+유저 링크 등록 및 수정 Post - ("link/set") link_fb, link_insta, link_kakao, link_twitter, link_etc
+			--> 11/30 추가 파라미터 active가 포함된 파라미터는 0이면 비활성, 1이면 활성입니다.
+			link_fb_active, link_insta_active, link_kakao_active, link_twitter_active, link_etc_active
+			
+			link_etc의 경우 여러개면 ("aa.com,ab.com") 이런식으로 해주시면됩니다
+			마찬가지로 link_etc_active ("0,1") 이런식으로 부탁드릴게요
+
+
+-------------------------- 유저 문의사항 -----------------------------
+
+유저 문의 등록 Post - ("question/write") question_title, question_content
+
+유저 문의 보기 Get - ("question") question_id
+
+문의 리스트 Get - ("question/list")
+-------------------------- 미디어 ---------------------------------
+
+미디어 등록 Post - ("media/regist") link_id, media_file , media_type, media_location
+		11/30 추가 media_profile --> 미디어 프로필로 파일형태 입니다.
+
+제작편집 미디어 등록 Post - ("media/videomake") link_id, media_file, media_type, media_location
+                         
+
+유저 등록 미디어 보기 Get - ("media") media_type
+
+미디어 추천 Post - ("recommend/media") media_id
+
+메인화면 미디어 리스트 - Get ("media/list") category --> recent / popular
+

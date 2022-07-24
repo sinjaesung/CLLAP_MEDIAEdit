@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+
+        #canvasOutput{
+            background-color:#808080
+        }
+        #imagesrc{
+            outline:1px solid black; width:400px;height:400px;display:block;
+        }
+        #canvasinput1{
+            background-color:#202080
+        }
+        #canvasinput2{
+            background-color:#202080
+        }
+    </style>
+</head>
+<body>
+<h2>HELLO OEPNCV.JS</h2>
+<p id='status'>OPENCV IS JIS LOADING....</p>
+<div>
+    <p>Inputoutput</p>
+    <button id='start'>START</button>
+    <div class='inputoutput'>
+        <img id='source' src='../public/sourceimg/test3.jpg' width=300 height=300>
+    </div>
+    <div class='inputoutput'>
+        <div class='caption'>canvasinput</div>
+        <canvas id='canvasinput1'></canvas>
+        <canvas id='canvasinput2'></canvas>
+    </div>
+    <div class='inputoutput'>
+        <div class='caption'>canvasOutput</div>
+        <canvas id='canvasOutput'></canvas>
+    </div>
+</div>
+<script>
+let imgElement = document.getElementById('imagesrc');
+let inputElement=document.getElementById('fileInput');
+let video=document.getElementById('video');
+
+let canvasinput1=document.getElementById('canvasinput1');
+let canvasinput2=document.getElementById('canvasinput2');
+let context1=canvasinput1.getContext('2d');
+
+let imagesource=document.getElementById('source');
+imagesource.addEventListener('load',e=>{
+   context1.drawImage(imagesource,33,71,104,124,21,20,87,104)
+    
+})
+let src;
+let dst;
+function init_cv(){
+    
+    src=new cv.Mat(video.height,video.width,cv.CV_8UC4);
+    dst=new cv.Mat(video.height,video.width,cv.CV_8UC1);
+
+    processVideo();
+}
+const FPS=30;
+function processVideo(){
+    let begin= Date.now();
+    context1.drawImage()
+}
+
+imgElement.onload = function() {
+    console.log('imgElement자원요소가 모두 로드되었을시에::',cv);
+    //let mat = cv.imread(imgElement);
+    //cv.imshow('canvasOutput',mat);
+    //console.log('imgshow mat elemtnssnso datasss:',mat);
+    //mat.delete();
+};
+function onOpenCvReady(){
+    document.getElementById('status').innerHTML ='OPENCV,.JS IS REaday';
+
+    init_cv();
+}
+</script>
+<script async src='https://docs.opencv.org/3.4.0/opencv.js' onload='onOpenCvReady()'></script>
+</body>
+</html>

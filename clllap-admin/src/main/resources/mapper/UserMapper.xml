@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.clllap.admin.mapper.UserMapper">
+
+    <select id="user_count" resultType="int">
+        SELECT COUNT(user_id)
+        FROM user
+    </select>
+    
+    <select id="user_list" resultType="Users">
+        SELECT *
+        FROM user
+        ORDER BY user_id DESC
+    </select>
+
+    <select id="recentUserLoginDate" parameterType="int" resultType="String">
+        SELECT login_date
+        FROM login_info
+        WHERE user_id = #{user_id}
+        ORDER BY login_id DESC
+        LIMIT 1
+    </select>
+
+    <select id="user_info" parameterType="int" resultType="Users">
+        SELECT *
+        FROM user
+        WHERE user_id = #{user_id}
+    </select>
+
+    <select id="searchUserCount" resultType="int">
+        SELECT COUNT(user_id)
+        FROM user
+        WHERE user_email LIKE CONCAT('%',#{user_email},'%')
+            <if test='start_date != null'>
+                AND user_create_date BETWEEN #{start_date} AND #{end_date}
+            </if>
+    </select>
+
+    <select id="searchUserList" resultType="Users">
+        SELECT *
+        FROM user
+        WHERE user_email LIKE CONCAT('%',#{user_email},'%')
+        <if test='start_date != null'>
+            AND user_create_date BETWEEN #{start_date} AND #{end_date}
+        </if>
+        ORDER BY user_id DESC
+    </select>
+
+    <select id="genderPercentList" resultType="GenderPercentDTO">
+        SELECT user_gender, (total/t2.cnt)*100 AS gender_percent
+        FROM (
+                 SELECT user_gender, COUNT(*) AS total
+                 FROM user
+                 GROUP BY user_gender
+             ) AS t1, (SELECT count(*)AS cnt
+                       FROM user) AS  t2
+        GROUP BY user_gender
+    </select>
+
+    <select id="agePercentList" resultType="AgePercentDTO">
+        SELECT user_age, (total/t2.cnt)*100 AS age_percent
+        FROM (
+                 SELECT user_age, COUNT(*) AS total
+                 FROM user
+                 GROUP BY user_age
+             ) AS t1, (SELECT count(*)AS cnt
+                       FROM user) AS  t2
+        GROUP BY user_age
+    </select>
+
+    <select id="countryPercentList" resultType="countryPercentDTO">
+        SELECT user_country, (total/t2.cnt)*100 AS country_percent
+        FROM (
+                 SELECT user_country, COUNT(*) AS total
+                 FROM user
+                 GROUP BY user_country
+             ) AS t1, (SELECT count(*)AS cnt
+                       FROM user) AS  t2
+        GROUP BY user_country
+    </select>
+
+</mapper>

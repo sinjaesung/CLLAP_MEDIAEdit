@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+        
+        <title>영상업로드</title>
+       
+        <style>
+            body,html{
+                margin:0;padding:0;
+                width:100%;height:100%; background:linear-gradient('90deg','#202020','#efefef');
+            }
+            #video_result_area{
+                width:60%;height:auto;
+            }
+            #loading-progress{
+                position:fixed;background-color:rgba(50,200,240,0.5);flex-flow:row wrap;justify-content:center;align-items:center;color:white;
+                font-size:40px;font-weight:bold;display:none; width:50%;height:50%;z-index:9;left:50%;top:50%;transform:translateX(-50%)translateY(-50%)
+            }
+        </style>
+
+    </head>
+    <body>
+        <h1>영상편집샘플(비디오,오디오 혼합copy&add)</h1>
+
+        <form id='uploadform' method='post' action='/upload_another' enctype='multipart/form-data'>
+            <label id='file1'>동영상 첨부1</label><input type='file' id='file1' name='file1'/>
+            <label id='file2'>동영상 첨부2</label><input type='file' id='file2' name='file2'/>
+            <label id='file3'>동영상 첨부3</label><input type='file' id='file3' name='file3'/>
+            <label id='file4'>동영상 첨부4</label><input type='file' id='file4' name='file4'/>
+            <label id='file5'>동영상 첨부5</label><input type='file' id='file5' name='file5'/>
+            <select name='audio_select'>
+                <option value='1'>audio1</option>
+                <option value='2'>audio2</option>
+                <option value='3'>audio3</option>
+            </select>
+            <input type='submit' value='upload videos' name='submit'/>
+        </form>   
+
+        <div id='video_result_area'>
+            <video controls id='video_element'>
+                <source src='' type='video/mp4' id='video_source'/>
+            </video>
+        </div>
+
+        <div id='loading-progress'>
+            <span>Loading...</span>
+            <p>관련 연산 처리중입니다!..</p>
+        </div>
+
+       
+
+    </body>
+</html>

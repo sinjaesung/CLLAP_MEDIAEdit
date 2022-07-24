@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="28.117" height="34.117" viewBox="0 0 28.117 34.117">
+  <defs>
+    <filter id="Line_1" x="0" y="7" width="28.117" height="27.117" filterUnits="userSpaceOnUse">
+      <feOffset input="SourceAlpha"/>
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feFlood flood-opacity="0.322"/>
+      <feComposite operator="in" in2="blur"/>
+      <feComposite in="SourceGraphic"/>
+    </filter>
+    <filter id="Line_2" x="0" y="0" width="28.117" height="27.117" filterUnits="userSpaceOnUse">
+      <feOffset input="SourceAlpha"/>
+      <feGaussianBlur stdDeviation="3" result="blur-2"/>
+      <feFlood flood-opacity="0.322"/>
+      <feComposite operator="in" in2="blur-2"/>
+      <feComposite in="SourceGraphic"/>
+    </filter>
+  </defs>
+  <g id="그룹_4221" data-name="그룹 4221" transform="translate(-17722.442 -23677.442) rotate(180)">
+    <g transform="matrix(-1, 0, 0, -1, -17722.44, -23677.44)" filter="url(#Line_1)">
+      <path id="Line_1-2" data-name="Line 1" d="M-.071,8.058l-.988-1.129L8.071-1.058,9.058.071Z" transform="translate(18.06 24.06) rotate(180)" fill="#fff"/>
+    </g>
+    <g transform="matrix(-1, 0, 0, -1, -17722.44, -23677.44)" filter="url(#Line_2)">
+      <path id="Line_2-2" data-name="Line 2" d="M8.071,8.058-1.058.071l.988-1.129L9.058,6.929Z" transform="translate(18.06 17.06) rotate(180)" fill="#fff"/>
+    </g>
+  </g>
+</svg>

@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>We-up 관리자</title>
+
+    <!-- Custom fonts for this template-->
+    <link href="vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
+          rel="stylesheet">
+
+    <!-- Custom styles for this template-->
+    <link href="css/sb-admin-2.min.css" rel="stylesheet">
+
+</head>
+
+<style>
+	th, tr, td {
+		text-align: center;
+	}
+
+</style>
+
+<body id="page-top">
+
+<!-- Page Wrapper -->
+<div id="wrapper">
+
+    <th:block th:replace="/../hf/sidebar.html"></th:block>
+
+    <!-- Content Wrapper -->
+    <div id="content-wrapper" class="d-flex flex-column">
+
+        <!-- Main Content -->
+        <div id="content">
+            <th:block th:replace="/../hf/header.html"></th:block>
+
+            <!-- Begin Page Content -->
+            <div class="container-fluid">
+
+                <!-- Page Heading -->
+                <h1 class="text-gray-800 head_title">공지사항 상세</h1>
+                <th:block th:each="notice : ${notice}">
+                    <!-- <input type="hidden" id="hidden_memNum" th:value="${user.mem_id}"> -->
+                    <!-- DataTales Example -->
+                    <div class="card shadow mb-4">
+                        <div class="card-header py-3">
+                            <h6 class="m-0 font-weight-bold text-primary">공지사항 상세</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-bordered" width="100%" cellspacing="0">
+                                    <tr>
+                                        <th>제목</th>
+                                        <td th:text="${notice.note_title}"></td>
+                                    </tr>
+                                    <tr>
+                                        <th>업종 카테고리</th>
+                                        <td th:if="${notice.note_type} == 0"><span>공지사항</span></td>
+                                        <td th:if="${notice.note_type} == 1"><span>이벤트</span></td>
+                                    </tr>
+                                    <tr>
+                                        <th>첨부파일</th>
+                                        <td th:if="${img_file} != null">
+	                                        <span th:each="img : ${img_file}">
+	                                        <a th:href="@{/download_noticeFile(fileName=${img})}" th:download="${img}"><span id="file_name" th:text="${img}"></span><br/></a>
+	                                        </span>
+                                        </td>
+                                        <td th:if="${img_file} == null"></td>
+                                    </tr>
+                                    <tr th:if="${img_file} != null">
+                                    	<th >내용</th>
+                                    	<td>
+	                                        <span th:each="img : ${img_file}">
+	                                        <img style="width:200px;height:240px;" alt="notice_file" th:src="@{https://weup-bucket.s3.ap-northeast-2.amazonaws.com/images/notice/}+${img}">
+	                                        </span><br/><br/>
+	                                        <span th:text="${notice.note_content}"></span>
+                                        </td>
+                                    </tr>
+                                    <tr th:if="${img_file} == null">
+                                    	<th >내용</th>
+                                    	<td>
+	                                        <span th:text="${notice.note_content}"></span>
+                                        </td>
+                                    </tr>
+                                </table><br/><br/>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary" th:onclick="'location.href=\'modify_noticePage?note_id='+${notice.note_id}+'\''">수정</button>
+                        <button class="btn btn-primary" onclick="location.href='noticeList'">목록</button>
+                    </div>
+            </div>
+            </th:block>
+        </div>
+        <!-- End of Main Content -->
+
+        <!-- Footer -->
+        <footer class="sticky-footer bg-white">
+            <div class="container my-auto">
+                <div class="copyright text-center my-auto">
+                    <span>Copyright &copy; We-up 2021</span>
+                </div>
+            </div>
+        </footer>
+        <!-- End of Footer -->
+
+    </div>
+    <!-- End of Content Wrapper -->
+
+</div>
+<!-- End of Page Wrapper -->
+
+<!-- Scroll to Top Button-->
+<a class="scroll-to-top rounded" href="#page-top">
+    <i class="fas fa-angle-up"></i>
+</a>
+
+
+
+<!-- Logout Modal-->
+<div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Ready to Leave?</h5>
+                <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">Select "Logout" below if you are ready to end your current session.</div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+                <a class="btn btn-primary" href="login.html">Logout</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap core JavaScript-->
+<script src="vendor/jquery/jquery.min.js"></script>
+<script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+<!-- Core plugin JavaScript-->
+<script src="vendor/jquery-easing/jquery.easing.min.js"></script>
+
+<!-- Custom scripts for all pages-->
+<script src="js/sb-admin-2.min.js"></script>
+<script>
+	
+
+</script>
+</body>
+
+</html>

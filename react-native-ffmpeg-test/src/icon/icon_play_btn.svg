@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="67" height="71.455" viewBox="0 0 67 71.455">
+  <defs>
+    <filter id="iconmonstr-play-thin" x="0" y="0" width="67" height="71.455" filterUnits="userSpaceOnUse">
+      <feOffset input="SourceAlpha"/>
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feFlood flood-opacity="0.325"/>
+      <feComposite operator="in" in2="blur"/>
+      <feComposite in="SourceGraphic"/>
+    </filter>
+  </defs>
+  <g transform="matrix(1, 0, 0, 1, 0, 0)" filter="url(#iconmonstr-play-thin)">
+    <path id="iconmonstr-play-thin-2" data-name="iconmonstr-play-thin" d="M50,26.727,1,53.455V0ZM3.227,49.7,45.349,26.727,3.227,3.753Z" transform="translate(8 9)" fill="#fff" fill-rule="evenodd"/>
+  </g>
+</svg>

@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+
+        #canvasOutput{
+            background-color:#808080
+        }
+        #imagesrc{
+            outline:1px solid black; width:400px;height:400px;display:block;
+        }
+        
+    </style>
+</head>
+<body>
+<h2>HELLO OEPNCV.JS</h2>
+<p id='status'>OPENCV IS JIS LOADING....</p>
+<div>
+    <p>Inputoutput</p>
+    <button id='start'>START</button>
+    <div class='inputoutput'>
+        <video id='video' width=640 height=480 alt='no image' src='resource/resource1.mp4' controls></video>
+        <video id='effect' width=640 height=480 alt='no image' src='resource/Particles/Particles_3.mp4' controls></video>   
+    </div>
+    <div class='inputoutput'>
+        Weight : <input type='range' id='trackbar' value=50 min=0 max=100 step=1 oninput='callback()'>
+        <input type='text' id='weightvalue' size=3 value=50>
+    </div>
+    <div class='inputoutput'>
+        <div class='caption'>canvasinput</div>
+        <canvas id='canvasinput1'></canvas>
+        <canvas id='canvasinput2'></canvas>
+    </div>
+    <div class='inputoutput'>
+        <div class='caption'>canvasOutput</div>
+        <canvas id='canvasOutput'></canvas>
+    </div>
+</div>
+<script>
+let imgElement = document.getElementById('imagesrc');
+let inputElement=document.getElementById('fileInput');
+let video=document.getElementById('video');
+let effect=document.getElementById('effect');
+
+let canvasinput1=document.getElementById('canvasinput1');
+let canvasinput2=document.getElementById('canvasinput2');
+let canvasOutput=document.getElementById('canvasOutput');
+let context1=canvasinput1.getContext('2d');
+
+let src;
+let effect_src;
+let dst;
+let cap,effect_cap;
+
+let weightValue=document.getElementById('weightvalue');
+let trackbar=document.getElementById('trackbar');
+
+function init_cv(){
+    console.log('inti_cv호출:::');
+    src=new cv.Mat(video.height,video.width,cv.CV_8UC4);
+    effect_src=new cv.Mat(effect.height,effect.width,cv.CV_8UC4);
+
+    //dst=new cv.Mat(video.height,video.width,cv.CV_8UC1);
+    cap=new cv.VideoCapture(video);
+    effect_cap=new cv.VideoCapture(effect);
+    processVideo();
+}
+const FPS=3;
+function processVideo(){
+    try{
+        let begin= Date.now();
+        cap.read(src);
+        effect_cap.read(effect_src);
+        //cv.cvtColor(src,dst,cv.COLOR_RGBA2GRAY);
+        cv.imshow('canvasinput1',src);
+        cv.imshow('canvasinput2',effect_src);
+
+        //console.log('processing videoss:');
+        //console.log('capss::',cap);
+        //console.log('dst::',dst);
+        //console.log('srcss:',src);
+
+        let delay=1000/FPS - (Date.now() - begin);
+        //console.log('delayss:',delay);
+
+        callback();
+
+        setTimeout(processVideo,delay)
+    }catch(error){
+        console.log('errosss:',error);
+    }
+    
+}
+function callback(){
+    try{
+        weightValue.setAttribute('value',trackbar.value);
+        let alpha=trackbar.value / trackbar.max;
+        console.log('투명도??:',alpha);
+        //let beta = 0.05;
+        
+        let src1=cv.imread(canvasinput1);
+        let src2=cv.imread(canvasinput2);
+
+        let dst=new cv.Mat();
+        cv.addWeighted(src1,1,src2,alpha,0.0, dst, -1);
+        cv.imshow(canvasOutput,dst);
+
+        console.log("dst localss:",src1,src2,dst);
+    }catch(error){
+        console.log('what errosss:',error);
+    }
+}
+imgElement.onload = function() {
+    console.log('imgElement자원요소가 모두 로드되었을시에::',cv);
+    //let mat = cv.imread(imgElement);
+    //cv.imshow('canvasOutput',mat);
+    //console.log('imgshow mat elemtnssnso datasss:',mat);
+    //mat.delete();
+};
+function onOpenCvReady(){
+    document.getElementById('status').innerHTML ='OPENCV,.JS IS REaday';
+    document.getElementById('start').addEventListener('click',init_cv,false);
+    init_cv();
+}
+</script>
+<script async src='https://docs.opencv.org/3.4.0/opencv.js' onload='onOpenCvReady()'></script>
+</body>
+</html>

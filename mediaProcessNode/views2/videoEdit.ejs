@@ -1,0 +1,2087 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        html,body{
+            margin:0;padding:0
+        }
+        .display_none{
+            display:none;
+        }
+        canvas{
+            background-color:#808080
+        }
+        #imagesrc{
+            outline:1px solid black; width:400px;height:400px;display:block;
+        }
+
+        .OUTPUT{
+            width:100%;height:auto;border:1px solid blue;
+        }
+
+        /*비디오에디팅*/
+        .editing_area{
+            overflow:hidden;
+        }
+        #video_editing_area{
+            width:100%;height:auto;margin:60px 0;background-color:rgba(80,200,240,0.8);position:relative;
+        }
+        .video_upload_area{
+            width:100%;height:auto;display:block;overflow-x:auto;white-space:nowrap;background-color:#fff
+        }
+        .upload_video_element{
+            border:2px solid red; overflow:hidden;width:20%;display:inline-block;position:relative;height:180px;width:20%;
+        }
+        .upload_video_element video{
+            height:100%;height:auto;width:100%;position:relative;
+        }
+        .upload_video_element.plus video{
+            height:auto;width:auto;
+        }
+        .upload_video_element.plus label{
+            width:100%;height:auto;top:0;left:0;text-align:center;color:#fe8080;position:absolute;display:block;z-index:8
+        }
+       
+        /*비디오수정room관련 영역*/
+        .edit_room{
+            background-color:rgba(120,50,220,0.8);padding-top:60px;padding-bottom:60px;position:relative;
+        }
+        .edit_room .take_row{
+            position:relative;z-index:2;height:150px;border:1px dotted brown; display:none;
+        }
+        .edit_room .take_row_{
+            position:relative;z-index:2;height:150px;border:1px dotted brown; display:none;
+        }
+        .edit_room h2{
+            width:100%;height:30px;color:#fe8080;line-height:30px;margin:0;
+        }
+        .videotake_control{
+            width:20%;height:120px;background-color:#000;position:absolute;left:0;bottom:0;
+        }
+        .videotake_original{
+            width:40%;height:120px;background-color:rgba(50,60,240,0.8);
+        }
+        .videotake_control_{
+            width:20%;height:120px;background-color:#000;position:absolute;left:0;bottom:0;
+        }
+       
+        .video_left_duration_control{
+            position:absolute;left:0;top:0;bottom:0;height:100%;width:15px;background-color:#aaa;transform:translateX(-50%);
+        }   
+        .video_right_duration_control{
+            position:absolute;right:0;top:0;bottom:0;height:100%;width:15px;background-color:#aaa;transform:translateX(50%);
+        }
+        .video_left_duration_control img{
+            position:absolute;top:50%;width:20px;height:20px;left:0;transform:translateY(-50%)
+        }
+       .video_right_duration_control img{
+            position:absolute;top:50%;width:20px;height:20px;left:0;transform:translateY(-50%)rotate(180deg)
+        }
+        .videotake_control .time_info{
+            width:100%;height:20px;line-height:20px;display:block;color:white; display:flex;flex-flow:row wrap;justify-content:center;align-items:center;
+
+        }
+
+        .timesecond_grid_area{
+            width:100%; position:absolute;left:0;top:0;height:100%;z-index:0;display:flex;flex-flow:row nowrap;
+        }
+        .timesecond_grid_area .time_grid{
+            width:calc(100% / 30);border-left:1px solid #fedf20;border-right:1px solid #fedf20;height:100%;color:white;display:flex;flex-flow:row wrap;align-items:flex-start;justify-content:center; font-size:8px;
+        }
+        
+        .visible_range_cut{
+            position:absolute;left:0;top:0;width:3.3%;height:100%;background-color:transparent;
+        }
+
+        /*비디오 인코딩 시간이 소요가 꽤 있기에 관련 progress*/
+        #loading-progress{
+            position:fixed;background-color:rgba(50,200,240,0.5);flex-flow:row wrap;justify-content:center;align-items:center;color:white;
+            font-size:40px;font-weight:bold;display:none; width:50%;height:50%;z-index:9;left:50%;top:50%;transform:translateX(-50%)translateY(-50%)
+        }
+    </style>
+    <script src="/public/jquery.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <script src='/public/ffmpegwasm.js'></script>
+</head>
+<body>
+<h2>HELLO OEPNCV.JS</h2>
+<p id='status'>OPENCV IS JIS LOADING....</p>
+<div>
+    <div id='loading-progress'>
+        <span>Loading...</span>
+        <p>관련 연산 처리중입니다!..</p>
+    </div>
+
+    <button id='test_extract'>트랜지션처리(PROCESS)</button>
+    <button id='original_to_videoEdit'>원본비디오 편집분할출력</button>
+    <!--일련 작업 처리의 시작>>올린 영상들의 끝시작부분 각각 집합 이미지분할처리셋팅-->
+    <form action='/testsss' id='image_extract_form'method='post'>
+        <input type='hidden' name='upload_video_list' id='image_extract_form_data'/>
+    </form>
+
+    <p>video upload(1~5take select videos)</p>
+    <form action='/upload_ver2' method='post' id='video_uploadform' onSubmit="javascript:return video_upload(event);">
+        <input type='file' name='onetake' value='onetake'/>
+        <input type='file' name='twotake' value='twotake'/>
+        <input type='file' name='threetake' value='threetake'/>
+        <input type='file' name='fourtake' value='fourtake'/>
+        <input type='file' name='fivetake' value='fivetake'/>
+
+        <input type='submit' value='업로드&인코딩'/>
+    </form>
+    <input type='hidden' name='upload_encoded_form_data' id='upload_encoded_form_data'/>
+    
+    <div class='inputoutput'>
+        <video id='upload_edited_video0' width=640 height=360 alt='no image' src='' controls></video>
+        <video id='upload_edited_video1' width=640 height=360 alt='no image' src='' controls></video>
+        <video id='upload_edited_video2' width=640 height=360 alt='no image' src='' controls></video>
+        <video id='upload_edited_video3' width=640 height=360 alt='no image' src='' controls></video>
+        <video id='upload_edited_video4' width=640 height=360 alt='no image' src='' controls></video>
+    </div>
+    <div class='OUTPUT'>
+        <video id='output_video_element' width=640 height=360 alt='no image' src='' controls></video>
+    </div>
+
+    <div class='inputoutput'>
+        <div class='caption'>canvasinput</div>
+        <canvas id='canvasinput1'></canvas>
+        <canvas id='canvasinput2'></canvas>
+
+        <!--canvas img data areass display:none transition areass....-->
+        <canvas id='canvasinput1-1' ></canvas>
+        <canvas id='canvasinput1-2'></canvas>
+        <canvas id='canvasinput1-3'></canvas>
+        <canvas id='canvasinput1-4'></canvas>
+        <canvas id='canvasinput1-5'></canvas>
+        <canvas id='canvasinput1-6'class=''></canvas>
+        <canvas id='canvasinput1-7'class=''></canvas>
+        <canvas id='canvasinput1-8'class=''></canvas>
+        <canvas id='canvasinput1-9'class=''></canvas>
+        <canvas id='canvasinput1-10'class=''></canvas>
+        <canvas id='canvasinput1-11'class=''></canvas>
+        <canvas id='canvasinput1-12'class=''></canvas>
+        <canvas id='canvasinput1-13'class=''></canvas>
+        <canvas id='canvasinput1-14'class=''></canvas>
+        <canvas id='canvasinput1-15'class=''></canvas>
+        <canvas id='canvasinput1-16'class=''></canvas>
+        <canvas id='canvasinput1-17'class=''></canvas>
+        <canvas id='canvasinput1-18'class=''></canvas>
+        <canvas id='canvasinput1-19'class=''></canvas>
+        <canvas id='canvasinput1-20'class=''></canvas>
+        <canvas id='canvasinput1-21'class=''></canvas>
+        <canvas id='canvasinput1-22'class=''></canvas>
+        <canvas id='canvasinput1-23'class=''></canvas>
+        <canvas id='canvasinput1-24'class=''></canvas>
+        <canvas id='canvasinput1-25'class=''></canvas>
+        <canvas id='canvasinput1-26'class=''></canvas>
+        <canvas id='canvasinput1-27'class=''></canvas>
+        <canvas id='canvasinput1-28'class=''></canvas>
+        <canvas id='canvasinput1-29'class=''></canvas>
+        <canvas id='canvasinput1-30'class=''></canvas>
+        <canvas id='canvasinput1-31'class='display_none'></canvas>
+        <canvas id='canvasinput1-32'class='display_none'></canvas>
+        <canvas id='canvasinput1-33'class='display_none'></canvas>
+        <canvas id='canvasinput1-34'class='display_none'></canvas>
+        <canvas id='canvasinput1-35'class='display_none'></canvas>
+        <canvas id='canvasinput1-36'class='display_none'></canvas>
+        <canvas id='canvasinput1-37'class='display_none'></canvas>
+        <canvas id='canvasinput1-38'class='display_none'></canvas>
+        <canvas id='canvasinput1-39'class='display_none'></canvas>
+        <canvas id='canvasinput1-40'class='display_none'></canvas>
+        <canvas id='canvasinput1-41'class='display_none'></canvas>
+        <canvas id='canvasinput1-42'class='display_none'></canvas>
+        <canvas id='canvasinput1-43'class='display_none'></canvas>
+        <canvas id='canvasinput1-44'class='display_none'></canvas>
+        <canvas id='canvasinput1-45'class='display_none'></canvas>
+        <canvas id='canvasinput1-46'class='display_none'></canvas>
+        <canvas id='canvasinput1-47'class='display_none'></canvas>
+        <canvas id='canvasinput1-48'class='display_none'></canvas>
+        <canvas id='canvasinput1-49'class='display_none'></canvas>
+        <canvas id='canvasinput1-50'class='display_none'></canvas>
+        <canvas id='canvasinput1-51'class='display_none'></canvas>
+        <canvas id='canvasinput1-52'class='display_none'></canvas>
+        <canvas id='canvasinput1-53'class='display_none'></canvas>
+        <canvas id='canvasinput1-54'class='display_none'></canvas>
+        <canvas id='canvasinput1-55'class='display_none'></canvas>
+        <canvas id='canvasinput1-56'class='display_none'></canvas>
+        <canvas id='canvasinput1-57'class='display_none'></canvas>
+        <canvas id='canvasinput1-58'class='display_none'></canvas>
+        <canvas id='canvasinput1-59'class='display_none'></canvas>
+        <canvas id='canvasinput1-60'class='display_none'></canvas>
+
+
+        <canvas id='canvasinput1-61'class='display_none'></canvas>
+        <canvas id='canvasinput1-62'class='display_none'></canvas>
+        <canvas id='canvasinput1-63'class='display_none'></canvas>
+        <canvas id='canvasinput1-64'class='display_none'></canvas>
+        <canvas id='canvasinput1-65'class='display_none'></canvas>
+        <canvas id='canvasinput1-66'class='display_none'></canvas>
+        <canvas id='canvasinput1-67'class='display_none'></canvas>
+        <canvas id='canvasinput1-68'class='display_none'></canvas>
+        <canvas id='canvasinput1-69'class='display_none'></canvas>
+        <canvas id='canvasinput1-70'class='display_none'></canvas>
+        <canvas id='canvasinput1-71'class='display_none'></canvas>
+        <canvas id='canvasinput1-72'class='display_none'></canvas>
+        <canvas id='canvasinput1-73'class='display_none'></canvas>
+        <canvas id='canvasinput1-74'class='display_none'></canvas>
+        <canvas id='canvasinput1-75'class='display_none'></canvas>
+        <canvas id='canvasinput1-76'class='display_none'></canvas>
+        <canvas id='canvasinput1-77'class='display_none'></canvas>
+        <canvas id='canvasinput1-78'class='display_none'></canvas>
+        <canvas id='canvasinput1-79'class='display_none'></canvas>
+        <canvas id='canvasinput1-80'class='display_none'></canvas>
+        <canvas id='canvasinput1-81'class='display_none'></canvas>
+        <canvas id='canvasinput1-82'class='display_none'></canvas>
+        <canvas id='canvasinput1-83'class='display_none'></canvas>
+        <canvas id='canvasinput1-84'class='display_none'></canvas>
+        <canvas id='canvasinput1-85'class='display_none'></canvas>
+        <canvas id='canvasinput1-86'class='display_none'></canvas>
+        <canvas id='canvasinput1-87'class='display_none'></canvas>
+        <canvas id='canvasinput1-88'class='display_none'></canvas>
+        <canvas id='canvasinput1-89'class='display_none'></canvas>
+        <canvas id='canvasinput1-90'class='display_none'></canvas>
+        <canvas id='canvasinput1-91'class='display_none'></canvas>
+        <canvas id='canvasinput1-92'class='display_none'></canvas>
+        <canvas id='canvasinput1-93'class='display_none'></canvas>
+        <canvas id='canvasinput1-94'class='display_none'></canvas>
+        <canvas id='canvasinput1-95'class='display_none'></canvas>
+        <canvas id='canvasinput1-96'class='display_none'></canvas>
+        <canvas id='canvasinput1-97'class='display_none'></canvas>
+        <canvas id='canvasinput1-98'class='display_none'></canvas>
+        <canvas id='canvasinput1-99'class='display_none'></canvas>
+        <canvas id='canvasinput1-100'class='display_none'></canvas>
+        <canvas id='canvasinput1-101'class='display_none'></canvas>
+        <canvas id='canvasinput1-102'class='display_none'></canvas>
+        <canvas id='canvasinput1-103'class='display_none'></canvas>
+        <canvas id='canvasinput1-104'class='display_none'></canvas>
+        <canvas id='canvasinput1-105'class='display_none'></canvas>
+        <canvas id='canvasinput1-106'class='display_none'></canvas>
+        <canvas id='canvasinput1-107'class='display_none'></canvas>
+        <canvas id='canvasinput1-108'class='display_none'></canvas>
+        <canvas id='canvasinput1-109'class='display_none'></canvas>
+        <canvas id='canvasinput1-110'class='display_none'></canvas>
+        <canvas id='canvasinput1-111'class='display_none'></canvas>
+        <canvas id='canvasinput1-112'class='display_none'></canvas>
+        <canvas id='canvasinput1-113'class='display_none'></canvas>
+        <canvas id='canvasinput1-114'class='display_none'></canvas>
+        <canvas id='canvasinput1-115'class='display_none'></canvas>
+        <canvas id='canvasinput1-116'class='display_none'></canvas>
+        <canvas id='canvasinput1-117'class='display_none'></canvas>
+        <canvas id='canvasinput1-118'class='display_none'></canvas>
+        <canvas id='canvasinput1-119'class='display_none'></canvas>
+        <canvas id='canvasinput1-120'class='display_none'></canvas>
+
+        <canvas id='canvasinput1-121'class='display_none'></canvas>
+        <canvas id='canvasinput1-122'class='display_none'></canvas>
+        <canvas id='canvasinput1-123'class='display_none'></canvas>
+        <canvas id='canvasinput1-124'class='display_none'></canvas>
+        <canvas id='canvasinput1-125'class='display_none'></canvas>
+        <canvas id='canvasinput1-126'class='display_none'></canvas>
+        <canvas id='canvasinput1-127'class='display_none'></canvas>
+        <canvas id='canvasinput1-128'class='display_none'></canvas>
+        <canvas id='canvasinput1-129'class='display_none'></canvas>
+        <canvas id='canvasinput1-130'class='display_none'></canvas>
+        <canvas id='canvasinput1-131'class='display_none'></canvas>
+        <canvas id='canvasinput1-132'class='display_none'></canvas>
+        <canvas id='canvasinput1-133'class='display_none'></canvas>
+        <canvas id='canvasinput1-134'class='display_none'></canvas>
+        <canvas id='canvasinput1-135'class='display_none'></canvas>
+        <canvas id='canvasinput1-136'class='display_none'></canvas>
+        <canvas id='canvasinput1-137'class='display_none'></canvas>
+        <canvas id='canvasinput1-138'class='display_none'></canvas>
+        <canvas id='canvasinput1-139'class='display_none'></canvas>
+        <canvas id='canvasinput1-140'class='display_none'></canvas>
+        <canvas id='canvasinput1-141'class='display_none'></canvas>
+        <canvas id='canvasinput1-142'class='display_none'></canvas>
+        <canvas id='canvasinput1-143'class='display_none'></canvas>
+        <canvas id='canvasinput1-144'class='display_none'></canvas>
+        <canvas id='canvasinput1-145'class='display_none'></canvas>
+        <canvas id='canvasinput1-146'class='display_none'></canvas>
+        <canvas id='canvasinput1-147'class='display_none'></canvas>
+        <canvas id='canvasinput1-148'class='display_none'></canvas>
+        <canvas id='canvasinput1-149'class='display_none'></canvas>
+        <canvas id='canvasinput1-150'class='display_none'></canvas>
+        <canvas id='canvasinput1-151'class='display_none'></canvas>
+        <canvas id='canvasinput1-152'class='display_none'></canvas>
+        <canvas id='canvasinput1-153'class='display_none'></canvas>
+        <canvas id='canvasinput1-154'class='display_none'></canvas>
+        <canvas id='canvasinput1-155'class='display_none'></canvas>
+        <canvas id='canvasinput1-156'class='display_none'></canvas>
+        <canvas id='canvasinput1-157'class='display_none'></canvas>
+        <canvas id='canvasinput1-158'class='display_none'></canvas>
+        <canvas id='canvasinput1-159'class='display_none'></canvas>
+        <canvas id='canvasinput1-160'class='display_none'></canvas>
+        <canvas id='canvasinput1-161'class='display_none'></canvas>
+        <canvas id='canvasinput1-162'class='display_none'></canvas>
+        <canvas id='canvasinput1-163'class='display_none'></canvas>
+        <canvas id='canvasinput1-164'class='display_none'></canvas>
+        <canvas id='canvasinput1-165'class='display_none'></canvas>
+        <canvas id='canvasinput1-166'class='display_none'></canvas>
+        <canvas id='canvasinput1-167'class='display_none'></canvas>
+        <canvas id='canvasinput1-168'class='display_none'></canvas>
+        <canvas id='canvasinput1-169'class='display_none'></canvas>
+        <canvas id='canvasinput1-170'class='display_none'></canvas>
+        <canvas id='canvasinput1-171'class='display_none'></canvas>
+        <canvas id='canvasinput1-172'class='display_none'></canvas>
+        <canvas id='canvasinput1-173'class='display_none'></canvas>
+        <canvas id='canvasinput1-174'class='display_none'></canvas>
+        <canvas id='canvasinput1-175'class='display_none'></canvas>
+        <canvas id='canvasinput1-176'class='display_none'></canvas>
+        <canvas id='canvasinput1-177'class='display_none'></canvas>
+        <canvas id='canvasinput1-178'class='display_none'></canvas>
+        <canvas id='canvasinput1-179'class='display_none'></canvas>
+        <canvas id='canvasinput1-180'class='display_none'></canvas>
+
+
+        <canvas id='canvasinput1-181'class='display_none'></canvas>
+        <canvas id='canvasinput1-182'class='display_none'></canvas>
+        <canvas id='canvasinput1-183'class='display_none'></canvas>
+        <canvas id='canvasinput1-184'class='display_none'></canvas>
+        <canvas id='canvasinput1-185'class='display_none'></canvas>
+        <canvas id='canvasinput1-186'class='display_none'></canvas>
+        <canvas id='canvasinput1-187'class='display_none'></canvas>
+        <canvas id='canvasinput1-188'class='display_none'></canvas>
+        <canvas id='canvasinput1-189'class='display_none'></canvas>
+        <canvas id='canvasinput1-190'class='display_none'></canvas>
+        <canvas id='canvasinput1-191'class='display_none'></canvas>
+        <canvas id='canvasinput1-192'class='display_none'></canvas>
+        <canvas id='canvasinput1-193'class='display_none'></canvas>
+        <canvas id='canvasinput1-194'class='display_none'></canvas>
+        <canvas id='canvasinput1-195'class='display_none'></canvas>
+        <canvas id='canvasinput1-196'class='display_none'></canvas>
+        <canvas id='canvasinput1-197'class='display_none'></canvas>
+        <canvas id='canvasinput1-198'class='display_none'></canvas>
+        <canvas id='canvasinput1-199'class='display_none'></canvas>
+        <canvas id='canvasinput1-200'class='display_none'></canvas>
+        <canvas id='canvasinput1-201'class='display_none'></canvas>
+        <canvas id='canvasinput1-202'class='display_none'></canvas>
+        <canvas id='canvasinput1-203'class='display_none'></canvas>
+        <canvas id='canvasinput1-204'class='display_none'></canvas>
+        <canvas id='canvasinput1-205'class='display_none'></canvas>
+        <canvas id='canvasinput1-206'class='display_none'></canvas>
+        <canvas id='canvasinput1-207'class='display_none'></canvas>
+        <canvas id='canvasinput1-208'class='display_none'></canvas>
+        <canvas id='canvasinput1-209'class='display_none'></canvas>
+        <canvas id='canvasinput1-210'class='display_none'></canvas>
+        <canvas id='canvasinput1-211'class='display_none'></canvas>
+        <canvas id='canvasinput1-212'class='display_none'></canvas>
+        <canvas id='canvasinput1-213'class='display_none'></canvas>
+        <canvas id='canvasinput1-214'class='display_none'></canvas>
+        <canvas id='canvasinput1-215'class='display_none'></canvas>
+        <canvas id='canvasinput1-216'class='display_none'></canvas>
+        <canvas id='canvasinput1-217'class='display_none'></canvas>
+        <canvas id='canvasinput1-218'class='display_none'></canvas>
+        <canvas id='canvasinput1-219'class='display_none'></canvas>
+        <canvas id='canvasinput1-220'class='display_none'></canvas>
+        <canvas id='canvasinput1-221'class='display_none'></canvas>
+        <canvas id='canvasinput1-222'class='display_none'></canvas>
+        <canvas id='canvasinput1-223'class='display_none'></canvas>
+        <canvas id='canvasinput1-224'class='display_none'></canvas>
+        <canvas id='canvasinput1-225'class='display_none'></canvas>
+        <canvas id='canvasinput1-226'class='display_none'></canvas>
+        <canvas id='canvasinput1-227'class='display_none'></canvas>
+        <canvas id='canvasinput1-228'class='display_none'></canvas>
+        <canvas id='canvasinput1-229'class='display_none'></canvas>
+        <canvas id='canvasinput1-230'class='display_none'></canvas>
+        <canvas id='canvasinput1-231'class='display_none'></canvas>
+        <canvas id='canvasinput1-232'class='display_none'></canvas>
+        <canvas id='canvasinput1-233'class='display_none'></canvas>
+        <canvas id='canvasinput1-234'class='display_none'></canvas>
+        <canvas id='canvasinput1-235'class='display_none'></canvas>
+        <canvas id='canvasinput1-236'class='display_none'></canvas>
+        <canvas id='canvasinput1-237'class='display_none'></canvas>
+        <canvas id='canvasinput1-238'class='display_none'></canvas>
+        <canvas id='canvasinput1-239'class='display_none'></canvas>
+        <canvas id='canvasinput1-240'class='display_none'></canvas>
+    </div>
+    <!--overlay or filter effect canvasinput elements...-->
+    <div>
+        <canvas id='canvasinput_effect1'></canvas>
+        <canvas id='canvasinput_effect2'></canvas>
+        <canvas id='canvasinput_effect3'></canvas>
+        <canvas id='canvasinput_effect4'></canvas>
+        <canvas id='canvasinput_effect5'></canvas>
+        <canvas id='canvasinput_effect6'></canvas>
+        <canvas id='canvasinput_effect7'></canvas>
+        <canvas id='canvasinput_effect8'></canvas>
+        <canvas id='canvasinput_effect9'></canvas>
+        <canvas id='canvasinput_effect10'></canvas>
+        <canvas id='canvasinput_effect11'></canvas>
+        <canvas id='canvasinput_effect12'></canvas>
+        <canvas id='canvasinput_effect13'></canvas>
+        <canvas id='canvasinput_effect14'></canvas>
+        <canvas id='canvasinput_effect15'></canvas>
+        <canvas id='canvasinput_effect16'></canvas>
+        <canvas id='canvasinput_effect17'></canvas>
+        <canvas id='canvasinput_effect18'></canvas>
+        <canvas id='canvasinput_effect19'></canvas>
+        <canvas id='canvasinput_effect20'></canvas>
+        <canvas id='canvasinput_effect21'></canvas>
+        <canvas id='canvasinput_effect22'></canvas>
+        <canvas id='canvasinput_effect23'></canvas>
+        <canvas id='canvasinput_effect24'></canvas>
+        <canvas id='canvasinput_effect25'></canvas>
+        <canvas id='canvasinput_effect26'></canvas>
+        <canvas id='canvasinput_effect27'></canvas>
+        <canvas id='canvasinput_effect28'></canvas>
+        <canvas id='canvasinput_effect29'></canvas>
+        <canvas id='canvasinput_effect30'></canvas>
+        <canvas id='canvasinput_effect31'></canvas>
+        <canvas id='canvasinput_effect32'></canvas>
+        <canvas id='canvasinput_effect33'></canvas>
+        <canvas id='canvasinput_effect34'></canvas>
+        <canvas id='canvasinput_effect35'></canvas>
+        <canvas id='canvasinput_effect36'></canvas>
+        <canvas id='canvasinput_effect37'></canvas>
+        <canvas id='canvasinput_effect38'></canvas>
+        <canvas id='canvasinput_effect39'></canvas>
+        <canvas id='canvasinput_effect40'></canvas>
+        <canvas id='canvasinput_effect41'></canvas>
+        <canvas id='canvasinput_effect42'></canvas>
+        <canvas id='canvasinput_effect43'></canvas>
+        <canvas id='canvasinput_effect44'></canvas>
+        <canvas id='canvasinput_effect45'></canvas>
+        <canvas id='canvasinput_effect46'></canvas>
+        <canvas id='canvasinput_effect47'></canvas>
+        <canvas id='canvasinput_effect48'></canvas>
+        <canvas id='canvasinput_effect49'></canvas>
+        <canvas id='canvasinput_effect50'></canvas>
+        <canvas id='canvasinput_effect51'></canvas>
+        <canvas id='canvasinput_effect52'></canvas>
+        <canvas id='canvasinput_effect53'></canvas>
+        <canvas id='canvasinput_effect54'></canvas>
+        <canvas id='canvasinput_effect55'></canvas>
+        <canvas id='canvasinput_effect56'></canvas>
+        <canvas id='canvasinput_effect57'></canvas>
+        <canvas id='canvasinput_effect58'></canvas>
+        <canvas id='canvasinput_effect59'></canvas>
+        <canvas id='canvasinput_effect60'></canvas>
+        <canvas id='canvasinput_effect61'></canvas>
+        <canvas id='canvasinput_effect62'></canvas>
+        <canvas id='canvasinput_effect63'></canvas>
+        <canvas id='canvasinput_effect64'></canvas>
+        <canvas id='canvasinput_effect65'></canvas>
+        <canvas id='canvasinput_effect66'></canvas>
+        <canvas id='canvasinput_effect67'></canvas>
+        <canvas id='canvasinput_effect68'></canvas>
+        <canvas id='canvasinput_effect69'></canvas>
+        <canvas id='canvasinput_effect70'></canvas>
+        <canvas id='canvasinput_effect71'></canvas>
+        <canvas id='canvasinput_effect72'></canvas>
+        <canvas id='canvasinput_effect73'></canvas>
+        <canvas id='canvasinput_effect74'></canvas>
+        <canvas id='canvasinput_effect75'></canvas>
+        <canvas id='canvasinput_effect76'></canvas>
+        <canvas id='canvasinput_effect77'></canvas>
+        <canvas id='canvasinput_effect78'></canvas>
+        <canvas id='canvasinput_effect79'></canvas>
+        <canvas id='canvasinput_effect80'></canvas>
+        <canvas id='canvasinput_effect81'></canvas>
+        <canvas id='canvasinput_effect82'></canvas>
+        <canvas id='canvasinput_effect83'></canvas>
+        <canvas id='canvasinput_effect84'></canvas>
+        <canvas id='canvasinput_effect85'></canvas>
+        <canvas id='canvasinput_effect86'></canvas>
+        <canvas id='canvasinput_effect87'></canvas>
+        <canvas id='canvasinput_effect88'></canvas>
+        <canvas id='canvasinput_effect89'></canvas>
+        <canvas id='canvasinput_effect90'></canvas>
+        <canvas id='canvasinput_effect91'></canvas>
+        <canvas id='canvasinput_effect92'></canvas>
+        <canvas id='canvasinput_effect93'></canvas>
+        <canvas id='canvasinput_effect94'></canvas>
+        <canvas id='canvasinput_effect95'></canvas>
+        <canvas id='canvasinput_effect96'></canvas>
+        <canvas id='canvasinput_effect97'></canvas>
+        <canvas id='canvasinput_effect98'></canvas>
+        <canvas id='canvasinput_effect99'></canvas>
+        <canvas id='canvasinput_effect100'></canvas>
+        <canvas id='canvasinput_effect101'></canvas>
+        <canvas id='canvasinput_effect102'></canvas>
+        <canvas id='canvasinput_effect103'></canvas>
+        <canvas id='canvasinput_effect104'></canvas>
+        <canvas id='canvasinput_effect105'></canvas>
+        <canvas id='canvasinput_effect106'></canvas>
+        <canvas id='canvasinput_effect107'></canvas>
+        <canvas id='canvasinput_effect108'></canvas>
+        <canvas id='canvasinput_effect109'></canvas>
+        <canvas id='canvasinput_effect110'></canvas>
+        <canvas id='canvasinput_effect111'></canvas>
+        <canvas id='canvasinput_effect112'></canvas>
+        <canvas id='canvasinput_effect113'></canvas>
+        <canvas id='canvasinput_effect114'></canvas>
+        <canvas id='canvasinput_effect115'></canvas>
+        <canvas id='canvasinput_effect116'></canvas>
+        <canvas id='canvasinput_effect117'></canvas>
+        <canvas id='canvasinput_effect118'></canvas>
+        <canvas id='canvasinput_effect119'></canvas>
+        <canvas id='canvasinput_effect120'></canvas>
+        <canvas id='canvasinput_effect121'></canvas>
+        <canvas id='canvasinput_effect121'></canvas>
+        <canvas id='canvasinput_effect122'></canvas>
+        <canvas id='canvasinput_effect123'></canvas>
+        <canvas id='canvasinput_effect124'></canvas>
+        <canvas id='canvasinput_effect125'></canvas>
+        <canvas id='canvasinput_effect126'></canvas>
+        <canvas id='canvasinput_effect127'></canvas>
+        <canvas id='canvasinput_effect128'></canvas>
+        <canvas id='canvasinput_effect129'></canvas>
+        <canvas id='canvasinput_effect130'></canvas>
+        <canvas id='canvasinput_effect131'></canvas>
+        <canvas id='canvasinput_effect132'></canvas>
+        <canvas id='canvasinput_effect133'></canvas>
+        <canvas id='canvasinput_effect134'></canvas>
+        <canvas id='canvasinput_effect135'></canvas>
+        <canvas id='canvasinput_effect136'></canvas>
+        <canvas id='canvasinput_effect137'></canvas>
+        <canvas id='canvasinput_effect138'></canvas>
+        <canvas id='canvasinput_effect139'></canvas>
+        <canvas id='canvasinput_effect140'></canvas>
+        <canvas id='canvasinput_effect141'></canvas>
+        <canvas id='canvasinput_effect142'></canvas>
+        <canvas id='canvasinput_effect143'></canvas>
+        <canvas id='canvasinput_effect144'></canvas>
+        <canvas id='canvasinput_effect145'></canvas>
+        <canvas id='canvasinput_effect146'></canvas>
+        <canvas id='canvasinput_effect147'></canvas>
+        <canvas id='canvasinput_effect148'></canvas>
+        <canvas id='canvasinput_effect149'></canvas>
+        <canvas id='canvasinput_effect150'></canvas>
+        <canvas id='canvasinput_effect151'></canvas>
+        <canvas id='canvasinput_effect152'></canvas>
+        <canvas id='canvasinput_effect153'></canvas>
+        <canvas id='canvasinput_effect154'></canvas>
+        <canvas id='canvasinput_effect155'></canvas>
+        <canvas id='canvasinput_effect156'></canvas>
+        <canvas id='canvasinput_effect157'></canvas>
+        <canvas id='canvasinput_effect158'></canvas>
+        <canvas id='canvasinput_effect159'></canvas>
+        <canvas id='canvasinput_effect160'></canvas>
+        <canvas id='canvasinput_effect160'></canvas>
+        <canvas id='canvasinput_effect161'></canvas>
+        <canvas id='canvasinput_effect162'></canvas>
+        <canvas id='canvasinput_effect163'></canvas>
+        <canvas id='canvasinput_effect164'></canvas>
+        <canvas id='canvasinput_effect165'></canvas>
+        <canvas id='canvasinput_effect166'></canvas>
+        <canvas id='canvasinput_effect167'></canvas>
+        <canvas id='canvasinput_effect168'></canvas>
+        <canvas id='canvasinput_effect169'></canvas>
+        <canvas id='canvasinput_effect170'></canvas>
+        <canvas id='canvasinput_effect171'></canvas>
+        <canvas id='canvasinput_effect172'></canvas>
+        <canvas id='canvasinput_effect173'></canvas>
+        <canvas id='canvasinput_effect174'></canvas>
+        <canvas id='canvasinput_effect175'></canvas>
+        <canvas id='canvasinput_effect176'></canvas>
+        <canvas id='canvasinput_effect177'></canvas>
+        <canvas id='canvasinput_effect178'></canvas>
+        <canvas id='canvasinput_effect179'></canvas>
+        <canvas id='canvasinput_effect180'></canvas>
+        <canvas id='canvasinput_effect180'></canvas>
+        <canvas id='canvasinput_effect181'></canvas>
+        <canvas id='canvasinput_effect182'></canvas>
+        <canvas id='canvasinput_effect183'></canvas>
+        <canvas id='canvasinput_effect184'></canvas>
+        <canvas id='canvasinput_effect185'></canvas>
+        <canvas id='canvasinput_effect186'></canvas>
+        <canvas id='canvasinput_effect187'></canvas>
+        <canvas id='canvasinput_effect188'></canvas>
+        <canvas id='canvasinput_effect189'></canvas>
+        <canvas id='canvasinput_effect190'></canvas>
+        <canvas id='canvasinput_effect191'></canvas>
+        <canvas id='canvasinput_effect192'></canvas>
+        <canvas id='canvasinput_effect193'></canvas>
+        <canvas id='canvasinput_effect194'></canvas>
+        <canvas id='canvasinput_effect195'></canvas>
+        <canvas id='canvasinput_effect196'></canvas>
+        <canvas id='canvasinput_effect197'></canvas>
+        <canvas id='canvasinput_effect198'></canvas>
+        <canvas id='canvasinput_effect199'></canvas>
+        <canvas id='canvasinput_effect200'></canvas>
+        <canvas id='canvasinput_effect201'></canvas>
+        <canvas id='canvasinput_effect202'></canvas>
+        <canvas id='canvasinput_effect203'></canvas>
+        <canvas id='canvasinput_effect204'></canvas>
+        <canvas id='canvasinput_effect205'></canvas>
+        <canvas id='canvasinput_effect206'></canvas>
+        <canvas id='canvasinput_effect207'></canvas>
+        <canvas id='canvasinput_effect208'></canvas>
+        <canvas id='canvasinput_effect209'></canvas>
+        <canvas id='canvasinput_effect210'></canvas>
+        <canvas id='canvasinput_effect211'></canvas>
+        <canvas id='canvasinput_effect212'></canvas>
+        <canvas id='canvasinput_effect213'></canvas>
+        <canvas id='canvasinput_effect214'></canvas>
+        <canvas id='canvasinput_effect215'></canvas>
+        <canvas id='canvasinput_effect216'></canvas>
+        <canvas id='canvasinput_effect217'></canvas>
+        <canvas id='canvasinput_effect218'></canvas>
+        <canvas id='canvasinput_effect219'></canvas>
+        <canvas id='canvasinput_effect220'></canvas>
+        <canvas id='canvasinput_effect221'></canvas>
+        <canvas id='canvasinput_effect222'></canvas>
+        <canvas id='canvasinput_effect223'></canvas>
+        <canvas id='canvasinput_effect224'></canvas>
+        <canvas id='canvasinput_effect225'></canvas>
+        <canvas id='canvasinput_effect226'></canvas>
+        <canvas id='canvasinput_effect227'></canvas>
+        <canvas id='canvasinput_effect228'></canvas>
+        <canvas id='canvasinput_effect229'></canvas>
+        <canvas id='canvasinput_effect230'></canvas>
+        <canvas id='canvasinput_effect231'></canvas>
+        <canvas id='canvasinput_effect232'></canvas>
+        <canvas id='canvasinput_effect233'></canvas>
+        <canvas id='canvasinput_effect234'></canvas>
+        <canvas id='canvasinput_effect235'></canvas>
+        <canvas id='canvasinput_effect236'></canvas>
+        <canvas id='canvasinput_effect237'></canvas>
+        <canvas id='canvasinput_effect238'></canvas>
+        <canvas id='canvasinput_effect239'></canvas>
+        <canvas id='canvasinput_effect240'></canvas>
+        <canvas id='canvasinput_effect240'></canvas>
+        <canvas id='canvasinput_effect241'></canvas>
+        <canvas id='canvasinput_effect242'></canvas>
+        <canvas id='canvasinput_effect243'></canvas>
+        <canvas id='canvasinput_effect244'></canvas>
+        <canvas id='canvasinput_effect245'></canvas>
+        <canvas id='canvasinput_effect246'></canvas>
+        <canvas id='canvasinput_effect247'></canvas>
+        <canvas id='canvasinput_effect248'></canvas>
+        <canvas id='canvasinput_effect249'></canvas>
+        <canvas id='canvasinput_effect250'></canvas>
+        <canvas id='canvasinput_effect251'></canvas>
+        <canvas id='canvasinput_effect252'></canvas>
+        <canvas id='canvasinput_effect253'></canvas>
+        <canvas id='canvasinput_effect254'></canvas>
+        <canvas id='canvasinput_effect255'></canvas>
+        <canvas id='canvasinput_effect256'></canvas>
+        <canvas id='canvasinput_effect257'></canvas>
+        <canvas id='canvasinput_effect258'></canvas>
+        <canvas id='canvasinput_effect259'></canvas>
+        <canvas id='canvasinput_effect260'></canvas>
+        <canvas id='canvasinput_effect261'></canvas>
+        <canvas id='canvasinput_effect262'></canvas>
+        <canvas id='canvasinput_effect263'></canvas>
+        <canvas id='canvasinput_effect264'></canvas>
+        <canvas id='canvasinput_effect265'></canvas>
+        <canvas id='canvasinput_effect266'></canvas>
+        <canvas id='canvasinput_effect267'></canvas>
+        <canvas id='canvasinput_effect268'></canvas>
+        <canvas id='canvasinput_effect269'></canvas>
+        <canvas id='canvasinput_effect270'></canvas>
+    </div>
+
+    <div id='canvasinput_takevideo_wrap'>
+    </div>
+
+    </div>
+    <div id='video_between_transition_startendArea'>
+    </div>
+    <div id='take_video_imgpart_total'>
+        
+    </div>
+
+    <div id='video_editing_area' class='editing_area'>
+        <h3>원본영상에서 자르고싶은 부분적인 길이/위치구간 지정</h3>
+        <div class='video_upload_area'>
+            <div id='take1_video' class='upload_video_element'>
+                <video id='upload_video0' src='' width=320 height=180 controls></video>
+            </div>
+            <div id='take2_video'class='upload_video_element'>
+                <video id='upload_video1' src='' width=320 height=180 controls></video>
+            </div>
+            <div id='take3_video'class='upload_video_element'>
+                <video id='upload_video2' src='' width=320 height=180 controls></video>
+            </div>
+            <div id='take4_video'class='upload_video_element'>
+                <video id='upload_video3' src='' width=320 height=180 controls></video>
+            </div>
+            <div id='take5_video'class='upload_video_element'>
+                <video id='upload_video4' src='' width=320 height=180 controls></video>
+            </div>
+        </div>
+        <div class='edit_room'>
+            <div class='timesecond_grid_area'>
+                <div class='time_grid' id='index1'>
+                    0~1(s)
+                </div>
+                <div class='time_grid'id='index2'>
+                    1~2(s)
+                </div>
+                <div class='time_grid'id='index3'>
+                    2~3(s)
+                </div>
+                <div class='time_grid'id='index4'>
+                    3~4(s)
+                </div>
+                <div class='time_grid'id='index5'>
+                    4~5(s)
+                </div>
+                <div class='time_grid'id='index6'>
+                    5~6(s)
+                </div>
+                <div class='time_grid'id='index7'>
+                    6~7(s)
+                </div>
+                <div class='time_grid'id='index8'>
+                    7~8(s)
+                </div>
+                <div class='time_grid'id='index9'>
+                    8~9(s)
+                </div>
+                <div class='time_grid'id='index10'>
+                    9~10(s)
+                </div>
+                <div class='time_grid'id='index11'>
+                    10~11(s)
+                </div>
+                <div class='time_grid'id='index12'>
+                    11~12(s)
+                </div>
+                <div class='time_grid'id='index13'>
+                    12~13(s)
+                </div>
+                <div class='time_grid'id='index14'>
+                    13~14(s)
+                </div>
+                <div class='time_grid'id='index15'>
+                    14~15(s)
+                </div>
+                <div class='time_grid'id='index16'>
+                    15~16(s)
+                </div>
+                <div class='time_grid'id='index17'>
+                    16~17(s)
+                </div>
+                <div class='time_grid'id='index18'>
+                    17~18(s)
+                </div>
+                <div class='time_grid'id='index19'>
+                    18~19(s)
+                </div>
+                <div class='time_grid'id='index20'>
+                    19~20(s)
+                </div>
+                <div class='time_grid'id='index21'>
+                    20~21(s)
+                </div>
+                <div class='time_grid'id='index22'>
+                    21~22(s)
+                </div>
+                <div class='time_grid'id='index23'>
+                    22~23(s)
+                </div>
+                <div class='time_grid'id='index24'>
+                    23~24(s)
+                </div>
+                <div class='time_grid'id='index25'>
+                    24~25(s)
+                </div>
+                <div class='time_grid'id='index26'>
+                    25~26(s)
+                </div>
+                <div class='time_grid'id='index27'>
+                    26~27(s)
+                </div>
+                <div class='time_grid'id='index28'>
+                    27~28(s)
+                </div>
+                <div class='time_grid'id='index29'>
+                    28~29(s)
+                </div>
+                <div class='time_grid'id='index30'>
+                    29~30(s)
+                </div>             
+            </div>
+            <div class='take_row' id='take1_area'>
+                <h2>TAKE1</h2>
+                <div class='videotake_control' dataset-take=1 id='control1' original_duration=20 change_duration=20 startpos=0 endpos=0>
+                    <span class='time_info' id='control1_timeinfo'></span>
+                    <div class='video_left_duration_control'>
+                        <img src='resource/arrow.png'/>
+                    </div>
+                    <div class='video_right_duration_control'>
+                        <img src='resource/arrow.png'/>
+                    </div>
+                </div>
+            </div>
+            <div class='take_row'id='take2_area'>
+                <h2>TAKE2</h2>
+                <div class='videotake_control' dataset-take=2 id='control2'original_duration=20 change_duration=20 startpos=0 endpos=0>
+                    <span class='time_info' id='control2_timeinfo'></span>
+                    <div class='video_left_duration_control'>
+                        <img src='resource/arrow.png'/>
+                    </div>
+                    <div class='video_right_duration_control'>
+                        <img src='resource/arrow.png'/>
+                    </div>
+                </div>
+            </div>
+            <div class='take_row'id='take3_area'>
+                <h2>TAKE3</h2>
+                <div class='videotake_control' dataset-take=3 id='control3'original_duration=16 change_duration=16 startpos=0 endpos=0>
+                    <span class='time_info' id='control3_timeinfo'></span>
+                    <div class='video_left_duration_control'>
+                        <img src='resource/arrow.png'/>
+                    </div>
+                    <div class='video_right_duration_control'>
+                        <img src='resource/arrow.png'/>
+                    </div>
+                </div>
+            </div>
+            <div class='take_row'id='take4_area'>
+                <h2>TAKE4</h2>
+                <div class='videotake_control' dataset-take=4 id='control4'original_duration=18 change_duration=18 startpos=0 endpos=0>
+                    <span class='time_info' id='control4_timeinfo'></span>
+                    <div class='video_left_duration_control'>
+                        <img src='resource/arrow.png'/>
+                    </div>
+                    <div class='video_right_duration_control'>
+                        <img src='resource/arrow.png'/>
+                    </div>
+                </div>
+            </div>
+            <div class='take_row'id='take5_area'>
+                <h2>TAKE5</h2>
+                <div class='videotake_control' dataset-take=5 id='control5'original_duration=9 change_duration=9 startpos=0 endpos=0>
+                    <span class='time_info' id='control5_timeinfo'></span>
+                    <div class='video_left_duration_control'>
+                        <img src='resource/arrow.png'/>
+                    </div>
+                    <div class='video_right_duration_control'>
+                        <img src='resource/arrow.png'/>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <hr/><hr/>
+
+    <div class='editing_area'>
+        <h3>지정된 최종출력된 비디오들 병합&처리(사이사이 트랜지션)</h3>
+        <div class='video_upload_area' id='video_upload_area_final'>
+            <div id='take1_video_' class='upload_video_element plus'>
+                <label>TAKE1</label>
+                <video id='upload_video0_' src='' width=320 height=180 controls></video>
+            </div>
+            <div id='take2_video_'class='upload_video_element plus'>
+                <label>TAKE2</label>
+                <video id='upload_video1_' src='' width=320 height=180 controls></video>
+            </div>
+            <div id='take3_video_'class='upload_video_element plus'>
+                <label>TAKE3</label>
+                <video id='upload_video2_' src='' width=320 height=180 controls></video>
+            </div>
+            <div id='take4_video_'class='upload_video_element plus'>
+                <label>TAKE4</label>
+                <video id='upload_video3_' src='' width=320 height=180 controls></video>
+            </div>
+            <div id='take5_video_'class='upload_video_element plus'>
+                <label>TAKE5</label>
+                <video id='upload_video4_' src='' width=320 height=180 controls></video>
+            </div>
+        </div>
+    </div>
+
+</div>
+<script>
+    //페이지 로드 시점 관련 스크립트>>>
+    let canvasinput_takevideo_wrap=document.getElementById('canvasinput_takevideo_wrap');
+    for(let s=0; s<3000; s++){
+        let canvasElement=document.createElement("CANVAS");
+        canvasElement.id=`canvasinput_takevideo${s+1}`;//삼천개 가량 생성>>
+        canvasinput_takevideo_wrap.appendChild(canvasElement);
+    }
+    
+    //원본비디오 부분 제어 및 추출 관련 데이터처리>>
+    function video_takecontrol_move_closure (){
+
+        let move_target=null; let move_target_=null;
+        let move_parentTarget=null;//무브오브젝트 자체를 클릭한 경우에는 move_parentTarget,mmove_target동일하게끔하고, 그게 아닌경우라면 다르게한다.
+        let isdrag=false; let isdrag_=false;
+        let move_object_pos={};  let move_object_pos_={};
+        let time_grid_elements=document.getElementsByClassName('time_grid');
+
+        //videoTake element 어떤것을 클릭시작하여 드래그 시작했는지 start origin관련 해당 클로저함수내부체에서 어떤 타깃을 클릭했었고, 그 특정타깃이 클릭해서 뗐는지 여부 파악.>>>
+        function mousedown_module(event){
+            event.preventDefault();
+
+            move_target=event.target;
+
+            console.log('드래그할 대상 move_tagets:',move_target,move_target.classList,move_target.className);
+
+            if(move_target.className.indexOf('videotake_control')==-1){
+                //좌우 리사이즈요소 관련 처리한경우
+                console.log('videoTake_control요소가 아님!!:',move_target,event.target);
+                /*if(move_target.className.indexOf('video_right_duration_control')!=-1 || move_target.className.indexOf('video_left_duration_control')!=-1){
+                    console.log('video_left,right duraitoncontorls가 클릭이 된경우 인지된경우!');
+                    move_target=move_target.parentElement;
+                }*/
+                move_target=event.target;
+                move_parentTarget=move_target.parentElement;//부모요소 해당 좌우요소의 부모요소(element자체)
+            }else{
+                //비디오컨트롤 요소 자체를 처리하는경우(위치이동)
+                console.log('videoTake_control요소임!!',move_target,event.target);
+                move_target=event.target;
+                move_parentTarget=move_target;
+            }   
+            isdrag=true;
+        }
+        //deprecated!..
+        function mousedown_module_(event){
+            event.preventDefault();
+
+            move_target_ =event.target;
+
+            console.log('드래그 대상 move_targsss:(mouwsedown_moudle)::',move_target_,move_target_.classList,move_target_.className);
+            isdrag_=true;
+        }
+        //takerow요소에 거는 이벤트들>>>
+        /*function mousemove_module(event){
+            let current_target=event.target;
+            //console.log("mousemove이벤트 발생 관련 객체:",move_target,event.target);
+
+            if(isdrag && move_target.className.indexOf("videotake_control")!=-1){
+                console.log('드래그중 상태::>>videotake_control요소 자체를 move액션 관련',isdrag,current_target,move_target);
+
+                console.log('현재 마우스위치(clientX클라이언트 화면뷰포트 좌표기준::',event.clientX,event.clientY);//대상 개체 targetElement가 아닌 takeROW area에서의 x좌표값 (offset좌표임)구해서 그 위치값에 대해서 기억하고있다가 그 위치로 mouseup시에 이동시킨다.
+                move_object_pos['x']=event.clientX;
+                move_object_pos['y']=event.clientY;
+            }else if(isdrag && (move_target.className.indexOf("video_left_duration_control")!=-1)){
+                console.log("드래그 중 상태::video left,right size duration change move액션관련",isdrag,current_target,move_target);
+
+                console.log('현재 마우스위치(clientX 클라이언트 화면뷰포트 좌표기준:',event.clientX,event.clientY);
+                move_object_pos['x'] = event.clientX;
+                move_object_pos['y'] = event.clientY;
+            }
+        }*/
+        //deprecated..!
+        function mouseup_module_(event){
+            let current_target=event.target;
+            console.log('mouseup이벤트 발생 관련 객체:',current_target,event.target,isdrag_);
+
+            if(isdrag_){
+                move_object_pos_['x']= event.clientX;
+                move_object_pos_['y']= event.clientY;
+
+                console.log('mouseup이벤트 발생 move당시때의 offset위치정보값:',move_object_pos_,move_target_);
+
+                if(move_target_.className.indexOf('videotake_control_')!=-1){
+                    console.log('videotakeControl요소 자체를 이동시키려고하는 경우:',move_target_);
+                    let adapt_x= move_object_pos_['x'];//해당 x위치로 이동시킨다.
+                    let distance_array=[];
+                    for(let t=0; t<time_grid_elements.length; t++){
+                        console.log('mouseup당시때의 adapt_x좌표 offsetX,clientX와 가장 가까운 대상 찾기');
+                        let item=time_grid_elements[t];
+                        let offsetX=item.offsetLeft;
+                        console.log('item offisetX, adapt_x:',offsetX, adapt_x);
+
+                        let distance= Math.abs(adapt_x-offsetX);
+                        distance_array.push({
+                            index : t+1,
+                            object: time_grid_elements[t],
+                            value : distance
+                        });
+                    }
+                    console.log('==>>>매 확인된 distance값::',distance_array);
+                    //가장 작은값 순으로 해서 정렬 가장 첫요소 찾기
+                    let sort_result = distance_array.sort(function(a,b){
+                        let left = parseInt(a.value);
+                        let right = parseInt(b.value);
+
+                        if(left < right){
+                            return -1;
+                        }
+                        if(left > right){
+                            return 1;
+                        }
+                        return 0;
+                    });
+                    console.log('정렬처리후 distance_array:',distance_array);
+                    let adapt_final_target=distance_array[0].object;
+                    console.log('대상 타깃 leftoffsetX시작위치index값',distance_array[0].index);
+                    let adapt_final_targetindex=distance_array[0].index;
+                    //move_target.style.left =adapt_final_target.offsetLeft+'px';
+                    move_target_.style.left = 3.333*(adapt_final_targetindex -1 )+'%';
+
+                    move_target_.setAttribute('startpos',adapt_final_targetindex -1 );
+                    let change_duration = parseInt(move_target_.getAttribute('change_duration'));//변화적용된 최종길이값(초값) startpos = x + durationvalue
+                    let end_pos=(adapt_final_targetindex -1) + change_duration;
+                    move_target.setAttribute('endpos',end_pos);
+
+                    let id_val=move_parentTarget.id.replace('control_','');
+
+                }
+            }
+            isdrag_=false;
+        }
+        function mouseup_module(event){
+            let current_target=event.target;
+            console.log('mouseup이벤트 발생 관련 객체:',current_target,event.target);
+
+            if(isdrag){
+                move_object_pos['x']= event.clientX;
+                move_object_pos['y']= event.clientY;
+
+                console.log('mouseup이벤트 발생 move당시때의 offset위치정보값:',move_object_pos,move_target);
+
+                if(move_target.className.indexOf('videotake_control')!=-1){
+                    console.log('videotakeControl요소 자체를 이동시키려고하는 경우:',move_target);
+                    let adapt_x= move_object_pos['x'];//해당 x위치로 이동시킨다.
+                    let distance_array=[];
+                    for(let t=0; t<time_grid_elements.length; t++){
+                        console.log('mouseup당시때의 adapt_x좌표 offsetX,clientX와 가장 가까운 대상 찾기');
+                        let item=time_grid_elements[t];
+                        let offsetX=item.offsetLeft;
+                        console.log('item offisetX, adapt_x:',offsetX, adapt_x);
+
+                        let distance= Math.abs(adapt_x-offsetX);
+                        distance_array.push({
+                            index : t+1,
+                            object: time_grid_elements[t],
+                            value : distance
+                        });
+                    }
+                    console.log('==>>>매 확인된 distance값::',distance_array);
+                    //가장 작은값 순으로 해서 정렬 가장 첫요소 찾기
+                    let sort_result = distance_array.sort(function(a,b){
+                        let left = parseInt(a.value);
+                        let right = parseInt(b.value);
+
+                        if(left < right){
+                            return -1;
+                        }
+                        if(left > right){
+                            return 1;
+                        }
+                        return 0;
+                    });
+                    console.log('정렬처리후 distance_array:',distance_array);
+                    let adapt_final_target=distance_array[0].object;
+                    console.log('대상 타깃 leftoffsetX시작위치index값',distance_array[0].index);
+                    let adapt_final_targetindex=distance_array[0].index;
+                    //move_target.style.left =adapt_final_target.offsetLeft+'px';
+                    move_target.style.left = 3.333*(adapt_final_targetindex -1 )+'%';
+
+                    move_target.setAttribute('startpos',adapt_final_targetindex -1 );
+                    let change_duration = parseInt(move_target.getAttribute('change_duration'));//변화적용된 최종길이값(초값) startpos = x + durationvalue
+                    let end_pos=(adapt_final_targetindex -1) + change_duration;
+                    move_target.setAttribute('endpos',end_pos);
+
+                    let id_val=move_parentTarget.id.replace('control','');
+                    let control_timeinfo = document.getElementById(`control${id_val}_timeinfo`);
+                    let string_make = `DURATION = ${change_duration}, STARTPOS = ${adapt_final_targetindex-1}, ENDPOS = ${end_pos}`;
+                    control_timeinfo.innerHTML = string_make;
+
+                    //visual video target elements visible expand view controls..
+                    let visual_video_take_element=document.getElementById(`take${id_val}_video`);
+                    let visual_video_take_element_rangechilds=visual_video_take_element.children;
+
+                    let make_range_string=[];
+                    for(let s=adapt_final_targetindex; s<=end_pos; s++){
+                        make_range_string.push(s);
+                    }
+                    console.log('현재 videocontrol moveaction에 따른 시간범위 make_range_stringss:',make_range_string);
+                    for(let i=0; i<visual_video_take_element_rangechilds.length; i++){
+                        if(visual_video_take_element_rangechilds[i].className.indexOf('visible_range_cut')!=-1){
+                            let target=visual_video_take_element_rangechilds[i];
+                            let target_timeindex=parseInt(target.getAttribute('time_index'));
+                            console.log('==>>대상타깃targetss:',target,target_timeindex);
+                            console.log('target hwatsss존재하나??:',target,make_range_string.includes(target_timeindex), i);
+                            if( make_range_string.includes(target_timeindex)){
+                                target.style.backgroundColor='rgba(0,0,0,0.0)';
+                            }else{
+                                target.style.backgroundColor='rgba(0,0,0,0.9)';
+                            }
+                        }
+                    }
+                }else if(move_target.className.indexOf("video_left_duration_control")!=-1){
+                    //이동연산 + 크기 resize연산 둘다 진행>>
+                    console.log('video_left_duration_control 요소를 mousedown했다가 drag하여 mouseup한경우:',move_target,move_parentTarget);
+                    let adapt_x= move_object_pos['x'];
+                    let distance_array=[];
+                    let distance_array2=[];
+                    let mother_object_offsetrightX = parseFloat(move_parentTarget.offsetLeft) + parseFloat(window.getComputedStyle(move_parentTarget,null)['width']);
+
+                    for(let t=0; t<time_grid_elements.length; t++){
+                        console.log('mouseup당시때의 adapt_x좌표 offsetX,clientX와 가장 가까운 대상찾기 timegrid위치대상찾기');
+                        console.log('mouseup당시때의 또한 대상타깃의 mother moveParentElement의 rightoffsetX위치값이 어떤 인댁스상에 있었는지,adaptx좌표는 또한');
+                        let item=time_grid_elements[t];
+                        let offsetX=item.offsetLeft;
+                        console.log('item offsetX,adapt_x,motherobject_offsetrightX:',offsetX,adapt_x,mother_object_offsetrightX);
+
+                        let distance= Math.abs(adapt_x - offsetX);
+                        distance_array.push({
+                            index : t+1,
+                            object: time_grid_elements[t],
+                            value : distance
+                        });
+                        let distance2 = Math.abs(mother_object_offsetrightX - offsetX);
+                        distance_array2.push({
+                            index : t+1,
+                            object:time_grid_elements[t],
+                            value: distance2
+                        });
+                    }
+                    console.log('==>>>매 확인된 distance값::',distance_array);
+                    console.log('==>>>매 확인된 distance2값::',distance_array2);
+                    //가장 작은값 순으로 해서 정렬 가장 첫요소 찾기
+                    let sort_result = distance_array.sort(function(a,b){
+                        let left =parseInt(a.value);
+                        let right= parseInt(b.value);
+
+                        if(left < right){
+                            return -1;
+                        }
+                        if(left > right){
+                            return 1;
+                        }
+                        return 0;
+                    });
+                    console.log('정렬처리후 distance_arrayss:',distance_array);
+                    let sort_result2 = distance_array2.sort(function(a,b){
+                        let left =parseInt(a.value);
+                        let right= parseInt(b.value);
+
+                        if(left < right){
+                            return -1;
+                        }
+                        if(left > right){
+                            return 1;
+                        }
+                        return 0;
+                    });
+                    console.log('정렬처리후 distance_arrayss:',distance_array2);
+                    
+                    //1.최종 관련 마우스mouseup된 위치값과의 격차가 가장 적은 timegrid offsetLeft위치 object를 찾는다.그리고 그 위치로 moveTarget이동시킴.
+                    let adapt_final_target=distance_array[0].object;
+                    let adapt_final_targetindex=distance_array[0].index;
+                    //move_parentTarget.style.left = adapt_final_target.offsetLeft + 'px';
+                    move_parentTarget.style.left = (3.333 * (adapt_final_targetindex-1))+'%';
+                    //2. mouseup이벤트 발생시점때에 motherElement의 offsetRight xleft값위치인접한 위치시작인댁스index-1 - adaptfinaltARGET INDEX값과의 차이값의 곧 IDNEX차이격차값이 각 인댁스는 일초값이고 이값 N% * s값 만큼의 폭을 가진다%폭으로 처리한다(반응형고려) 또한 몇초duration인지도 추적가능함.
+                    
+                    let adapt_final_posx_index=distance_array[0].index;//해당 이동할 위치와 moveMother object rightPosx와의 격차값은 새로 반영width크기이다.
+                    let mother_object_offsetrightX_index= distance_array2[0].index;
+                    console.log('adapt_final_posxIndex,mother_object_fofsetrightXindex:',adapt_final_posx_index,mother_object_offsetrightX_index);
+                    let adapt_width_duration = mother_object_offsetrightX_index - adapt_final_posx_index;
+                    console.log('적용 duration초 상수값::',adapt_width_duration);
+
+                    if(adapt_width_duration >= 0 && adapt_width_duration < 1){
+                        alert('적용 duration이 1초는 되어야합니다.');
+                        adapt_width_duration = 1;
+
+                    }else if(adapt_width_duration > move_parentTarget.getAttribute('original_duration')){
+                        alert('영상 고유의 duration값보다 더 크게 지정하려고 했던경우.');
+                        adapt_width_duration = move_parentTarget.getAttribute('original_duration');
+
+                    }else if(adapt_width_duration < 0){
+                        alert('적용 duration이 유효하지 않습니다!!');
+                        adapt_width_duration = 1;
+                    }
+                    move_parentTarget.setAttribute('change_duration',adapt_width_duration);
+                    move_parentTarget.style.width = parseFloat( 3.333 * adapt_width_duration)+'%'; 
+
+                    move_parentTarget.setAttribute('startpos',adapt_final_targetindex-1);
+                    //변화 적용된 당시때의 change_duration값을 더해서 한다.
+                    //let change_duration = parseInt(move_parentTarget.getAttribute('change_duration'));
+                    let change_duration = adapt_width_duration;
+                    let end_pos = (adapt_final_targetindex - 1) + change_duration;
+                    move_parentTarget.setAttribute('endpos',end_pos);
+
+                    let id_val=move_parentTarget.id.replace('control','');
+                    let control_timeinfo = document.getElementById(`control${id_val}_timeinfo`);
+                    let string_make = `DURATION = ${adapt_width_duration}, STARTPOS = ${adapt_final_targetindex-1}, ENDPOS = ${end_pos}`;
+                    control_timeinfo.innerHTML = string_make;
+
+                    //visual video target elements visible expand view controls..
+                    let visual_video_take_element=document.getElementById(`take${id_val}_video`);
+                    let visual_video_take_element_rangechilds=visual_video_take_element.children;
+
+                    let make_range_string=[];
+                    for(let s=adapt_final_targetindex; s<=end_pos; s++){
+                        make_range_string.push(s);
+                    }
+                    console.log('현재 videocontrol resize_action에 따른 시간범위 make_range_stringss:',make_range_string,visual_video_take_element_rangechilds);
+                    for(let i=0; i<visual_video_take_element_rangechilds.length; i++){
+                        if(visual_video_take_element_rangechilds[i].className.indexOf('visible_range_cut')!=-1){
+                            let target=visual_video_take_element_rangechilds[i];
+                            let target_timeindex=parseInt(target.getAttribute('time_index'));
+                            console.log('target,targetindexxx::',target,target_timeindex);
+                            console.log('target hwatsss존재하나??:',target,target.getAttribute('time_index'),make_range_string.includes(target_timeindex), i);
+                            if( make_range_string.includes(target_timeindex)){
+                                target.style.backgroundColor='rgba(0,0,0,0.0)';
+                            }else{
+                                target.style.backgroundColor='rgba(0,0,0,0.9)';
+                            }
+                        }
+                    }
+
+                    //크기변환 이벤트시에만 아래의 비디오 및 관련요소들 크기 변환한다>>
+                    let original_duration = parseInt(move_parentTarget.getAttribute('original_duration'));
+                    let target_video__content = document.getElementById(`take${id_val}_video_`);
+                    let adapt_width_percent = (20 * parseFloat(adapt_width_duration / original_duration)).toFixed(3);
+                    target_video__content.style.width = adapt_width_percent +'%';
+
+                    /*let after_controlcontent = document.getElementById(`control${id_val}_final`);
+                    after_controlcontent.setAttribute('change_duration',adapt_width_duration);
+                    after_controlcontent.style.width = parseFloat(3.333 * adapt_width_duration)+'%';*/
+
+                }else if(move_target.className.indexOf("video_right_duration_control")!=-1){
+                    //크기 resize연산 둘다 진행>>
+                    console.log('video_right_duration_control 요소를 mousedown했다가 drag하여 mouseup한경우:',move_target,move_parentTarget);
+                    let adapt_x= move_object_pos['x'];
+                    let distance_array=[];
+                    let distance_array2=[];
+                    let mother_object_offsetleftX = parseFloat(move_parentTarget.offsetLeft);
+
+                    for(let t=0; t<time_grid_elements.length; t++){
+                        console.log('mouseup당시때의 adapt_x좌표 offsetX,clientX와 가장 가까운 대상찾기 timegrid위치대상찾기');
+                        console.log('mouseup당시때의 또한 대상타깃의 mother moveParentElement의 rightoffsetX위치값이 어떤 인댁스상에 있었는지,adaptx좌표는 또한');
+                        let item=time_grid_elements[t];
+                        let offsetX=item.offsetLeft;
+                        console.log('item offsetX,adapt_x,motherobject_offsetrightX:',offsetX,adapt_x,mother_object_offsetleftX);
+
+                        let distance= Math.abs(adapt_x - offsetX);
+                        distance_array.push({
+                            index : t+1,
+                            object: time_grid_elements[t],
+                            value : distance
+                        });
+                        let distance2 = Math.abs(mother_object_offsetleftX - offsetX);
+                        distance_array2.push({
+                            index : t+1,
+                            object:time_grid_elements[t],
+                            value: distance2
+                        });
+                    }
+                    console.log('==>>>매 확인된 distance값::',distance_array);
+                    console.log('==>>>매 확인된 distance2값::',distance_array2);
+                    //가장 작은값 순으로 해서 정렬 가장 첫요소 찾기
+                    let sort_result = distance_array.sort(function(a,b){
+                        let left =parseInt(a.value);
+                        let right= parseInt(b.value);
+
+                        if(left < right){
+                            return -1;
+                        }
+                        if(left > right){
+                            return 1;
+                        }
+                        return 0;
+                    });
+                    console.log('정렬처리후 distance_arrayss:',distance_array);
+                    let sort_result2 = distance_array2.sort(function(a,b){
+                        let left =parseInt(a.value);
+                        let right= parseInt(b.value);
+
+                        if(left < right){
+                            return -1;
+                        }
+                        if(left > right){
+                            return 1;
+                        }
+                        return 0;
+                    });
+                    console.log('정렬처리후 distance_arrayss:',distance_array2);
+                    
+                    //1.최종 관련 마우스mouseup된 위치값과의 격차가 가장 적은 timegrid offsetLeft위치 object를 찾는다.그리고 그 위치로 moveTarget이동시킴.
+                    let adapt_final_target=distance_array[0].object;
+                    let adapt_final_targetindex=distance_array[0].index;               
+                    
+                    let adapt_final_posx_index=distance_array[0].index;//해당 이동할 위치와 moveMother object rightPosx와의 격차값은 새로 반영width크기이다.
+                    let mother_object_offsetleftX_index= distance_array2[0].index;
+                    console.log('adapt_final_posxIndex,mother_object_fofsetrightXindex:',adapt_final_posx_index,mother_object_offsetleftX_index);
+                    let adapt_width_duration = adapt_final_posx_index - mother_object_offsetleftX_index;
+                    console.log('적용 duration초 상수값::',adapt_width_duration);
+
+                    if(adapt_width_duration >= 0 && adapt_width_duration < 1){
+                        alert('적용 duration이 1초는 되어야합니다.');
+                        adapt_width_duration = 1;
+
+                    }else if(adapt_width_duration > move_parentTarget.getAttribute('original_duration')){
+                        alert('영상 고유의 duration값보다 더 크게 지정하려고 했던경우.');
+                        adapt_width_duration = move_parentTarget.getAttribute('original_duration');
+
+                    }else if(adapt_width_duration < 0){
+                        alert('적용 duration이 유효하지 않습니다!!');
+                        adapt_width_duration = 1;
+                    }
+                    adapt_width_duration = parseInt(adapt_width_duration);
+
+                    move_parentTarget.setAttribute('change_duration',adapt_width_duration);
+                    move_parentTarget.style.width = parseFloat( 3.333 * adapt_width_duration)+'%'; 
+                
+                    let start_pos = parseInt(move_parentTarget.getAttribute('startpos'));
+                    let end_pos = start_pos + adapt_width_duration;
+                    move_parentTarget.setAttribute('endpos',end_pos);
+
+                    let id_val =move_parentTarget.id.replace('control','');
+                    let control_timeinfo = document.getElementById(`control${id_val}_timeinfo`);
+                    let string_make = `DURATION = ${adapt_width_duration} , STARTPOS = ${start_pos} , ENDPOS = ${end_pos}`;
+                    control_timeinfo.innerHTML = string_make; 
+                    
+
+                    //visual video target elements visible expand view controls..
+                    let visual_video_take_element=document.getElementById(`take${id_val}_video`);
+                    let visual_video_take_element_rangechilds=visual_video_take_element.children;
+
+                    let make_range_string=[];
+                    for(let s=(start_pos+1); s<=end_pos; s++){
+                        make_range_string.push(s);
+                    }
+                    console.log('현재 videocontrol resize_action에 따른 시간범위 make_range_stringss:',make_range_string,visual_video_take_element_rangechilds);
+                    for(let i=0; i<visual_video_take_element_rangechilds.length; i++){
+                        if(visual_video_take_element_rangechilds[i].className.indexOf('visible_range_cut')!=-1){
+                            let target=visual_video_take_element_rangechilds[i];
+                            let target_timeindex=parseInt(target.getAttribute('time_index'));
+                            console.log('target,target timeindex:',target,target_timeindex);
+                            console.log('target hwatsss존재하나??:',target,target.getAttribute('time_index'),make_range_string.includes(target_timeindex), i);
+                            if( make_range_string.includes(target_timeindex)){
+                                target.style.backgroundColor='rgba(0,0,0,0.0)';
+                            }else{
+                                target.style.backgroundColor='rgba(0,0,0,0.9)';
+                            }
+                        }
+                    }
+
+                    //크기변환 이벤트시에만 아래의 비디오 및 관련요소들의 크기를 변환한다.
+                    let original_duration = parseInt(move_parentTarget.getAttribute('original_duration'));
+                    let target_video__content = document.getElementById(`take${id_val}_video_`);
+                    let adapt_width_percent= (20 * parseFloat(adapt_width_duration / original_duration)).toFixed(3);
+                    target_video__content.style.width = adapt_width_percent +'%';
+
+                    /*let after_controlcontent = document.getElementById(`control${id_val}_final`);
+                    after_controlcontent.setAttribute('change_duration',adapt_width_duration);
+                    after_controlcontent.style.width = parseFloat(3.333 * adapt_width_duration)+'%';*/
+                }
+            }
+            isdrag=false;
+        }
+        return [mousedown_module,mouseup_module,mousedown_module_,mouseup_module_];
+    }
+    var return_set = video_takecontrol_move_closure();
+    var video_takecontrol_mousedown = return_set[0];
+    var video_takecontrol_mouseup = return_set[1];
+    var video_takecontrol_mousedown_ = return_set[2];
+    var video_takecontrol_mouseup_ = return_set[3];
+
+    console.log('관련 타깃 대상함수::',video_takecontrol_mousedown,video_takecontrol_mouseup,video_takecontrol_mousedown_,video_takecontrol_mouseup_);
+
+    //트랙자체를 이동시키는 관련 이벤트.
+    let video_track_elements=document.getElementsByClassName('videotake_control');
+    //각 테이크별 row영역 해당 영역에 mousemove,up관련 핸들러 등록(이동관련)
+    let take_row_area=document.getElementsByClassName('take_row');
+    //각 트랙의 left,right 크기조정bar관련 사이즈조절관련 핸들러
+    let video_left_duration_control = document.getElementsByClassName('video_left_duration_control');
+    let video_right_duration_control = document.getElementsByClassName("video_right_duration_control");
+
+    let video_track_elements_=document.getElementsByClassName('videotake_control_');
+    let take_row_areas_=document.getElementsByClassName('take_row_');
+
+
+    //video_track_elements(mousedown이동 핸들러mousedown)
+    for(let j=0; j<video_track_elements.length; j++){
+        let item=video_track_elements[j];
+        item.addEventListener('mousedown',video_takecontrol_mousedown,false);   
+    }
+    /*for(let j=0; j<video_track_elements_.length; j++){
+        let item=video_track_elements_[j];
+        item.addEventListener('mousedown',video_takecontrol_mousedown_,false);
+    }*/
+    for(let j=0; j<take_row_area.length; j++){
+        let item=take_row_area[j];
+        item.addEventListener('mouseup',video_takecontrol_mouseup,false);
+    }
+    /*for(let j=0; j<take_row_areas_.length; j++){
+        let item=take_row_areas_[j];
+        item.addEventListener('mouseup',video_takecontrol_mouseup_,false);
+    }*/
+
+    //각 비디오controlbar의 보여질 초값 duration지정(자르기,늘리기관련 액션, 자르기의 경우 최소 1초이상의 값을 가져야만하며, 늘리기의 경우 원래의 타고난 duration길이이하여야만한다.)
+    for(let s=0; s<video_left_duration_control.length; s++){
+        let item=video_left_duration_control[s];
+        let item2=video_right_duration_control[s];
+        item.addEventListener('mousedown',video_takecontrol_mousedown,false);
+        item2.addEventListener('mousedown',video_takecontrol_mousedown,false);
+    }
+
+    //not related codes...(transition and image filter and overlay process)
+    let video=document.getElementById('video');
+
+    let test_extract=document.getElementById('test_extract');
+    let original_to_videoEdit = document.getElementById('original_to_videoEdit');
+
+    let canvasinput1=document.getElementById('canvasinput1');
+    let canvasinput2=document.getElementById('canvasinput2');
+    let context1=canvasinput1.getContext('2d');
+
+    let canvasoutput1=document.getElementById('canvasOutput');
+    let canvasoutput2=document.getElementById('canvasOutput2');
+    let canvasoutput3=document.getElementById('canvasOutput3');
+    let canvasoutput4=document.getElementById('canvasOutput4');
+    let canvasoutput5=document.getElementById('canvasOutput5');
+    let canvasoutput6=document.getElementById('canvasOutput6');
+    let canvasoutput7=document.getElementById('canvasOutput7');
+    let canvasoutput8=document.getElementById('canvasOutput8');
+
+    let output_video_element= document.getElementById('output_video_element');
+
+    let firstimage=document.getElementById('firstimage');
+    let secondimage=document.getElementById('secondimage');
+
+    let src;
+    let dst;
+    let cap;
+
+    let test=document.getElementById('test');
+
+    function init_cv(){
+        
+        let src00 = new cv.Mat();
+        src00 = cv.imread(test);
+        console.log('src00:',src00);
+
+        let src01 = new cv.Mat();
+        src01 = cv.imread(test2);
+        console.log('src01:',src01);
+    }
+
+    //트랜지션효과 적용함수
+    function image_transition_front(upload_count,upload_list){
+
+        //트랜지션 처리관련
+        let video_between_transition_startendArea=document.getElementById('video_between_transition_startendArea');
+        let between_count=parseInt(video_between_transition_startendArea.children.length / 2);
+
+
+        var formdata=new FormData();
+
+        formdata.append('upload_count',upload_count);
+        formdata.append('upload_list',upload_list);
+
+        for(let between=0; between<between_count; between++){
+            let between_image_start=document.getElementById(`between_${between+1}_start`);
+            let between_image_end = document.getElementById(`between_${between+1}_end`);
+            
+            /*switch((between+1)){
+                case 1:
+                    between_image_start = between_image_start1_g;
+                    between_image_end = between_image_end1_g;
+                break;
+                case 2:
+                    between_image_start = between_image_start2_g;
+                    between_image_end = between_image_end2_g;
+                break;
+                case 3:
+                    between_image_start = between_image_start3_g;
+                    between_image_end = between_image_end3_g;
+                break;
+                case 4:
+                    between_image_start = between_image_start4_g;
+                    between_image_end = between_image_end4_g;
+                break;
+            }*/
+
+            let alpha=1;let beta; 
+
+            console.log('관련 타깃대상요소 별 전환>:',between_image_start,between_image_end);
+            let between_start_s=cv.imread(between_image_start);
+            let between_end_s=cv.imread(between_image_end);
+            console.log('====>>각 사이장면between별 read값::',between_start_s,between_end_s);
+
+            for(let tran=0; tran<26; tran++){
+                //장면별전환시에 26장 이미지를 초당 26개씩보여주는 26fps로 일단 처리>>
+                let blend_dst = new cv.Mat();
+                let src1 = new cv.Mat(); let src2= new cv.Mat();
+
+                //transition관련 처리 starts...OPENCV.js
+                console.log('->>>각 장면 변환별 참조 이미지start~end:',between_image_start,between_image_end);
+                //src1 = cv.imread(between_image_start);
+                //src2 = cv.imread(between_image_end);
+                src1= between_start_s.clone();
+                src2 =between_end_s.clone();
+
+                console.log('src1:',src1);
+                console.log('src2:',src2);
+                alpha -= (1/26); beta=1 - alpha;
+                alpha = parseFloat(alpha.toFixed(2));
+                beta = parseFloat(beta.toFixed(2));
+                alpha = alpha <=0?0:alpha;
+                beta = beta>=1?1:beta;
+                console.log('alpha and betass:',alpha,beta);
+
+                cv.addWeighted(src1,alpha,src2,beta,0.0,blend_dst,-1);
+                let target_element=document.getElementById('canvasinput1-'+((26*(between))+(tran+1)));
+
+                console.log('targetelemtensss:',target_element);
+                cv.imshow(target_element, blend_dst);
+                //transition관련 처리 ends...
+
+                let data_url = target_element.toDataURL();//image urlsss
+                console.log('get data urlsss:',data_url);
+
+                let bstr= atob(data_url.split(",")[1]);
+                let n = bstr.length;
+                let u8arr = new Uint8Array(n);
+
+                while(n--){
+                    u8arr[n] = bstr.charCodeAt(n);
+                }
+                var file=new File([u8arr],`blend_transitionImg_between${between+1}_${(tran+1)}.png`);
+
+                console.log('filesss:',file);
+                formdata.append(`between${between+1}_${tran+1}`,file);//file개체 betwen1_1,2,3,4,5,.... between2_1,2,3,4,.... 이런식으로 한다. upload_count 4이면 사이공간between3까지 있을것임..
+                //let input_loca=document.createElement('input');
+                //input_loca.setAttribute('type','hidden');
+                //input_loca.setAttribute('name',);
+                //input_loca.setAttribute('value',)
+                src1.delete();src2.delete();blend_dst.delete();
+            }
+        }
+        
+        //필터링 관련 처리>>(테이크별 비디오:테이크별 이미지들의 총 업로드수)
+        let take_video_imgpart_total=document.getElementById('take_video_imgpart_total');
+        let take_count=take_video_imgpart_total.children.length;
+
+        let canvas_index=0; let canvas_index_original=0; let videotake_upload_imgcnt=0;
+        for(let t=0; t<take_video_imgpart_total.children.length; t++){
+            let item_loca=take_video_imgpart_total.children[t];//해당 take의 모든 장면들 프레임들(이미지들 대부분 99%)중에서 26fps기준으로 했을시 1초랜덤구간을 테이크별로 2개씩 집합한다.
+            let takevideo_duration=item_loca.getAttribute('duration');//초값>>재생시간값>>... 7초라고한다면 1,2,3,4,5,6,7 값중 5초라고 한다면 1,2,3,4,5 중 두개선택한 랜덤선택한 두개값을 리턴. 1초라고한다면 1중에 두개선택 일만 두개나옴>>두개 이펙트 겹쳐서 같이 나옴.1,3나왔을시 0~1  2~3초 구간에 해당하는 인댁스 번호체 1~26  26*2+1~26*3길이만큼 나오게한다.구간 이미지 집합들에 대해서 효과적용한다>>
+            let random_area_array=[];
+
+            let random_index= Math.floor(takevideo_duration*Math.random());//0~6.999999xx형태의 수 0~6내림수를 처리한다.
+            random_index += 1;//1~7사이의수가 나오게한다.
+            console.log('take별 랜덤구간 초범위형상화:',t+1, random_index-1,random_index);//
+
+            let random_start=randomn_index-2<0?0:random_index-2;
+            let random_end=random_index;
+        
+            let imgpart_children=item_loca.children;
+            let take_effect_adapt_targets=[];
+            for(let inner=0; inner<imgpart_children.length; inner++){
+                let local_item=imgpart_children[inner];
+                let local_item_index=parseInt(local_item.getAttribute('index'));
+
+                if(26*(random_start)+1 <= local_item_index && local_item_index <= 26*random_end){
+                    take_effect_adapt_targets.push(local_item);
+
+                    let target_src=new cv.Mat();let effect_dst=new cv.Mat();
+                    target_src = cv.imread(local_item);//원본대상 그 대상체 이미지>>읽는다.
+
+                    cv.cvtColor(target_src,effect_dst,cv.COLOR_RGBA2RGB);
+                    cv.cvtColor(effect_dst,effect_dst,cv.COLOR_RGB2HSV);
+                    let target_canvas_element=document.getElementById(`canvasinput_effect${canvas_index+1}`);
+                    console.log('적용 관련 타깃::',target_canvas_element,`canvasinput_effect${canvas_index+1}`);
+                    cv.imshow(target_canvas_element,effect_dst);//이펙트 적용된 것 mat vector 관련 대상 캔버스대상체에 적용한다imshow한다>>
+
+                    let data_url = target_canvas_element.toDataURL();//바로 적용된 연산결과mat결과물 이미지데이터바로 적용가능한듯하고->그 적용된imshow대상체(canvas imshow대상체) url정보를 가져온다.
+                    let bstr=atob(data_url.split(",")[1]);
+                    let n =bstr.length;
+                    let u8arr = new Uint8Array(n);
+
+                    while(n--){
+                        u8arr[n] = bstr.charCodeAt(n);
+                    }
+                    var file=new File([u8arr],`takevideo${t+1}_partimg_process${inner+1}`);
+                    console.log('process filess:',file);
+                    target_src.delete();effect_dst.delete();
+
+                    formdata.append(`takevideo${t+1}_${inner+1}`,file);
+
+                    canvas_index++;
+                }else{
+                    //해당 범위에 속하지 않은 원본형태 이미지들 그대로 new File해서 전달>>
+                    let target_src= new cv.Mat();
+                    target_src = cv.imread(local_item);
+
+                    let target_canvas_element=document.getElementById(`canvasinput_takevideo${canvas_index_original+1}`);
+                    console.log('적용 관련 타깃::',target_canvas_element,`canvasinput_takevideo${canvas_index_original+1}`);
+                    cv.imshow(target_canvas_element,target_src);
+
+                    let data_url = target_canvas_element.toDataURL();
+                    let bstr=atob(data_url.split(",")[1]);
+                    let n=bstr.length;
+                    let u8arr=new Uint8Array(n);
+
+                    while(n--){
+                        u8arr[n]= bstr.charCodeAt(n);
+                    }
+                    var file=new File([u8arr],`takdevideo${t+1}_partimg_process${inner+1}`);
+                    console.log('process fiess:',file);
+                    target_src.delete();
+
+                    formdata.append(`takevideo${t+1}_${inner+1}`,file);
+
+                    canvas_index_original++;
+                }
+
+                videotake_upload_imgcnt++;
+            }
+            console.log('각 테이크별(원본전체)에서 특정 랜럼구간(일초)에 해당하는 타깃 파트 이미지들::',take_effect_adapt_targets,videotake_upload_imgcnt);
+        }
+        formdata.append('videotake_partimg_totalcnt',videotake_upload_imgcnt);
+
+        $.ajax({
+            url:'/upload_ver',
+            //url:'/upload_ver_another',
+            processData:false,
+            contentType:false,
+            data:formdata,
+            type:"POST",
+            error:function(jqxHR,textStatus,errorThrown){
+
+            },
+            beforeSend:function(){
+                console.log('ajax startsss');
+                $('#loading-progress')[0].style.display='flex';
+            },
+            complete:function(){
+                $('#loading-progress').hide();
+            },
+            success:function(result){
+                console.log('upload process resultsss:',result);
+                alert('처리완료>>>>');
+                //serverfile_process(result);    
+                
+                output_video_element.src='http://localhost:3001/processfiles/'+result.video_result;
+                output_video_element.load();
+            },
+            
+        });
+        /*let xhr = new XMLHttpRequest();
+
+        xhr.onload=(result)=>{
+            if(xhr.status === 500 && result && result.code === 'ECONNRESET'){
+                console.log("concneicto was resetss henrece retry the sendRequest function");
+            }else if(xhr.status===200){
+
+            }else{
+                console.log('Error while retrieinve gdatas');
+            }
+        }
+        xhr.onerror = (e) => {
+            console.log('there was an error while reteirv data from serivcie',e);
+        };
+
+        xhr.open('POST','/upload_ver_another');
+        //xhr.setRequestHeader("Content-Type",'multipart/form-data');
+        xhr.send(formdata);*/
+
+    }
+
+    function video_upload(e){
+        console.log('비디오업로드폼 데이터 제출:');
+        e.preventDefault();
+        let video_uploadform = document.getElementById('video_uploadform');
+        let form_data= new FormData(video_uploadform);
+        $.ajax({
+            url:'/upload_ver2',
+            type:'post',
+            data: form_data,
+            cache:false,
+            contentType:false,
+            processData:false,
+            error:function(jqxHR,textStatus,errorThrown){
+
+            },
+            beforeSend:function(){
+                $('#loading-progress')[0].style.display='flex';
+            },
+            complete:function(){
+                $('#loading-progress').hide();
+            },
+            success:function(data){
+                console.log('result datatsss:',data);
+                
+                //let image_extract_form_inputdata=document.getElementById('image_extract_form_data');
+                let upload_encoded_form_inputdata=document.getElementById('upload_encoded_form_data');//업로드시에 인코딩처리되어 처리된 결과물 문자열들>>관련 
+                //image_extract_form_inputdata.value=data.join(',');//문자열저장화
+                upload_encoded_form_inputdata.value=data.join(',');
+                for(let r=0; r<data.length; r++){
+                    let target_video = document.getElementById('upload_video'+r);
+                    target_video.src=data[r];
+                    target_video.load();
+                    target_video.setAttribute('index',(r+1));
+                    console.log('해당 업로드 지정비디오 duration값::',target_video,target_video.duration);
+
+                    let target_video_= document.getElementById('upload_video'+r+'_');
+                    target_video_.src=data[r];
+                    target_video_.load();
+                    target_video_.setAttribute('index',(r+1));
+
+                    target_video.onloadeddata= function(event){
+                        console.log('타깃비디오 모드 로드시점에 실행>>>:',event.target,event.target.duration,event);
+
+                        //비디오태그
+                        let normal_target=event.target;
+                        let index=normal_target.getAttribute('index');
+                        console.log('normal_targetss:',normal_target,index);
+                        //take_area
+                        let duration=Math.round(parseFloat(event.target.duration));
+                        let target=document.getElementById(`take${index}_area`);
+                        target.style.display='block';
+                        //take_video(original)
+                        //let target_=document.getElementById(`take${index}`);
+                       // target_.setAttribute('original_duration',duration);
+                        //target_.style.width = (3.333 *duration)+'%';
+                        //take_video(abstract edit control element)
+                        let target2=document.getElementById(`control${index}`);
+                        target2.setAttribute('original_duration',duration);
+                        target2.setAttribute('change_duration',duration);
+                        target2.setAttribute('startpos',0);
+                        target2.setAttribute('endpos',0+duration);
+                        target2.style.width = (3.333 * duration)+ '%';
+
+                        //video wrap visual element
+                        let visual_connect_target=document.getElementById(`take${index}_video`);
+                        //visual_connect_target.style.width=(3.333 * duration)+'%';
+                        //visual_connect_target.style.width=20%;
+
+                        //각 업로드된 비디오의 duration만큼 자식을 생성한다.
+                        for(let s=0; s<duration; s++){
+                            let make_visible_rangecut=document.createElement('DIV');
+                            make_visible_rangecut.classList.add('visible_range_cut');
+
+                            let calc_percent_width = ( 100 / duration).toFixed(3);
+                            make_visible_rangecut.style.width = (calc_percent_width)+'%';
+                            make_visible_rangecut.style.left = (calc_percent_width * s)+'%';//0,3.333,....3.3333*n-1의 형태 구조로 처리>>
+                            make_visible_rangecut.setAttribute('time_index',s+1);
+                            visual_connect_target.appendChild(make_visible_rangecut);
+                        }
+                        
+                        //하단 최종fix위치 지정된 비디오(분할예정된)의 위치배치배정>>
+                    }
+                    
+                    /*target_video_.onloadeddata= function(event){
+                        console.log('타깃비디오 모드 로드시점에 실행>>>:',event.target,event.target.duration,event);
+
+                        //비디오태그
+                        let normal_target=event.target;
+                        let index=normal_target.getAttribute('index');
+                        console.log('normal_targetss:',normal_target,index);
+                        //take_area
+                        let duration=Math.round(parseFloat(event.target.duration));
+                        let target=document.getElementById(`take${index}_area_final`);
+                        target.style.display='block';
+                        //take_video(original)
+                        //let target_=document.getElementById(`take${index}_final`);
+                        //target_.setAttribute('original_duration',duration);
+                        //target_.style.width = (3.333 *duration)+'%';
+                        //take_video(abstract edit control element)
+                        let target2=document.getElementById(`control${index}_final`);
+                        target2.setAttribute('original_duration',duration);
+                        target2.setAttribute('change_duration',duration);
+                        target2.setAttribute('startpos',0);
+                        target2.setAttribute('endpos',0+duration);
+                        target2.style.width = (3.333 * duration)+ '%';
+
+                        //video wrap visual element
+                       // let visual_connect_target=document.getElementById(`take${index}_video_`);
+                        //visual_connect_target.style.width=(3.333 * duration)+'%';
+                        //visual_connect_target.style.width=20%;
+
+                        
+                        
+                        //하단 최종fix위치 지정된 비디오(분할예정된)의 위치배치배정>>
+                    }*/
+                }
+            }
+        });
+        return false;
+    }
+    function onOpenCvReady(){
+         // console.log('filesaverss saveAs:',saveAs);
+        document.getElementById('status').innerHTML ='OPENCV,.JS IS REaday';
+
+        let rel_target_gathering={};//n개 올린 비디오의 각 between start,endpos 관련 이미지 한개씩 쌍정보 개체들 수집하는 관련된 대기저장
+
+        test_extract.addEventListener('click',function(){
+            video_between_transition_startendArea.innerHTML='';
+            //document.getElementById('testform').submit();
+            console.log('whatssss:');
+
+            let image_extract_form_data = document.getElementById('image_extract_form_data');//추출부분 분할 잘려진 비디오
+            let transfer_data={
+                'upload_list_data':image_extract_form_data.value
+            }
+            console.log('transfer datasss:',transfer_data);
+            //var formdata=new FormData(document.getElementById('uploadform'));
+            $.ajax({
+                url:'/testsss',//editing최종반영되어진 비디오들입니다.이들 각각 테이크별로 하여 26fps기준으로 하여 모두 해당 프레임률로 자릅니다.영상 이미지로 추출>>
+                type:'post',
+                data:transfer_data,
+                cache:false,
+                //contentType:false,
+                //processData:false,
+                error:function(jqxHR,textStatus,errorThrown){
+
+                },
+                beforeSend: function(){
+                    console.log('ajax startssss:');
+                    $('#loading-progress')[0].style.display='flex';
+                },
+                complete: function(){
+                },
+                success:function(result_data){
+                    console.log('result datasss;',result_data);
+                    
+                    //upload_listss>>
+                    let upload_list = result_data.upload_list;
+                    //video_between_transition_startendArea
+                    let video_between_transition_startendArea = document.getElementById('video_between_transition_startendArea');
+                    let take_video_imgpart_total = document.getElementById('take_video_imgpart_total');
+
+                    let loop_count = result_data.upload_count;
+
+                    //트랜지션 이미지 처리 관련 async변수 init
+                    let transition_async_start=0;
+                    let transition_async_end=0;//각 비디오별 시작/끝 지점에 해당하는 값 저장한다.
+
+                    //각 테이크별 전체적인 이미지들의 총 로드성공카운트수 로드성공카운트가 모두 꽉 채운(테이크별합) 경우에 sertInterval clearinterval처리한다>>
+                    let effect_async_count=0;
+
+                    for(let l=0; l<loop_count; l++){//각 업로드 비디오(잘려진 가공처리된)
+                        //0:0,1  1:1,2  2:2,3  3:3,4 
+                        let now_video_endpoint = result_data.data[(l+1)+'_end_data'];
+                        let next_video_startpoint= result_data.data[(l+1+1)+'_start_data'];//첫비디오,n번쨰 비디오가 있을때 다음대상 비디오가 있으면 다음비디오의 첫부분과 지금비디오의 마지막부분의 트랜지션 효과를 부여할뿐임>>
+                        let target_full_imgdata=result_data.data[`${l+1}_full_data`];//1,2,3,4,...fulldata 요소를 가져온다.
+                
+                        console.log('video between image transitions standy loopss:',now_video_endpoint,next_video_startpoint,target_full_imgdata);
+
+                        let takevideo_group_element=document.createElement('DIV');
+                        takevideo_group_element.classList.add('takevideo_group_imglist');
+                        takevideo_group_element.setAttribute('id',`take${l+1}_group`);
+                        takevideo_group_element.setAttribute('childlength',target_full_imgdata.length);
+                        takevideo_group_element.setAttribute('duration',target_full_imgdata.length / 26);//일단 fix값형태로 26프레임량으로 나눈 duration재생시간값>>
+                        let async_imgpart_cnt=0;
+                        for(let inner=0; inner<target_full_imgdata.length; inner++){
+                            let make_image_part_video=document.createElement('IMG');
+                            make_image_part_video.width=320;
+                            make_image_part_video.height=180;
+                            make_image_part_video.src=target_full_imgdata[inner];
+                            make_image_part_video.setAttribute('id',`take${l+1}_img${inner+1}`);
+                            make_image_part_video.setAttribute('index',inner+1);
+                            takevideo_group_element.appendChild(make_image_part_video);
+
+                            make_image_part_video.onload=function(e){
+                                console.log('대상 관련 개체 모두 로드시점때 실행>>:',e.target);
+
+                                effect_async_count++;//임의 테이크안의 세부적 이미지들자식들의 수 로드성공만큼 증가한다.테이크별 이미지전체로드 개수합>>
+                            }
+                        }
+                        if(next_video_startpoint){
+                            //지금 현재 비디오의 마지막장면이미지(한개)
+                            let make_image_current=document.createElement('IMG');
+                            make_image_current.width=1280; make_image_current.height=720; 
+                            make_image_current.src= now_video_endpoint[0];
+                            make_image_current.setAttribute('id',`between_${l+1}_start`);//n번째 사이공간의 시작
+                            //다음 비디오의 첫번째 장면이미지(한개)
+                            let make_image_next = document.createElement('IMG');
+                            make_image_next.width=1280; make_image_next.height=720;
+                            make_image_next.src= next_video_startpoint[0];
+                            make_image_next.setAttribute('id',`between_${l+1}_end`);//n번쨰 사이공간의 끝
+
+                            video_between_transition_startendArea.appendChild(make_image_current);
+                            video_between_transition_startendArea.appendChild(make_image_next);
+
+                            make_image_current.onload=function(e){
+                                console.log('create elemtn image first개체 다 로드시점실행>>:',e.target);
+                                //rel_target_gathering[`${l+1}_start`] = true;
+                                
+                                rel_target_gathering[`${transition_async_start+1}_start`] = true;//비디오사이별 between의 순번 상관없이 그 순번의 개수를 기준으로 한다 그 between개수만큼을 만족하는 각 bewteen start,end 만 있으면 되니까 그들이 다 모이기만 하면됨.
+                                transition_async_start++;
+                            }
+                            make_image_next.onload=function(e){
+                                console.log('create elemtn image after개체 다 로드시점실행>>:',e.target);
+                                //rel_target_gathering[`${l+1}_end`] = true;
+
+                                rel_target_gathering[`${transition_async_end+1}_end`] = true;//각 사이 순서상관없는 형태의 무작위형태의 집합들이 모였을때를 고려한다.추적을 하려면 정밀한 클로저설계가 필요함.
+                                transition_async_end++;
+                            }
+                        }
+
+                        take_video_imgpart_total.appendChild(takevideo_group_element);
+                    }
+
+                    let standby = window.setInterval(function(){
+                        console.log('===>>관련 이미지대상between들 모두 로드된시점에 실행>>>:',standby, rel_target_gathering);
+                        let pass=false;
+                        for(let t=0; t<loop_count-1; t++){
+                            //3 : 0,1,2 
+                            if(rel_target_gathering[`${t+1}_start`] && rel_target_gathering[`${t+1}_end`]){
+                                //t:1 2 3 4 5  세개 업로드했다면 그 개수-1 개만큼의 사이공간이 있다는것이고 1,2 between 5개했다면 0~4 0,1,2,3=>1,2,3,4 네개between있어야만 비트윈들에 조건 개수가들이 모두 존재해야만 통과이다 통과안하면 계속 도는것이고 통과되는순간 interval멈춘다 관련사이between대상 object개체이며, 이 원소리스트 집합중 존재했던 경우라면 pass=true
+                                pass=true;
+                            }else{
+                                pass=false;//존재하지 않았던 한 케이스라도 존재하지 않았던 경우라면 
+                            }
+                        }
+                        //이펙트(필터) 관련된 vaild통과관련>>
+                        let takevideo_group_element_refer=document.getElementsByClassName('takevideo_group_imglist');
+                        console.log(takevideo_group_element_refer);
+
+                        let pass2=false;
+                        let take_partimgs_totalcnt=0;
+                        for(let ss=0; ss<takevideo_group_element_refer.length; ss++){
+                            // 각 장면 형상화이고, 각테이크비디오이고 이를 이미지로써 분할한 데이터이다.>>>이들중 리스트중에서 childelgnth개수만큼  img요소가 다 자식 추가되었을때 loaeded된 시점..>떄를 판단>>...
+                            let item=takevideo_group_element_refer[ss];
+                            let childlength = parseInt(item.getAttribute('childlength'));//자식수
+                            /*let real_childlength=item.children.length;//img태그 자식의 수
+                            if(childlength == real_childlength){
+                                console.log('==>>>childelgnth;,realchildelngths:',childlength,real_childlength);
+                                pass2=true;
+                            }else{
+                                pass2=false;
+                            }*/
+                            take_partimgs_totalcnt += childlength;//총 이미지 데이터 자식의 수
+                        }
+                        console.log('effect관련 대상들로 쓰일 take별 세부이미지들 로드준비가 모두 되었는지 카운트수==standby수 동일여부 같다면 모두 로드된것:',take_partimgs_totalcnt,effect_async_count)
+                        if(take_partimgs_totalcnt == effect_async_count){
+                            pass2=true;
+                        }
+                        console.log('===>>데이터 gathering full여부(트랜지션,필터이팩트 모두):',pass,pass2);
+                        if(pass && pass2){
+                            
+                            window.clearInterval(standby);
+                            alert('필요한 이미지(트랜지션,이펙트적용) 로드 재료는 모두 준비완료!!');
+                            //반복호출실행을 멈추고, image_write_front실행>>
+                            image_transition_front(loop_count,upload_list);//filter and transitionsss
+                        }
+                    },20);
+                    /*document.getElementById('firstimage').width=1280;
+                    document.getElementById('firstimage').height=720;
+                    document.getElementById('secondimage').width=1280;
+                    document.getElementById('secondimage').height=720;
+                    document.getElementById('firstimage').src=data['1_data'][1];
+                    document.getElementById('secondimage').src=data['2_data'][0];
+
+                    //let url=URL.createObjectURL(data);
+                    //console.log('urlsss read 가능??:',url);
+                    //http://localhost:3000/processfiles/xxxxxxxxresultfile.mp4
+
+                    firstimage.onload=function(e){
+                        console.log('파일이 다 로드된시점에 실행:::',e.target);
+                        rel_target_gathering['1']=true;
+                    }
+                    secondimage.onload=function(e){
+                        console.log('파일이 다 로드된시점에 실행:::',e.target);
+                        rel_target_gathering['2']=true;
+                    }
+
+                    let standby = window.setInterval(function(){
+                        console.log('===>이미지파일로드 src다 둘다 지정된경우에 실행>>>:',standby,rel_target_gathering);
+                        if(rel_target_gathering['1'] && rel_target_gathering['2']){
+                            window.clearInterval(standby);
+                            //let src1=cv.imread(firstimage);
+                            //let src2=cv.imread(secondimage);
+                            //console.log('src1:',src1);
+                            //console.log('src2:',src2);
+
+                            image_write_front();
+                        }
+                    },10);*/
+                    
+                    //video_source_element.src='http://localhost:3000/processfiles/'+data.video_result;
+                    //video_element.load();
+                }
+            });    
+        },false);
+
+        original_to_videoEdit.addEventListener('click',function(){
+            //document.getElementById('testform').submit();
+            //alert('원본비디오수정처리하는관련 돼나?');
+            console.log('original to video Edit process gogo:');
+
+            let upload_encoded_form_data = document.getElementById('upload_encoded_form_data');//업로드가 될 원본 엔코딩 영상들 그 각각을 그 각각에 연결되어있는 split정보와 함께 보내어서 영상을 가공 자른다.
+            let split_and_move_video_controls= document.getElementsByClassName('take_row');
+            let take_video_process_info = [];
+
+            if(upload_encoded_form_data.value=='' || split_and_move_video_controls.length==0){
+                alert('처리할 관련 정보가 없습니다!.');
+                return false;
+            }
+            for(let s=0; s<split_and_move_video_controls.length; s++){
+                if(split_and_move_video_controls[s].style.display=='block'){
+                    //block인항목들에 대해서만 >>
+                    //let item=split_and_move_video_controls[s];
+                    let item=document.getElementById(`control${s+1}`);
+                    //순차적 테이크 순서 절대적인 1~5순서쌍 정보>>>
+                    let take_index=s+1;
+                    let original_duration = parseInt(item.getAttribute('original_duration'));
+                    let change_duration=parseInt(item.getAttribute('change_duration'));
+                    let startpos = parseInt(item.getAttribute('startpos'));
+                    let endpos = parseInt(item.getAttribute('endpos'));
+                    
+                    if(startpos < 0){
+                        alert('프레임범위가 원본비디오를 벗어났습니다.');
+                        return false;
+                    }
+                    if(change_duration > original_duration){
+                        alert('원본 비디오 길이보다 더 길게 지정은 불가합니다.');
+                        return false;
+                    }
+                    if(endpos > original_duration){
+                        alert('프레임범위가 원본비디오를 벗어났습니다.');
+                        return false;
+                    }
+                    let store_obj= {};
+                    store_obj['take'] = take_index;
+                    store_obj['duration'] = change_duration;
+                    store_obj['startpos'] = startpos;
+                    store_obj['endpos'] = endpos; 
+
+                    take_video_process_info.push(store_obj);
+                }               
+            }
+            let transfer_data={
+                'upload_list_data':upload_encoded_form_data.value,
+                'edit_process_info' : JSON.stringify(take_video_process_info)
+            }
+            console.log('transfer datasss:',transfer_data);
+            //var formdata=new FormData(document.getElementById('uploadform'));
+            $.ajax({
+                url:'/video_move_and_splice_process',
+                type:'post',
+                data:transfer_data,
+                cache:false,
+                //contentType:json,
+                //dataType:'json',
+                //processData:false,
+                error:function(jqxHR,textStatus,errorThrown){
+
+                },
+                beforeSend: function(){
+                    //console.log('ajax startssss:');
+                    //$('#loading-progress')[0].style.display='flex';
+                },
+                complete: function(){
+                // $('#loading-progress').hide();
+                },
+                success:function(result_data){
+                    console.log('result datasss;',result_data);
+                    
+                    //editivineg 처리되어 나온 그 대상파일들이 있을것이고 그들을 기억하고 그 정보 바탕으로 하여 그대로 이어서 관련 처리>>트랜지션등 이어서 처리>.....
+                    let image_extract_form_inputdata = document.getElementById('image_extract_form_data');
+                    let process_data=result_data.process_data;
+                    image_extract_form_inputdata.value=result_data.process_data.join(',');
+                    for(let r=0; r<process_data.length; r++){
+                        let target_video = document.getElementById('upload_edited_video'+r);
+                        target_video.src=process_data[r];
+                        target_video.load();
+                        target_video.setAttribute('index',(r+1));
+                        console.log('해당 업로드 지정비디오 duration값:::',target_video,target_video.duration);
+                    }
+                }
+            });   
+        },false);
+    }
+
+</script>
+<script async src='public/opencv.js' onload='onOpenCvReady()'></script>
+</body>
+</html>

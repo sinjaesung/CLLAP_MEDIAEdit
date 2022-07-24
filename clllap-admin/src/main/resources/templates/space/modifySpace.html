@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="description" content="">
+<meta name="author" content="">
+
+<title>We-up 관리자</title>
+
+<!-- Custom fonts for this template-->
+<link href="vendor/fontawesome-free/css/all.min.css" rel="stylesheet"
+	type="text/css">
+<link
+	href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
+	rel="stylesheet">
+
+<!-- Custom styles for this template-->
+<link href="css/sb-admin-2.min.css" rel="stylesheet">
+
+</head>
+
+<style>
+th, tr, td {
+	text-align: center;
+}
+</style>
+
+<body id="page-top">
+
+	<!-- Page Wrapper -->
+	<div id="wrapper">
+
+		<th:block th:replace="/../hf/sidebar.html"></th:block>
+
+		<!-- Content Wrapper -->
+		<div id="content-wrapper" class="d-flex flex-column">
+
+			<!-- Main Content -->
+			<div id="content">
+				<th:block th:replace="/../hf/header.html"></th:block>
+
+				<!-- Begin Page Content -->
+				<div class="container-fluid">
+
+					<!-- Page Heading -->
+					<h1 class="text-gray-800 head_title">공유주방 & 공간 수정</h1>
+					<th:block th:each="shareSpace : ${shareSpace}">
+						<!-- DataTales Example -->
+						<div class="card shadow mb-4">
+							<div class="card-header py-3">
+								<h6 class="m-0 font-weight-bold text-primary">공유주방 & 공간 수정</h6>
+							</div>
+							<div class="card-body">
+								<div class="table-responsive">
+									<form id="modify_spaceForm" action="modifySpace" method="post">
+										<input type="hidden" name="mem_id" id="mem_id" th:value="${shareSpace.mem_id}">
+                    					<input type="hidden" name="share_id" id="share_id" th:value="${shareSpace.share_id}">
+										<!-- <input type="hidden" name="share_id" th:value="${shareSpace.share_id}"> -->
+										<table class="table table-bordered" width="100%"
+											cellspacing="0">
+											<tr>
+												<th>업종 카테고리</th>
+												<td th:text="${shareSpace.share_biz_type}"></td>
+												<th>제목</th>
+												<td th:text="${shareSpace.share_title}"></td>
+											</tr>
+											<tr>
+												<th>상태</th>
+												<td th:if="${shareSpace.share_deleted} == 0"><input
+													type="checkbox" class="share_deleted" name="share_deleted"
+													value="0" checked>활성 &nbsp;&nbsp; <input
+													type="checkbox" class="share_deleted" name="share_deleted"
+													value="1">비활성</td>
+												<td th:if="${shareSpace.share_deleted} == 1"><input
+													type="checkbox" class="share_deleted" name="share_deleted"
+													value="0">활성 &nbsp;&nbsp; <input type="checkbox"
+													class="share_deleted" name="share_deleted" value="1"
+													checked>비활성</td>
+												<th>ID(이메일)</th>
+												<td><a
+													th:href="@{/detailUser(mem_id=${shareSpace.mem_id})}"
+													th:text="${shareSpace.mem_email}"></a>&nbsp;&nbsp;
+													<!-- <button type="button" id="modify_memEmail" class="btn btn-secondary" onclick="location.href='findUser'">변경하기</button> -->
+													<button type="button" id="findEmail" class="btn btn-primary">이메일 찾기</button>
+												</td>
+											</tr>
+											<tr>
+												<th>보증금</th>
+												<td><input type="text" name="share_deposit"
+													th:value="${shareSpace.share_deposit}"> 원</td>
+												<th>위치</th>
+												<td><span th:text="${shareSpace.share_address}"></span>
+													<span th:text="${shareSpace.share_address_detail}"></span></td>
+											</tr>
+											<tr>
+												<th>월세</th>
+												<td><input type="text" name="share_price"
+													th:value="${shareSpace.share_price}"> 원</td>
+												<th>평수</th>
+												<td><input type="text" name="share_sqft"
+													th:value="${shareSpace.share_sqft}"> 평</td>
+											</tr>
+											<tr>
+												<th>조회수</th>
+												<td th:text="${shareSpace.share_view_count}"></td>
+												<th>등록일(최종수정일자)</th>
+												<td>
+												<span
+													th:if="${shareSpace.share_modify_date} == null"><span
+														th:text="${shareSpace.share_create_date}"></span></span> <span
+													th:if="${shareSpace.share_modify_date} != null"><span
+														th:text="${shareSpace.share_modify_date}"></span></span>
+												</td>
+											</tr>
+											<tr>
+												<th>찜하기</th>
+												<td th:text="${shareSpace.share_wish_count}"></td>
+												<th>공유수</th>
+												<td th:text="${shareSpace.share_share_count}"></td>
+											</tr>
+											<tr>
+												<th>게시글 상세보기</th>
+												<td><a th:href="@{https://becomeceo.net/ShareSpaceDetailsPage/}+${shareSpace.share_id}" target="_blank">게시글 바로가기</a></td>
+												<th>태그</th>
+												<td><input type="text" name="share_tag"
+													th:value="${shareSpace.share_tag}"></td>
+											</tr>
+											<tr>
+												<th>이미지</th>
+		                                        <td colspan="3">
+		                                            <a th:each="img : ${mainImg}" th:href="@{https://weup-bucket.s3.ap-northeast-2.amazonaws.com/images/space/}+${img}" target="_blank">
+		                                            	<img style="width:200px;height:240px;" th:src="@{https://weup-bucket.s3.ap-northeast-2.amazonaws.com/images/space/}+${img}">
+		                                            </a>
+		                                        </td>
+                                        	</td>
+											</tr>
+											<tr>
+												<th>상세 내용</th>
+												<td colspan="3"><textarea name="share_desc"
+														th:text="${shareSpace.share_desc}" rows=5 style="width: 100%;"></textarea></td>
+											<tr>
+										</table>
+
+										<div class="modal-footer">
+											<button type="submit" id="modify" class="btn btn-secondary"
+												data-dismiss="modal">수정</button>
+											<button type="button" class="btn btn-primary"
+												onclick="location.href='spaceKitchen_list'">목록</button>
+										</div>
+									</form>
+								</div>
+							</div>
+
+						</div>
+					</th:block>
+				</div>
+				<!-- End of Main Content -->
+
+				<!-- Footer -->
+				<footer class="sticky-footer bg-white">
+					<div class="container my-auto">
+						<div class="copyright text-center my-auto">
+							<span>Copyright &copy; We-up 2020</span>
+						</div>
+					</div>
+				</footer>
+				<!-- End of Footer -->
+
+			</div>
+			<!-- End of Content Wrapper -->
+
+		</div>
+		<!-- End of Page Wrapper -->
+
+		<!-- Scroll to Top Button-->
+		<a class="scroll-to-top rounded" href="#page-top"> <i
+			class="fas fa-angle-up"></i>
+		</a>
+
+
+		<!-- Bootstrap core JavaScript-->
+		<script src="vendor/jquery/jquery.min.js"></script>
+		<script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+		<!-- Core plugin JavaScript-->
+		<script src="vendor/jquery-easing/jquery.easing.min.js"></script>
+
+		<!-- Custom scripts for all pages-->
+		<script src="js/sb-admin-2.min.js"></script>
+		<script>
+		
+		var mem_id = $('#mem_id').val()
+		var share_id = $('#share_id').val()
+
+		$('#findEmail').click(()=>{
+			window.open("find_emailPage?mem_id="+mem_id+"&share_id="+share_id,"이메일 찾기", "width=1400, height=550, left=100, top=50"); 
+		})
+
+  	
+		  	// 체크박스 하나만 설정
+		  	$('.share_deleted').click(function(){
+		  		$('input[type="checkbox"][name="share_deleted"]').prop('checked',false)
+		  		$(this).prop('checked', true)
+		  	})
+		  	
+		  	$('#modify_memEmail').click(()=>{
+		  		
+		  	})
+  	
+		</script>
+</body>
+
+</html>

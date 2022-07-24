@@ -1,0 +1,56 @@
+plugins {
+    id 'org.springframework.boot' version '2.6.0'
+    id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+    id 'java'
+    id 'eclipse'
+}
+
+group = 'com.clllap'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '1.8'
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+repositories {
+    mavenCentral()
+    maven { url "https://www.datanucleus.org/downloads/maven2/"}
+    
+}
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter'
+    compileOnly 'org.projectlombok:lombok'
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+    runtimeOnly 'mysql:mysql-connector-java'
+    annotationProcessor 'org.projectlombok:lombok'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-web-services'
+    implementation group: 'org.mybatis.spring.boot', name: 'mybatis-spring-boot-starter', version: '2.1.4'
+
+    implementation group: 'io.springfox', name: 'springfox-swagger-ui', version: '2.9.2'
+    implementation group: 'io.springfox', name: 'springfox-swagger2', version: '2.9.2'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-oauth2-client', version: '2.4.8'
+
+    implementation group: 'com.google.guava', name: 'guava', version: '30.0-jre'
+    implementation group: 'net.nurigo', name: 'javaSDK', version: '2.2'
+
+    implementation 'com.amazonaws:aws-java-sdk-core'
+    implementation 'com.amazonaws:aws-java-sdk:1.11.313'
+    implementation group: 'org.apache.httpcomponents', name: 'httpcore', version: '4.4.8'
+    implementation group: 'commons-logging', name: 'commons-logging', version: '1.2'
+    implementation group: 'org.apache.httpcomponents', name: 'httpmime', version: '4.2.4'
+	implementation group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.3'
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-mail', version: '2.4.5'
+
+}
+
+test {
+    useJUnitPlatform()
+}

@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en" 
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+	>
+<head>
+
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+<title>Insert title here</title>
+</head>
+<body>
+	<!-- Topbar -->
+        <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
+		<th:block th:with=" user = ${#authentication.principal}">
+          <!-- Topbar Navbar -->
+          <ul class="navbar-nav ml-auto">
+            <!-- Nav Item - User Information -->
+            <li class="nav-item dropdown no-arrow">
+              <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              	<th:block th:if="${ #strings.equals(user, 'anonymousUser')}">
+              		<span class="mr-2 d-none d-lg-inline text-gray-600 small">로그인이 필요합니다.</span>
+              	</th:block>
+              	<th:block th:unless="${#strings.equals(user, 'anonymousUser')}">
+                	<span class="mr-2 d-none d-lg-inline text-gray-600 small" th:text="|${user.admin_email} 님|"></span>
+                </th:block>
+                <img class="img-profile rounded-circle" src="https://source.unsplash.com/QAB-WJcbgJk/60x60">                
+              </a>
+              <!-- Dropdown - User Information -->
+              <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="userDropdown">
+                <!-- <a class="dropdown-item" href="#">
+                  <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
+                  Profile
+                </a>
+                <a class="dropdown-item" href="#">
+                  <i class="fas fa-cogs fa-sm fa-fw mr-2 text-gray-400"></i>
+                  Settings
+                </a>
+                <a class="dropdown-item" href="#">
+                  <i class="fas fa-list fa-sm fa-fw mr-2 text-gray-400"></i>
+                  Activity Log
+                </a> 
+                <div class="dropdown-divider"></div> -->
+                <th:block th:if="${ #strings.equals(user, 'anonymousUser')}">
+                	<a class="dropdown-item" href="login">
+	                  <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
+	                  Login
+	                </a>
+	                <a class="dropdown-item" href="join_page">
+	                  <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
+	                  Join
+	                </a>
+                </th:block>
+                <th:block th:unless="${ #strings.equals(user, 'anonymousUser')}">
+	                <a class="dropdown-item" onclick="location.href='logout'">
+	                  <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
+	                  Logout
+	                </a>
+                </th:block>
+              </div>
+            </li>
+
+          </ul>
+
+        </nav>
+        <!-- End of Topbar -->
+</body>
+
+</html>

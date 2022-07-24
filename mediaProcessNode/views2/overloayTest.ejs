@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+
+        #canvasOutput{
+            background-color:#808080
+        }
+        canvas{
+            background-color:#808080
+        }
+        #imagesrc{
+            outline:1px solid black; width:400px;height:400px;display:block;
+        }
+    </style>
+</head>
+<body>
+<h2>HELLO OEPNCV.JS</h2>
+<p id='status'>OPENCV IS JIS LOADING....</p>
+<div>
+    <p>Inputoutput</p>
+    <button id='start' onclick="javascript:init_cv()">START</button>
+    <div class='inputoutput'>
+        <video id='video' width=320 height=240 alt='no image' src='resource/resource2.mp4' controls></video>
+        <video id='effect1' width=320 height=240 alt='no image' src='resource/Fireworks/Fireworks_3.mp4' controls></video>
+        <video id='effect2' width=320 height=240 alt='no image' src='resource/Fireworks/Fireworks_16.mp4' controls> </video>
+        <video id='effect3' width=320 height=240 alt='no image' src='resource/Lens flare/Lens Flare 6.mp4' controls></video>
+        <video id='effect4' width=320 height=240 alt='no image' src='resource/Lens flare/Lens Flare 7.mp4' controls></video>
+        <video id='effect5' width=320 height=240 alt='no image' src='resource/Particles/Particles_1.mp4' controls></video>
+        <video id='effect6' width=320 height=240 alt='no image' src='resource/Particles/Particles_3.mp4' controls></video>
+          
+    </div>
+    <div class='inputoutput'>
+        <div class='caption'>canvasinput</div>
+        <canvas id='canvasinput1'></canvas>
+        <canvas id='canvasinput2'></canvas>
+        <canvas id='canvasinput3'></canvas>
+        <canvas id='canvasinput4'></canvas>
+        <canvas id='canvasinput5'></canvas>
+        <canvas id='canvasinput6'></canvas>
+
+    </div>
+    <div class='inputoutput'>
+        <div class='caption'>canvasOutput</div>
+        <canvas id='canvasOutput' width=320 height=240></canvas>
+        <canvas id='canvasOutput2' width=320 height=240></canvas>
+        <canvas id='canvasOutput3' width=320 height=240></canvas>
+        <canvas id='canvasOutput4' width=320 height=240></canvas>
+        <canvas id='canvasOutput5' width=320 height=240></canvas>
+        <canvas id='canvasOutput6' width=320 height=240></canvas>
+        <canvas id='canvasOutput7' width=320 height=240></canvas>
+        <canvas id='canvasOutput8' width=320 height=240></canvas>
+        <canvas id='canvasOutput9' width=320 height=240></canvas>
+        <canvas id='canvasOutput10' width=320 height=240></canvas>
+    </div>
+</div>
+<script>
+let imgElement = document.getElementById('imagesrc');
+let inputElement=document.getElementById('fileInput');
+let video=document.getElementById('video');
+let effect1=document.getElementById('effect1');
+let effect2=document.getElementById('effect2');
+let effect3=document.getElementById('effect3');
+let effect4=document.getElementById('effect4');
+let effect5=document.getElementById('effect5');
+let effect6=document.getElementById('effect6');
+
+let canvasinput1=document.getElementById('canvasinput1');
+let canvasinput2=document.getElementById('canvasinput2');
+let context1=canvasinput1.getContext('2d');
+let canvasoutput = document.getElementById('canvasOutput');
+let canvasoutput2 = document.getElementById('canvasOutput2');
+let canvasoutput3 = document.getElementById('canvasOutput3');
+let canvasoutput4 = document.getElementById('canvasOutput4');
+let canvasoutput5 = document.getElementById('canvasOutput5');
+let canvasoutput6 = document.getElementById('canvasOutput6');
+let canvasoutput7 = document.getElementById('canvasOutput7');
+let canvasoutput8 = document.getElementById('canvasOutput8');
+let canvasoutput9 = document.getElementById('canvasOutput9');
+let canvasoutput10 = document.getElementById('canvasOutput10');
+
+let video_src;
+let effect_src1;
+let effect_src2;
+let effect_src3;
+let effect_src4;
+let effect_src5;
+let effect_src6;
+
+//let dst1,dst2,dst3,dst4,dst5,dst6;
+let cap1,cap2,ca3,cap4,cap5,cap6;
+let video_cap;
+
+function init_cv(){
+    let alpha_blend_desti;
+
+    video_src = new cv.Mat(video.height,video.width,cv.CV_8UC4);
+    effect_src1=new cv.Mat(effect1.height,effect1.width,cv.CV_8UC4);
+    effect_src2=new cv.Mat(effect2.height,effect2.width,cv.CV_8UC4);
+    effect_src3=new cv.Mat(effect3.height,effect3.width,cv.CV_8UC4);
+    effect_src4=new cv.Mat(effect4.height,effect4.width,cv.CV_8UC4);
+    effect_src5=new cv.Mat(effect5.height,effect5.width,cv.CV_8UC4);
+    effect_src6=new cv.Mat(effect6.height,effect6.width,cv.CV_8UC4);
+    //src2=new cv.Mat(video.height,video.width,cv.CV_8UC3);
+    //dst=new cv.Mat(effect_src1.height,effect_src1.width,cv.CV_8UC1);
+    cap1=new cv.VideoCapture(effect1);
+    video_cap=new cv.VideoCapture(video);
+
+    cap1.read(effect_src1);
+    video_cap.read(video_src);
+    //cap.read(src2);//삼채널로
+    cv.imshow("canvasinput1",video_src);
+    cv.imshow("canvasinput2",effect_src1);
+    //cv.imshow("canvasinput2",src);
+    //cv.imshow("canvasinput3",src2);
+
+
+    /*for(let j=0; j<effect_src1.length; j++){
+        console.log('effetct_src1 a알파채널부분만 추적:');
+        //let target_alpha=4*(j+1)-1;//1,2,3,4....
+    }*/
+    let alpha=0.5;//알파채널 알파 투명도 처리합니다.고유의 색상은 유지한채 알파투명도만 처리한다.
+   // console.log("src2sss:3channelss:",src2);
+   // console.log('dstss:',dst);
+    //console.log('capsss:',cap);
+
+    callback(canvasinput1,canvasinput2);
+
+   // cv.addWeighted(video_src,1,effect_src1,0.6,0.0,alpha_blend_desti,-1);
+
+    
+    //console.log('effect_src1,video_src',effect_src1,video_src);
+    //console.log('alphablend 합성 destionaitaino:',alpha_blend_desti);
+}
+function callback(canvasinput,video){
+    try{
+        //weightValue.setAttribute('value',trackbar.value);
+        //let alpha=trackbar.value / trackbar.max;
+        //console.log('투명도??:',alpha);
+        //let beta = 0.05;
+        
+        let src1=cv.imread(canvasinput1);
+        let src2=cv.imread(canvasinput2);
+
+        let dst=new cv.Mat();
+        cv.addWeighted(canvasinput1,1,canvasinput2,0.6,0.0, dst, -1);
+        cv.imshow(canvasOutput,dst);
+
+        console.log("dst localss:",src1,src2,dst);
+    }catch(error){
+        console.log('what errosss:',error);
+    }
+    
+}
+const FPS=30;
+function processVideo(){
+    try{
+        let begin= Date.now();
+        cap.read(src);
+        //cv.cvtColor(src,dst,cv.COLOR_RGBA2GRAY);
+        cv.imshow('canvasinput1',src);
+
+        console.log('processing videoss:');
+        console.log('capss::',cap);
+        console.log('dst::',dst);
+        console.log('srcss:',src);
+
+        let delay=1000/FPS - (Date.now() - begin);
+        console.log('delayss:',delay);
+
+        setTimeout(processVideo,1000)
+    }catch(error){
+        console.log('errosss:',error);
+    }
+    
+}
+
+imgElement.onload = function() {
+    console.log('imgElement자원요소가 모두 로드되었을시에::',cv);
+    //let mat = cv.imread(imgElement);
+    //cv.imshow('canvasOutput',mat);
+    //console.log('imgshow mat elemtnssnso datasss:',mat);
+    //mat.delete();
+};
+function onOpenCvReady(){
+    document.getElementById('status').innerHTML ='OPENCV,.JS IS REaday';
+
+    init_cv();
+    //$('#start').click(init_cv);
+
+}
+</script>
+<script async src='https://docs.opencv.org/3.4.0/opencv.js' onload='onOpenCvReady()'></script>
+</body>
+</html>

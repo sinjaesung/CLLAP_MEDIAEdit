@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="description" content="">
+<meta name="author" content="">
+
+<title>We-up 관리자</title>
+
+<!-- Custom fonts for this template -->
+<link href="vendor/fontawesome-free/css/all.min.css" rel="stylesheet"
+	type="text/css">
+<link
+	href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
+	rel="stylesheet">
+
+<!-- Custom styles for this template -->
+<link href="css/sb-admin-2.min.css" rel="stylesheet">
+
+<!-- Custom styles for this page -->
+<link href="vendor/datatables/dataTables.bootstrap4.min.css"
+	rel="stylesheet">
+
+</head>
+
+<style>
+.search_top {
+	border-top: 1px solid #ccc;
+}
+
+.search_th {
+	width: 20%;
+	background: rgba(78, 125, 223, 0.2);
+	text-align: center;
+	border-bottom: 1px solid #ccc;
+}
+
+tr, td {
+	border: 1px solid #ccc;
+	padding: 7px;
+}
+
+table {
+	width: 100%;
+}
+
+.btn-search {
+	margin-top: 10px;
+	margin-left: 44%;
+}
+
+.btn-reset {
+	margin-top: 10px;
+}
+</style>
+
+<body id="page-top">
+
+	<!-- Page Wrapper -->
+	<div id="wrapper">
+
+
+		<!-- Content Wrapper -->
+		<div id="content-wrapper" class="d-flex flex-column">
+
+			<!-- Main Content -->
+			<div id="content">
+				<!-- Begin Page Content -->
+				<div class="container-fluid">
+					</br>
+
+					<!-- Page Heading -->
+					<h1 class="h3 mb-2 text-gray-800">ID(이메일) 찾기</h1>
+					<input type="hidden" id="share_id" th:if="${share_id !=null}" th:value="${share_id}">
+					<input type="hidden" id="shop_id" th:if="${shop_id !=null}" th:value="${shop_id}">
+					<input type="hidden" id="host_memId" th:value="${user.mem_id}">
+
+					<!-- DataTales Example -->
+					<div class="card shadow mb-4">
+						<div class="card-header py-3">
+							<div class="card-body">
+								<div class="search_area">
+									<form action="space_findUser" method="POST">
+										<table class="search">
+											<tbody>
+												<tr>
+													<th class="search_th search_top">이메일</th>
+													<td>
+														<div class="rows">
+															<input type="text" id="mem_email" name="mem_email">
+														</div>
+													</td>
+													<th class="search_th search_top">닉네임</th>
+													<td>
+														<div class="rows">
+															<input type="text" id="mem_nickname" name="mem_nickname">
+														</div>
+													</td>
+													<th class="search_th search_top">휴대폰번호</th>
+													<td>
+														<div class="rows">
+															<input type="text" id="mem_phone" name="mem_phone">
+														</div>
+													</td>
+													<!-- <th class="search_th search_top">기간</th>
+	                                            <td colspan="3">
+	                                                              
+	                                                <span><input type="date" name="mem_create_date1"
+	                                                             id="start_date"></span>
+	                                                ~
+	                                                <span><input type="date" name="mem_create_date2" id="end_date"></span>
+	                                            </td> -->
+												</tr>
+											</tbody>
+										</table>
+										<div class="btn_list">
+											<button type="button" id="search_btn" class="search_btn">검색</button>
+										</div>
+									</form>
+								</div>
+							</div>
+						</div>
+
+						<!-- <th:block th:if="${search_userData == null}"> -->
+						<th:block>
+							<!-- <div class="bd-top-gr pd_top_30" th:text='${"총 " + spaceList.size + "개의 게시글이 있습니다."}'/> -->
+							<div class="card-body">
+								<div class="table-responsive">
+									<table class="table table-bordered" width="100%"
+										cellspacing="0">
+										<thead>
+											<tr>
+												<th>선택</th>
+												<th>계정 상태</th>
+												<th>공간 등록여부</th>
+												<th>샵인샵 등록여부</th>
+												<th>ID(이메일)</th>
+												<th>생성일</th>
+												<th>최종 로그인 정보</th>
+											</tr>
+										</thead>
+										<tbody id="user_table">
+											<!-- <tr>
+												<td><input type="checkbox" class="checkbox"/></td>
+												<td><span th:if="${user.mem_deleted} == 0">활성</span> <span
+													th:if="${user.mem_deleted} == 1">비활성</span></td>
+
+												<td><span th:if="${user.mem_space_regist} == 1">O</span>
+													<span th:if="${user.mem_space_regist} == 0">X</span></td>
+												<td><span th:if="${user.mem_shop_regist} == 1">O</span>
+													<span th:if="${user.mem_shop_regist} == 0">X</span></td>
+
+												<td><span th:text="${user.mem_email}"></span></td>
+												<td><span th:text="${user.mem_create_date}"></span></td>
+												<td><span th:text="${user.mem_login_date}"></span></td>
+											</tr> -->
+										</tbody>
+									</table>
+								</div>
+							</div>
+						</th:block>
+						<div class="btn_list">
+							<button type="button" class="reset_btn" onclick="self.close();">취소</button>
+							<button type="button" id="change_btn" class="search_btn">변경</button>
+						</div>
+					</div>
+
+				</div>
+				<!-- /.container-fluid -->
+
+			</div>
+			<!-- End of Main Content -->
+
+			<!-- Footer -->
+			<!-- End of Footer -->
+
+		</div>
+		<!-- End of Content Wrapper -->
+
+	</div>
+	<!-- End of Page Wrapper -->
+
+	<!-- Scroll to Top Button-->
+	<a class="scroll-to-top rounded" href="#page-top"> <i
+		class="fas fa-angle-up"></i>
+	</a>
+
+	<!-- Logout Modal-->
+	<div class="modal fade" id="logoutModal" tabindex="-1" role="dialog"
+		aria-labelledby="exampleModalLabel" aria-hidden="true">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="exampleModalLabel">Ready to Leave?</h5>
+					<button class="close" type="button" data-dismiss="modal"
+						aria-label="Close">
+						<span aria-hidden="true">×</span>
+					</button>
+				</div>
+				<div class="modal-body">Select "Logout" below if you are ready
+					to end your current session.</div>
+				<div class="modal-footer">
+					<button class="btn btn-secondary" type="button"
+						data-dismiss="modal">Cancel</button>
+					<a class="btn btn-primary" href="login.html">Logout</a>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- Bootstrap core JavaScript-->
+	<script src="vendor/jquery/jquery.min.js"></script>
+	<script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+	<!-- Core plugin JavaScript-->
+	<script src="vendor/jquery-easing/jquery.easing.min.js"></script>
+
+	<!-- Custom scripts for all pages-->
+	<script src="js/sb-admin-2.min.js"></script>
+
+	<!-- Page level plugins -->
+	<script src="vendor/datatables/jquery.dataTables.min.js"></script>
+	<script src="vendor/datatables/dataTables.bootstrap4.min.js"></script>
+
+	<!-- Page level custom scripts -->
+	<script src="js/demo/datatables-demo.js"></script>
+
+	<script>
+  //오늘
+  $('#today').click(function(){
+  	document.getElementById('start_date').valueAsDate = new Date();
+  	document.getElementById('end_date').valueAsDate = new Date();
+  });
+
+	//날짜 객체 받아서 문자열로 리턴하는 함수
+	function getDateStr(myDate){
+		var myMonth = myDate.getMonth() + 1;
+		var month = myMonth >= 10 ? myMonth : '0' + myMonth;
+		var fake_day = myDate.getDate(); 
+		var day = fake_day >= 10 ? fake_day : '0' + fake_day;
+		return (myDate.getFullYear() + '-' + month + '-' + day);
+	}
+
+  //어제
+  function lastYesterday() {
+  	 var d = new Date();
+  	  var dayOfMonth = d.getDate();
+  	  d.setDate(dayOfMonth - 1);
+  	  return getDateStr(d);
+  }
+
+  $('#yesterday').click(function(){
+  	$("#start_date").val(lastYesterday());
+  	document.getElementById('end_date').valueAsDate = new Date();
+  });
+
+  //일주일
+  function lastWeek() {
+    var d = new Date();
+    var dayOfMonth = d.getDate();
+    d.setDate(dayOfMonth - 7);
+    return getDateStr(d);
+  }
+
+  $('#week').click(function(){
+  	$("#start_date").val(lastWeek());
+  	document.getElementById('end_date').valueAsDate = new Date();
+  });
+
+  //당월
+  function thisMonth() {
+    var d = new Date();
+    var monthOfYear = d.getMonth();
+    d.setDate(d.getDate() - d.getDate() + 1);
+    return getDateStr(d);
+  }
+
+  $('#thisMonth').click(function(){
+  	$("#start_date").val(thisMonth());
+  	document.getElementById('end_date').valueAsDate = new Date();
+  });
+  
+  //3개월
+  function last3Month() {
+    var d = new Date();
+    var monthOfYear = d.getMonth();
+    d.setMonth(monthOfYear - 3);
+    return getDateStr(d);
+  }
+
+  $('#3month').click(function(){
+  	$("#start_date").val(last3Month());
+  	document.getElementById('end_date').valueAsDate = new Date();
+  });
+  
+  //전월
+  function prevMonth() {
+    var d = new Date();
+    var monthOfYear = d.getMonth();
+    d.setMonth(monthOfYear - 1);
+    return getDateStr(d);
+  }
+  
+  $('#prevMonth').click(function(){
+  	$("#start_date").val(prevMonth());
+  	document.getElementById('end_date').valueAsDate = new Date();
+  });
+  
+  $('#search_btn').click(()=>{
+	  if($('#mem_email').val() =="" && $('#mem_nickname').val() =="" && $('#mem_phone').val()){
+		  alert('검색할 유저를 입력 해주세요')
+		  return;
+	  }
+	  
+	  $.ajax({
+		  type:'post',
+		  url: '/space_findUser',
+		  contentType:'application/x-www-form-urlencoded;charset=utf-8',
+		  data:{
+			  'mem_email':$('#mem_email').val(),
+			  'mem_nickname' : $('#mem_nickname').val(),
+			  'mem_phone' : $('#mem_phone').val(),
+			 /*  'mem_create_date1' : $('#start_date').val(),
+			  'mem_create_date2' : $('#end_date').val(), */
+		  },
+		  success:(data)=>{
+			  if(data.length == 0){
+				  alert('회원 정보가 없습니다.')
+				  $('#user_table').children().remove()
+				  return;
+			  }
+			  
+			  var table = "";
+			  $('#user_table').children().remove()
+			  
+			  for(user in data){
+				table += '<tr>'
+				table += '<input type="hidden" id="mem_id" value='+data[user].mem_id+'>'
+				table += '<td><input type="checkbox" class="checkbox"></td>'
+				if(data[user].mem_deleted == 0){
+					table += '<td>활성</td>'
+				}else{
+					table += '<td>비활성</td>'
+				}
+				
+				if(data[user].mem_space_regist == 1){
+					table += '<td>O</td>'
+				}else{
+					table += '<td>X</td>'
+				}
+				
+				if(data[user].mem_shop_regist == 1){
+					table += '<td>O</td>'
+				}else{
+					table += '<td>X</td>'
+				}
+				table += '<td>'+data[user].mem_email+'</td>'
+				table += '<td>'+data[user].mem_create_date+'</td>'
+				table += '<td>'+data[user].mem_login_date+'</td>'				
+				table += '</tr>'
+			  }
+			  $('#user_table').append(table)
+		  }
+	  })
+  })
+  
+  
+  $('#change_btn').click(()=>{
+	  var confirmValue = confirm('이 회원으로 게시자를 바꾸겠습니까?')
+	  var share_id = $('#share_id').val()
+	  var shop_id = $('#shop_id').val()
+	  var host_memId = $('#host_memId').val()
+	  var rowData = new Array();
+	  var mem_id = new Array()
+	  var checkbox = $("input[class=checkbox]:checked")
+	  
+	  checkbox.each((i)=>{
+		  var tr = checkbox.parent().parent().eq(i);
+		  var td = tr.children();
+		  
+		  var id = td.eq(0).val();
+		  mem_id.push(id);
+	  })
+	  
+	  if(confirmValue && mem_id.length == 1 && host_memId != mem_id[0] && share_id != 0){
+		  $.ajax({
+			  type:'post',
+			  url: '/change_spaceHost',
+			  contentType:'application/x-www-form-urlencoded;charset=utf-8',
+			  data : {
+				  'share_id' : share_id,
+				  'mem_id' : mem_id[0],
+				  'host_memId' : host_memId
+			  },  
+			  success(data){
+				  if(data == 1){
+					alert('변경 성공')
+					opener.parent.location.reload()
+					window.close();
+				  }else{
+					alert('변경 실패')
+				  }
+			  },error(err){
+					alert('변경 실패')
+					console.log(err)					 
+			  }
+		  })
+	  }else if(confirmValue && mem_id.length == 1 && host_memId != mem_id[0] && shop_id != 0){
+		  $.ajax({
+			  type:'post',
+			  url: '/change_shopHost',
+			  contentType:'application/x-www-form-urlencoded;charset=utf-8',
+			  data : {
+				  'shop_id' : shop_id,
+				  'mem_id' : mem_id[0],
+				  'host_memId' : host_memId
+			  },  
+			  success(data){
+				  if(data == 1){
+					alert('변경 성공')
+					opener.parent.location.reload()
+					window.close();
+				  }else{
+					alert('변경 실패')
+				  }
+			  },error(err){
+					alert('변경 실패')
+					console.log(err)					 
+			  }
+		  })
+	  }
+	  else if(mem_id.length == 0 || mem_id.length > 1){
+		  alert('유저를 한명 체크해주세요')
+		  return
+	  }else if(host_memId == mem_id[0]){
+		  alert('이미 해당 게시물 소유주입니다.')
+		  return;
+	  }
+  })
+  
+  
+</script>
+</body>
+
+</html>

@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.clllap.mapper.UserMapper">
+
+    <insert id="regist_user" parameterType="Users">
+        INSERT INTO user
+            (user_email, user_password, user_name, user_age, user_country, user_region, user_gender, user_nickname,
+                user_phone, user_profile, user_join_check, user_create_date)
+        VALUES
+            (#{user_email}, #{user_password}, #{user_name}, #{user_age}, #{user_country}, #{user_region}, #{user_gender}, #{user_nickname},
+             #{user_phone}, #{user_profile}, 'y', NOW())
+    </insert>
+
+    <select id="login_id" parameterType="String" resultType="Users">
+        SELECT *
+        FROM user
+        WHERE user_email = #{user_email}
+    </select>
+
+    <select id="login_info" parameterType="int" resultType="Users">
+        SELECT user_id, user_email, user_name, user_age, user_country, user_region, user_gender, user_nickname, user_phone,
+                user_profile, user_join_check
+        FROM user
+        WHERE user_id = #{user_id}
+    </select>
+
+    <select id="login_socialId" parameterType="String" resultType="SocialUsers">
+        SELECT *
+        FROM user
+        WHERE user_email = #{user_email}
+    </select>
+
+    <insert id="signup_socialUser" parameterType="Users">
+        INSERT INTO user
+        (user_social_key, user_email, user_password, user_name, user_create_date)
+        VALUES
+            (#{user_social_key}, #{user_email}, #{user_password}, #{user_name}, NOW())
+    </insert>
+
+    <update id="modify_user" parameterType="Users">
+        UPDATE user
+        SET user_gender = #{user_gender}, user_country = #{user_country}, user_region = #{user_region}, user_age = #{user_age},
+            user_phone = #{user_phone}
+        <if test="user_password != null">
+            ,user_password = #{user_password}
+        </if>
+        WHERE user_id = #{user_id}
+    </update>
+
+    <delete id="exit_user" parameterType="int">
+        DELETE FROM user
+        WHERE user_id = #{user_id}
+    </delete>
+
+    <insert id="update_login_date" parameterType="int">
+        INSERT INTO login_info
+            (user_id, login_date)
+        VALUES
+            (#{user_id}, NOW())
+    </insert>
+
+    <select id="check_user_phone" parameterType="String" resultType="int">
+        SELECT COUNT(user_id)
+        FROM user
+        WHERE user_phone = #{user_phone}
+    </select>
+
+    <update id="regist_social" parameterType="Users">
+        UPDATE user
+        SET user_nickname = #{user_nickname}, user_phone = #{user_phone}, user_gender = #{user_gender}, user_age = #{user_age}, user_country = #{user_country},
+            user_region = #{user_region}, user_join_check = 'y', user_create_date = NOW()
+        WHERE user_id = #{user_id}
+    </update>
+
+    <select id="find_id" resultType="String">
+        SELECT user_email
+        FROM user
+        WHERE user_phone = #{user_phone}
+    </select>
+
+    <select id="popular_user_list" resultType="Users">
+        SELECT u.user_id, u.user_nickname, SUM(media_recommend_count) recommend_count
+        FROM user u LEFT JOIN media m
+                              ON u.user_id = m.user_id
+        GROUP BY u.user_id
+        ORDER BY recommend_count DESC
+        LIMIT 10
+    </select>
+
+    <select id="recent_user_list" resultType="Users">
+        SELECT user_id, user_nickname
+        FROM user
+        ORDER BY user_id DESC
+        LIMIT 10
+    </select>
+
+    <update id="saveTempPassword">
+        UPDATE user
+        SET user_password = #{tempPassword}
+        WHERE user_email = #{userEmail}
+    </update>
+
+</mapper>

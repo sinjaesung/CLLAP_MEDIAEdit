@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.clllap.admin.mapper.AdminMapper">
+
+    <select id="check_admin" parameterType="String" resultType="Admin">
+        SELECT *
+        FROM admin
+        WHERE admin_email = #{admin_email}
+    </select>
+
+    <select id="adminList" resultType="Admin">
+        SELECT *
+        FROM admin
+        ORDER BY admin_role DESC, admin_id DESC
+    </select>
+
+    <update id="loginDate" parameterType="String">
+        UPDATE admin
+        SET admin_login_date = NOW()
+        WHERE admin_id = #{admin_id}
+    </update>
+
+    <insert id="adminJoin" parameterType="Admin">
+        INSERT INTO admin
+            (admin_email, admin_password, admin_role, admin_create_date)
+        VALUES
+            (#{admin_email}, #{admin_password}, #{admin_role}, NOW())
+    </insert>
+
+</mapper>

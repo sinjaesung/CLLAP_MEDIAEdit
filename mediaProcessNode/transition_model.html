@@ -1,0 +1,424 @@
+//글리치+노이즈, mat과 mat2 사이에 20개의 트랜지션 적용 프레임추가, mat과 mat2는 이미지 길이, 높이 같음
+function transition_noise_glitch(mat,mat2){
+  let transition = [];
+  let N1 = mat.cols;
+  let M1 = mat.rows;
+  transition[0] = new cv.Mat();
+  mat.copyTo(transition[0]);
+  for(let T=1;T<20;T++){
+    let count = [1,1,-1,-1,-1,-1,1,1,1,1,-1,-1,-1,-1,1,1,1,1,-1,-1,-1,-1];
+    let y2 = cv.matFromArray(2,3, cv.CV_64FC1, [1,0,N1*T/6,0,1,0]);
+    let dsize = new cv.Size(mat.cols,mat.rows);
+    transition[T] = new cv.Mat();
+    if(T<10)
+        mat.copyTo(transition[T]);
+    else
+        mat2.copyTo(transition[T]);
+    if(T==10){
+        for(let j=0;j<N1;j++){
+            if(Math.sin(j/3)>=0){
+                for(let i=0;i<M1-10;i++){
+                transition[T].ucharPtr(i,j)[0]=transition[T].ucharPtr(i+count[T-1]*10*Math.sin(j/3),j)[0];
+                transition[T].ucharPtr(i,j)[1]=transition[T].ucharPtr(i+count[T-1]*10*Math.sin(j/3),j)[1];
+                transition[T].ucharPtr(i,j)[2]=transition[T].ucharPtr(i+count[T-1]*10*Math.sin(j/3),j)[2];
+                }
+            }
+            else{
+                for(let i=M1;i>=10;i--){
+                transition[T].ucharPtr(i,j)[0]=transition[T].ucharPtr(i+count[T-1]*10*Math.sin(j/3),j)[0];
+                transition[T].ucharPtr(i,j)[1]=transition[T].ucharPtr(i+count[T-1]*10*Math.sin(j/3),j)[1];
+                transition[T].ucharPtr(i,j)[2]=transition[T].ucharPtr(i+count[T-1]*10*Math.sin(j/3),j)[2]; 
+                }
+            }
+        }
+    }
+    else{
+        for(let j=0;j<N1;j++){
+            if(Math.sin(j/3)>=0){
+                for(let i=0;i<M1-10;i++){
+                transition[T].ucharPtr(i,j)[0]=transition[T-1].ucharPtr(i+count[T-1]*10*Math.sin(j/3),j)[0];
+                transition[T].ucharPtr(i,j)[1]=transition[T-1].ucharPtr(i+count[T-1]*10*Math.sin(j/3),j)[1];
+                transition[T].ucharPtr(i,j)[2]=transition[T-1].ucharPtr(i+count[T-1]*10*Math.sin(j/3),j)[2];
+                }
+            }
+            else{
+                for(let i=M1;i>=10;i--){
+                transition[T].ucharPtr(i,j)[0]=transition[T-1].ucharPtr(i+count[T-1]*10*Math.sin(j/3),j)[0];
+                transition[T].ucharPtr(i,j)[1]=transition[T-1].ucharPtr(i+count[T-1]*10*Math.sin(j/3),j)[1];
+                transition[T].ucharPtr(i,j)[2]=transition[T-1].ucharPtr(i+count[T-1]*10*Math.sin(j/3),j)[2]; 
+                }
+            }
+        }
+    }
+    cv.warpAffine(transition[T],transition[T],y2,dsize,cv.INTER_LINEAR,cv.BORDER_WRAP, new cv.Scalar());
+  }
+  
+  for(let T=1; T<20;T++){
+    if(T==3||T==4){
+      for(let i=0;i<M1;i++){
+        for(let j=0;j<N1;j++){
+          if(transition[T].ucharPtr(i,j)[0] * 1.5>255)
+            transition[T].ucharPtr(i,j)[0] = 255;
+          else
+            transition[T].ucharPtr(i,j)[0] *=1.5;
+        }
+      }
+      for(let i=0;i<M1;i++){
+        for(let j=0;j<N1;j++){
+          if(transition[T].ucharPtr(i,j)[1] * 1.5>255)
+            transition[T].ucharPtr(i,j)[1] = 255;
+          else
+            transition[T].ucharPtr(i,j)[1] *=1.5;
+        }
+      }
+    }
+    else if(T==5||T==6){
+      for(let i=0;i<M1;i++){
+        for(let j=0;j<N1;j++){
+          if(transition[T].ucharPtr(i,j)[1] * 1.5>255)
+            transition[T].ucharPtr(i,j)[1] = 255;
+          else
+            transition[T].ucharPtr(i,j)[1] *=1.5;
+        }
+      }
+    }
+    else if(T==7||T==8){
+      cv.cvtColor(transition[T],transition[T],cv.COLOR_RGB2GRAY,0);
+      cv.bitwise_not(transition[T],transition[T]);
+    }
+    else if(T==9||T==10||T==11){
+      for(let i=0;i<M1;i++){
+        for(let j=0;j<N1;j++){
+          if(transition[T].ucharPtr(i,j)[2] * 1.5>255)
+            transition[T].ucharPtr(i,j)[2] = 255;
+          else
+            transition[T].ucharPtr(i,j)[2] *=1.5;
+        }
+      }
+    }
+    else if(T==14 || T==12 ||T==13){
+      for(let i=0;i<M1;i++){
+        for(let j=0;j<N1;j++){
+          if(transition[T].ucharPtr(i,j)[1] * 1.5>255)
+            transition[T].ucharPtr(i,j)[1] = 255;
+          else
+            transition[T].ucharPtr(i,j)[1] *=1.5;
+        }
+      }
+      for(let i=0;i<M1;i++){
+        for(let j=0;j<N1;j++){
+          if(transition[T].ucharPtr(i,j)[2] * 1.5>255)
+            transition[T].ucharPtr(i,j)[2] = 255;
+          else
+            transition[T].ucharPtr(i,j)[2] *=1.5;
+        }
+      }
+    }
+    else if(T==15 || T==16 ||T==17){
+      cv.cvtColor(transition[T],transition[T],cv.COLOR_RGB2GRAY,0);
+      cv.bitwise_not(transition[T],transition[T]);
+    }
+    else
+      continue;
+  }
+
+  for(let T=1;T<20;T++){
+    if(T!=8&&T!=9&&T!=10&&T!=11&&T!=15&&T!=16&&T!=17){
+      for(let i=0;i<M1/4;i++){
+        for(let j=0;j<N1/4;j++){
+          const random_x = Math.floor(Math.random()*M1);
+          const random_y = Math.floor(Math.random()*N1);
+          const random_i = Math.floor(Math.random()*3)
+          transition[T].ucharPtr(random_x,random_y)[random_i] = 255;
+        }
+      }
+    }
+  }
+  return transition;  
+}
+//글리치 트랜지션
+function transition_glitch(mat, mat2){
+  let transition = [];
+  let N1 = mat.cols;
+  let M1 = mat.rows;
+  transition[0] = new cv.Mat();
+  mat.copyTo(transition[0]);
+
+  for(let T=1;T<10;T++){
+    transition[T]=new cv.Mat();
+    mat.copyTo(transition[T]);
+    let rgba = new cv.MatVector();
+    let mer = new cv.MatVector();
+    let dst = new cv.Mat();
+    let rt = new cv.Mat();
+    let gt = new cv.Mat();
+    let bt = new cv.Mat();
+    let x1 = cv.matFromArray(2,3, cv.CV_64FC1, [1,0,3,0,1,3]);
+    let x2 = cv.matFromArray(2,3, cv.CV_64FC1, [1,0,-3,0,1,-3]);
+    let x3 = cv.matFromArray(2,3, cv.CV_64FC1, [1,0,3,0,1,-3]);
+    let x4 = cv.matFromArray(2,3, cv.CV_64FC1, [1,0,-3,0,1,3]);
+    let y1 = cv.matFromArray(2,3, cv.CV_64FC1, [1,0,15,0,1,15]);
+    let y2 = cv.matFromArray(2,3, cv.CV_64FC1, [1,0,-15,0,1,-15]);
+    let y3 = cv.matFromArray(2,3, cv.CV_64FC1, [1,0,15,0,1,-15]);
+    let y4 = cv.matFromArray(2,3, cv.CV_64FC1, [1,0,-15,0,1,15]);
+    
+    let dsize = new cv.Size(mat.cols,mat.rows);
+    if(T%4==1)
+      cv.warpAffine(transition[T],transition[T],y1,dsize,cv.INTER_LINEAR,cv.BORDER_TRANSPARENT, new cv.Scalar());
+    else if(T%4==2)
+      cv.warpAffine(transition[T],transition[T],y2,dsize,cv.INTER_LINEAR,cv.BORDER_TRANSPARENT, new cv.Scalar());
+    else if (T%4==3)
+      cv.warpAffine(transition[T],transition[T],y3,dsize,cv.INTER_LINEAR,cv.BORDER_TRANSPARENT, new cv.Scalar());
+    else
+      cv.warpAffine(transition[T],transition[T],y4,dsize,cv.INTER_LINEAR,cv.BORDER_TRANSPARENT, new cv.Scalar());
+
+    cv.split(transition[T],rgba);
+    let r = rgba.get(0);
+    let g = rgba.get(1);
+    let b = rgba.get(2);
+    let ap = rgba.get(3);
+    cv.warpAffine(r,rt,x1,dsize,cv.INTER_LINEAR,cv.BORDER_TRANSPARENT, new cv.Scalar());
+    cv.warpAffine(g,gt,x3,dsize,cv.INTER_LINEAR,cv.BORDER_TRANSPARENT, new cv.Scalar());
+    cv.warpAffine(b,bt,x2,dsize,cv.INTER_LINEAR,cv.BORDER_TRANSPARENT, new cv.Scalar());
+    mer.push_back(rt);
+    mer.push_back(gt);
+    mer.push_back(bt);
+    cv.merge(mer,dst);
+    dst.copyTo(transition[T]);
+  }
+
+  //cut 2
+  for(let T=10;T<20;T++){
+    transition[T]=new cv.Mat();
+    mat2.copyTo(transition[T]);
+    let y1 = cv.matFromArray(2,3, cv.CV_64FC1, [1,0,15,0,1,15]);
+    let y2 = cv.matFromArray(2,3, cv.CV_64FC1, [1,0,-15,0,1,-15]);
+    let y3 = cv.matFromArray(2,3, cv.CV_64FC1, [1,0,15,0,1,-15]);
+    let y4 = cv.matFromArray(2,3, cv.CV_64FC1, [1,0,-15,0,1,15]);
+    
+    let dsize = new cv.Size(mat.cols,mat.rows);
+    if(T%4==1)
+      cv.warpAffine(transition[T],transition[T],y1,dsize,cv.INTER_LINEAR,cv.BORDER_TRANSPARENT, new cv.Scalar());
+    else if(T%4==2)
+      cv.warpAffine(transition[T],transition[T],y2,dsize,cv.INTER_LINEAR,cv.BORDER_TRANSPARENT, new cv.Scalar());
+    else if (T%4==3)
+      cv.warpAffine(transition[T],transition[T],y3,dsize,cv.INTER_LINEAR,cv.BORDER_TRANSPARENT, new cv.Scalar());
+    else
+      cv.warpAffine(transition[T],transition[T],y4,dsize,cv.INTER_LINEAR,cv.BORDER_TRANSPARENT, new cv.Scalar());
+  }
+
+
+  return transition;
+}
+//노이즈+선 트랜지션
+function transition_noise(mat,mat2){
+  let transition = [];
+
+  transition[0] = new cv.Mat();
+  mat.copyTo(transition[0]);
+
+  let N1 = mat.cols;
+  let M1 = mat.rows;
+    transition[1]=new cv.Mat();
+    mat.copyTo(transition[1]);  
+    for (let i = 1; i < 70; i++) {
+        if (i % 12 == 0){
+          for(let j=0;j<M1;j++){
+            transition[1].ucharPtr(j,parseInt(N1*i/70)-1)[0]=0;
+            transition[1].ucharPtr(j,parseInt(N1*i/70)-1)[1]=0;
+            transition[1].ucharPtr(j,parseInt(N1*i/70)-1)[2]=0;
+            transition[1].ucharPtr(j,parseInt(N1*i/70))[0]=0;
+            transition[1].ucharPtr(j,parseInt(N1*i/70))[1]=0;
+            transition[1].ucharPtr(j,parseInt(N1*i/70))[2]=0;
+            transition[1].ucharPtr(j,parseInt(N1*i/70)+1)[0]=0;
+            transition[1].ucharPtr(j,parseInt(N1*i/70)+1)[1]=0;
+            transition[1].ucharPtr(j,parseInt(N1*i/70)+1)[2]=0;
+          }
+        }
+        else if (i % 7 == 0){
+          for(let j=0;j<M1;j++){
+            transition[1].ucharPtr(j,parseInt(N1*i/70))[0]=0;
+            transition[1].ucharPtr(j,parseInt(N1*i/70))[1]=0;
+            transition[1].ucharPtr(j,parseInt(N1*i/70))[2]=0;
+            transition[1].ucharPtr(j,parseInt(N1*i/70)+1)[0]=0;
+            transition[1].ucharPtr(j,parseInt(N1*i/70)+1)[1]=0;
+            transition[1].ucharPtr(j,parseInt(N1*i/70)+1)[2]=0;
+          }
+        }
+        else{
+          for(let j=0;j<M1;j++){
+            transition[1].ucharPtr(j,parseInt(N1*i/70))[0]=0;
+            transition[1].ucharPtr(j,parseInt(N1*i/70))[1]=0;
+            transition[1].ucharPtr(j,parseInt(N1*i/70))[2]=0;
+          }
+        }
+		}
+  for(let T=2;T <=9; T++){
+    transition[T]=new cv.Mat();
+    transition[1].copyTo(transition[T]);
+  }  
+  let count = [1,1,-1,-1,-1,-1,1,1,1,1];
+  for(let T=2;T<=8;T++){
+    for(let i=0;i<M1;i++){
+      if(Math.sin(i/3)>=0){
+        for(let j=0;j<N1-10;j++){
+          transition[T].ucharPtr(i,j)[0]=transition[T-1].ucharPtr(i,j+count[T-2]*3*Math.sin(i/3))[0];
+          transition[T].ucharPtr(i,j)[1]=transition[T-1].ucharPtr(i,j+count[T-2]*3*Math.sin(i/3))[1];
+          transition[T].ucharPtr(i,j)[2]=transition[T-1].ucharPtr(i,j+count[T-2]*3*Math.sin(i/3))[2];
+        }
+      }
+      else{
+        for(let j=N1;j>=5;j--){
+          transition[T].ucharPtr(i,j)[0]=transition[T-1].ucharPtr(i,j+count[T-2]*3*Math.sin(i/3))[0];
+          transition[T].ucharPtr(i,j)[1]=transition[T-1].ucharPtr(i,j+count[T-2]*3*Math.sin(i/3))[1];
+          transition[T].ucharPtr(i,j)[2]=transition[T-1].ucharPtr(i,j+count[T-2]*3*Math.sin(i/3))[2]; 
+        }
+      }
+    }
+  }
+
+    for(let T=0;T<10;T++){
+      for(let i=0;i<M1;i++){
+        for(let j=0;j<N1;j++){
+          if(transition[T].ucharPtr(i,j)[1] * 1.3>255)
+            transition[T].ucharPtr(i,j)[1] = 255;
+          else
+            transition[T].ucharPtr(i,j)[1] *=1.3;
+        }
+      }
+    }
+    
+////cut 2
+for(let T=10;T <=19; T++){
+    transition[T]=new cv.Mat();
+    mat2.copyTo(transition[T]);
+  }  
+  for(let T=11;T<=18;T++){
+    for(let i=0;i<M1;i++){
+      if(Math.sin(i/3)>=0){
+        for(let j=0;j<N1-10;j++){
+          transition[T].ucharPtr(i,j)[0]=transition[T-1].ucharPtr(i,j+count[T-11]*3*Math.sin(i/3))[0];
+          transition[T].ucharPtr(i,j)[1]=transition[T-1].ucharPtr(i,j+count[T-11]*3*Math.sin(i/3))[1];
+          transition[T].ucharPtr(i,j)[2]=transition[T-1].ucharPtr(i,j+count[T-11]*3*Math.sin(i/3))[2];
+        }
+      }
+      else{
+        for(let j=N1;j>=5;j--){
+          transition[T].ucharPtr(i,j)[0]=transition[T-1].ucharPtr(i,j+count[T-11]*3*Math.sin(i/3))[0];
+          transition[T].ucharPtr(i,j)[1]=transition[T-1].ucharPtr(i,j+count[T-11]*3*Math.sin(i/3))[1];
+          transition[T].ucharPtr(i,j)[2]=transition[T-1].ucharPtr(i,j+count[T-11]*3*Math.sin(i/3))[2]; 
+        }
+      }
+    }
+  }
+  for(let T=10;T<20;T++){
+    for(let i=0;i<M1;i++){
+      for(let j=0;j<N1;j++){
+        if(transition[T].ucharPtr(i,j)[0] * 1.3>255)
+          transition[T].ucharPtr(i,j)[0] = 255;
+        else
+          transition[T].ucharPtr(i,j)[0] *=1.3;
+      }
+    }
+  }
+  return transition;
+}
+//컷 트랜지션
+function transition_cut(mat, mat2){
+     let transition = [];
+    
+    transition[0] = new cv.Mat();
+    mat.copyTo(transition[0]);
+    
+    let N = mat.cols;
+    let M = mat.rows;
+    //가로 cut 
+    for(let i=1;i<9;i++){
+        transition[i]=new cv.Mat();
+        transition[i-1].copyTo(transition[i]);
+        let rect1 = new cv.Rect(N/16,0,N*15/16,M/2);
+        let rect2 = new cv.Rect(0,0,N*15/16,M/2);
+        let temp1 = new cv.Mat();
+        let temp2 = new cv.Mat();
+        temp1 = transition[i].roi(rect1);
+        temp2 = transition[i-1].roi(rect2);
+        temp2.copyTo(temp1);
+        rect1 = new cv.Rect(0, 0, N/16,M/2);
+        rect2 = new cv.Rect(N*15/16,0,N/16,M/2);
+        temp1 = transition[i].roi(rect1);
+        temp2 = transition[i-1].roi(rect2);
+        temp2.copyTo(temp1);
+        
+        rect1 = new cv.Rect(0, M/2, N*15/16,M/2);
+        rect2 = new cv.Rect(N/16,M/2,N*15/16,M/2);
+        temp1 = transition[i].roi(rect1);
+        temp2 = transition[i-1].roi(rect2);
+        temp2.copyTo(temp1);
+        rect1 = new cv.Rect(N*15/16, M/2, N/16,M/2);
+        rect2 = new cv.Rect(0,M/2,N/16,M/2);
+        temp1 = transition[i].roi(rect1);
+        temp2 = transition[i-1].roi(rect2);
+        temp2.copyTo(temp1);
+    }
+
+    //세로cut
+    transition[9] = new cv.Mat();
+    mat2.copyTo(transition[9]);
+    
+    if(1){
+        let rect1 = new cv.Rect(0,M*6/16,N/2,M*10/16);
+        let rect2 = new cv.Rect(0,0,N/2,M*10/16);
+        let temp1 = new cv.Mat();
+        let temp2 = new cv.Mat();
+        temp1 = transition[9].roi(rect1);
+        temp2 = transition[0].roi(rect2);
+        temp2.copyTo(temp1);
+        rect1 = new cv.Rect(0, 0, N/2,M*6/16);
+        rect2 = new cv.Rect(0,M*10/16,N/2,M*6/16);
+        temp1 = transition[9].roi(rect1);
+        temp2 = transition[0].roi(rect2);
+        temp2.copyTo(temp1);
+        
+        rect1 = new cv.Rect(N/2, M*10/16, N/2,M*6/16);
+        rect2 = new cv.Rect(N/2,0,N/2,M*6/16);
+        temp1 = transition[9].roi(rect1);
+        temp2 = transition[0].roi(rect2);
+        temp2.copyTo(temp1);
+        rect1 = new cv.Rect(N/2, 0, N/2,M*10/16);
+        rect2 = new cv.Rect(N/2,M*6/16,N/2,M*10/16);
+        temp1 = transition[9].roi(rect1);
+        temp2 = transition[0].roi(rect2);
+        temp2.copyTo(temp1);
+    }
+
+    for(let i=10;i<20;i++){
+        transition[i] = new cv.Mat();
+        transition[i-1].copyTo(transition[i]);
+       
+        let rect1 = new cv.Rect(0,M/16,N/2,M*15/16);
+        let rect2 = new cv.Rect(0,0,N/2,M*15/16);
+        let temp1 = new cv.Mat();
+        let temp2 = new cv.Mat();
+        temp1 = transition[i].roi(rect1);
+        temp2 = transition[i-1].roi(rect2);
+        temp2.copyTo(temp1);
+        rect1 = new cv.Rect(0, 0, N/2,M/16);
+        rect2 = new cv.Rect(0,M*15/16,N/2,M/16);
+        temp1 = transition[i].roi(rect1);
+        temp2 = transition[i-1].roi(rect2);
+        temp2.copyTo(temp1);
+        
+        rect1 = new cv.Rect(N/2, M*15/16, N/2,M/16);
+        rect2 = new cv.Rect(N/2,0,N/2,M/16);
+        temp1 = transition[i].roi(rect1);
+        temp2 = transition[i-1].roi(rect2);
+        temp2.copyTo(temp1);
+        rect1 = new cv.Rect(N/2, 0, N/2,M*15/16);
+        rect2 = new cv.Rect(N/2,M/16,N/2,M*15/16);
+        temp1 = transition[i].roi(rect1);
+        temp2 = transition[i-1].roi(rect2);
+        temp2.copyTo(temp1);
+    }
+
+    return transition;
+}

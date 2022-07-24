@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="67" height="67" viewBox="0 0 67 67">
+  <defs>
+    <linearGradient id="linear-gradient" x1="0.152" y1="0.139" x2="0.818" y2="0.859" gradientUnits="objectBoundingBox">
+      <stop offset="0" stop-color="#ee3dff"/>
+      <stop offset="0.167" stop-color="#7824f8"/>
+      <stop offset="0.363" stop-color="#2a15e6"/>
+      <stop offset="0.591" stop-color="#006cc9"/>
+      <stop offset="0.784" stop-color="#00bcdd"/>
+      <stop offset="1" stop-color="#15ce86"/>
+    </linearGradient>
+  </defs>
+  <g id="그룹_4198" data-name="그룹 4198" transform="translate(-344 -708)">
+    <g id="타원_301" data-name="타원 301" transform="translate(344 708)" stroke="#f4f4fc" stroke-width="3" fill="url(#linear-gradient)">
+      <circle cx="33.5" cy="33.5" r="33.5" stroke="none"/>
+      <circle cx="33.5" cy="33.5" r="32" fill="none"/>
+    </g>
+    <g id="그룹_4197" data-name="그룹 4197" transform="translate(6.184 -26.578)">
+      <line id="선_487" data-name="선 487" x2="13.674" y2="13.195" transform="translate(365.98 754.883)" fill="none" stroke="#fff" stroke-linecap="square" stroke-width="3"/>
+      <line id="선_488" data-name="선 488" y1="13.195" x2="13.674" transform="translate(365.98 768.078)" fill="none" stroke="#fff" stroke-linecap="square" stroke-width="3"/>
+    </g>
+  </g>
+</svg>

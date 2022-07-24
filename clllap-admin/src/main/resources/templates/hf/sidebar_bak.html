@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="">
+  <meta name="author" content="">
+</head>
+<body>
+
+<!-- Sidebar -->
+    <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
+
+      <!-- Sidebar - Brand -->
+      <a class="sidebar-brand d-flex align-items-center justify-content-center" href="dashboard">
+        <div class="sidebar-brand-icon rotate-n-15">
+          <i class="fas fa-laugh-wink"></i>
+        </div>
+        <div class="sidebar-brand-text mx-3">용된다 관리자</div>
+      </a>
+
+      <!-- Divider -->
+      <hr class="sidebar-divider">
+      
+      <li class="nav-item">
+        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsePages-dashboard" aria-expanded="true" aria-controls="collapsePages">
+          <i class="fas fa-fw fa-folder"></i>
+          <span>대시보드</span>
+        </a>
+        <div id="collapsePages-dashboard" class="collapse" aria-labelledby="headingPages" data-parent="#accordionSidebar">
+          <div class="bg-white py-2 collapse-inner rounded">
+          	<a class="collapse-item" href="dashboard">대시보드 이동</a>
+<!--             <a class="collapse-item" href="banklist">은행 목록</a> -->
+          </div>
+        </div>
+      </li>
+
+      <li class="nav-item">
+        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsePages-user" aria-expanded="true" aria-controls="collapsePages">
+          <i class="fas fa-fw fa-folder"></i>
+          <span>회원 관리</span>
+        </a>
+        <div id="collapsePages-user" class="collapse" aria-labelledby="headingPages" data-parent="#accordionSidebar">
+          <div class="bg-white py-2 collapse-inner rounded">
+          	<a class="collapse-item" href="userlist">유저 목록</a>
+          	<a class="collapse-item" href="admin_list">관리자 목록</a>
+            <a class="collapse-item" href="admin_join">관리자 생성</a>
+          </div>
+        </div>
+      </li>
+      
+      <li class="nav-item">
+        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsePages-prd" aria-expanded="true" aria-controls="collapsePages">
+          <i class="fas fa-fw fa-folder"></i>
+          <span>상품 통합 관리</span>
+        </a>
+        <div id="collapsePages-prd" class="collapse" aria-labelledby="headingPages" data-parent="#accordionSidebar">
+          <div class="bg-white py-2 collapse-inner rounded">
+            <a class="collapse-item" href="polist">상품 옵션 목록</a>
+            <a class="collapse-item" href="productslist">상품 목록</a>
+            <a class="collapse-item" href="insertproducts">상품 등록</a>
+            <a class="collapse-item" href="insertExcelprd">상품 엑셀 등록</a>
+            <a class="collapse-item" href="ptaglist">상품 뱃지 목록</a>
+            <a class="collapse-item" href="rulist">모아보기 배너 관리</a>
+            <a class="collapse-item" href="rounduplist">모아보기 상품 관리</a>
+          </div>
+        </div>
+      </li>
+      
+      <li class="nav-item">
+        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsePages-txn" aria-expanded="true" aria-controls="collapsePages">
+          <i class="fas fa-fw fa-folder"></i>
+          <span>주문 통합 관리</span>
+        </a>
+        <div id="collapsePages-txn" class="collapse" aria-labelledby="headingPages" data-parent="#accordionSidebar">
+          <div class="bg-white py-2 collapse-inner rounded">
+            <a class="collapse-item" href="tmlist">주문 조회</a>
+            <a class="collapse-item" href="tmnondeposit">미입금 확인</a>
+            <a class="collapse-item" href="tmsend">발주/발송 관리</a>
+            <a class="collapse-item" href="tmdelivery">배송현황 관리</a>
+            <a class="collapse-item" href="tmcancel">취소 관리</a>
+            <a class="collapse-item" href="tmrefund">반품 관리</a>
+            <a class="collapse-item" href="tmswap">교환 관리</a>
+          </div>
+        </div>
+      </li>
+      
+      <li class="nav-item">
+        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsePages-eb" aria-expanded="true" aria-controls="collapsePages">
+          <i class="fas fa-fw fa-folder"></i>
+          <span>배너/이벤트/팝업 관리</span>
+        </a>
+        <div id="collapsePages-eb" class="collapse" aria-labelledby="headingPages" data-parent="#accordionSidebar">
+          <div class="bg-white py-2 collapse-inner rounded">
+          	<a class="collapse-item" href="bannerlist">배너 목록</a>
+            <a class="collapse-item" href="eventlist">이벤트 목록</a>
+            <a class="collapse-item" href="popuplist">팝업 목록</a>
+          </div>
+        </div>
+      </li>
+      
+      <li class="nav-item">
+        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsePages-noti" aria-expanded="true" aria-controls="collapsePages">
+          <i class="fas fa-fw fa-folder"></i>
+          <span>공지사항/사이트 관리</span>
+        </a>
+        <div id="collapsePages-noti" class="collapse" aria-labelledby="headingPages" data-parent="#accordionSidebar">
+          <div class="bg-white py-2 collapse-inner rounded">
+<!--           	<a class="collapse-item" href="noticlist">공지사항 카테고리 목록</a> -->
+            <a class="collapse-item" href="notilist">공지사항 목록</a>
+            <a class="collapse-item" href="sitesettings">사이트 관리</a>
+          </div>
+        </div>
+      </li>
+      
+      <li class="nav-item">
+        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsePages-board" aria-expanded="true" aria-controls="collapsePages">
+          <i class="fas fa-fw fa-folder"></i>
+          <span>문의 / 리뷰 / FAQ 관리</span>
+        </a>
+        <div id="collapsePages-board" class="collapse" aria-labelledby="headingPages" data-parent="#accordionSidebar">
+          <div class="bg-white py-2 collapse-inner rounded">
+            <a class="collapse-item" href="boardlist">문의 목록</a>
+            <a class="collapse-item" href="reviewlist">리뷰 목록</a>
+            <a class="collapse-item" href="faqlist">FAQ 목록</a>
+          </div>
+        </div>
+      </li>
+      
+      <li class="nav-item">
+        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsePages1" aria-expanded="true" aria-controls="collapsePages">
+          <i class="fas fa-fw fa-folder"></i>
+          <span>혜택 관리</span>
+        </a>
+        <div id="collapsePages1" class="collapse" aria-labelledby="headingPages" data-parent="#accordionSidebar">
+          <div class="bg-white py-2 collapse-inner rounded">
+            <a class="collapse-item" href="couponlist">쿠폰 목록</a>
+            <a class="collapse-item" href="couponrlist">쿠폰 이력</a>
+            <a class="collapse-item" href="pointslist">포인트 목록</a>
+            <a class="collapse-item" href="benefit_page">혜택 설정</a>
+          </div>
+        </div>
+      </li>
+      
+      <li class="nav-item">
+        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsePages-attd" aria-expanded="true" aria-controls="collapsePages">
+          <i class="fas fa-fw fa-folder"></i>
+          <span>출석체크 관리</span>
+        </a>
+        <div id="collapsePages-attd" class="collapse" aria-labelledby="headingPages" data-parent="#accordionSidebar">
+          <div class="bg-white py-2 collapse-inner rounded">
+            <a class="collapse-item" href="attdList">출석체크 설정</a>
+          </div>
+        </div>
+      </li>
+      
+      <li class="nav-item">
+        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsePages-kakao" aria-expanded="true" aria-controls="collapsePages">
+          <i class="fas fa-fw fa-folder"></i>
+          <span>카카오톡 관리</span>
+        </a>
+        <div id="collapsePages-kakao" class="collapse" aria-labelledby="headingPages" data-parent="#accordionSidebar">
+          <div class="bg-white py-2 collapse-inner rounded">
+            <a class="collapse-item" href="kakao_page">카카오톡 발송</a>
+            <a class="collapse-item" href="setting_kakao">카카오톡 목록</a>
+          </div>
+        </div>
+      </li>
+      
+      <li class="nav-item">
+        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsePages-island" aria-expanded="true" aria-controls="collapsePages">
+          <i class="fas fa-fw fa-folder"></i>
+          <span>배송지 관리</span>
+        </a>
+        <div id="collapsePages-island" class="collapse" aria-labelledby="headingPages" data-parent="#accordionSidebar">
+          <div class="bg-white py-2 collapse-inner rounded">
+            <a class="collapse-item" href="island_list">제주/도서산간 지역 설정</a>
+            <a class="collapse-item" href="island_setting_page">배송비 설정</a>
+          </div>
+        </div>
+      </li>
+      
+      <!-- 
+      <li class="nav-item">
+        <a class="nav-link" href="popuplist">
+          <i class="fas fa-fw fa-table"></i>
+          <span>팝업 관리</span></a>
+      </li>
+      
+      <li class="nav-item">
+        <a class="nav-link" href="bannerlist">
+          <i class="fas fa-fw fa-table"></i>
+          <span>배너 관리</span></a>
+      </li>
+      
+      <li class="nav-item">
+        <a class="nav-link" href="eventlist">
+          <i class="fas fa-fw fa-table"></i>
+          <span>이벤트 관리</span></a>
+      </li>
+      
+      <li class="nav-item">
+        <a class="nav-link" href="notilist">
+          <i class="fas fa-fw fa-table"></i>
+          <span>공지사항</span></a>
+      </li>
+      
+      <li class="nav-item">
+        <a class="nav-link" href="noticlist">
+          <i class="fas fa-fw fa-table"></i>
+          <span>공지사항 카테고리</span></a>
+      </li>
+      
+      <li class="nav-item">
+        <a class="nav-link" href="userlist">
+          <i class="fas fa-fw fa-table"></i>
+          <span>회원 목록</span></a>
+      </li>
+      
+      <li class="nav-item">
+        <a class="nav-link" href="banklist">
+          <i class="fas fa-fw fa-table"></i>
+          <span>은행 목록</span></a>
+      </li>
+      
+      <li class="nav-item">
+        <a class="nav-link" href="faqlist">
+          <i class="fas fa-fw fa-table"></i>
+          <span>FAQ</span></a>
+      </li>
+      
+      <li class="nav-item">
+        <a class="nav-link" href="tockenlist">
+          <i class="fas fa-fw fa-table"></i>
+          <span>토큰 관리</span></a>
+      </li>
+       
+      <li class="nav-item">
+        <a class="nav-link" href="boardlist">
+          <i class="fas fa-fw fa-table"></i>
+          <span>문의 게시판</span></a>
+      </li>
+      
+      <li class="nav-item">
+        <a class="nav-link" href="reviewlist">
+          <i class="fas fa-fw fa-table"></i>
+          <span>리뷰 관리</span></a>
+      </li>
+      
+      <li class="nav-item">
+        <a class="nav-link" href="polist">
+          <i class="fas fa-fw fa-table"></i>
+          <span>상품 옵션 등록</span></a>
+      </li>
+      
+      <li class="nav-item">
+        <a class="nav-link" href="productslist">
+          <i class="fas fa-fw fa-table"></i>
+          <span>상품 등록</span></a>
+      </li>
+      
+      <li class="nav-item">
+        <a class="nav-link" href="cartlist">
+          <i class="fas fa-fw fa-table"></i>
+          <span>장바구니 관리</span></a>
+      </li>
+      
+      <li class="nav-item">
+        <a class="nav-link" href="txnlist">
+          <i class="fas fa-fw fa-table"></i>
+          <span>결제 관리</span></a>
+      </li>
+      
+      <li class="nav-item">
+        <a class="nav-link" href="tmlist">
+          <i class="fas fa-fw fa-table"></i>
+          <span>베송 관리</span></a>
+      </li>
+       -->
+      
+      <!-- Divider -->
+      <hr class="sidebar-divider d-none d-md-block">
+
+      <!-- Sidebar Toggler (Sidebar) -->
+      <div class="text-center d-none d-md-inline">
+        <button class="rounded-circle border-0" id="sidebarToggle"></button>
+      </div>
+
+    </ul>
+    <!-- End of Sidebar -->
+    
+</body>
+</html>

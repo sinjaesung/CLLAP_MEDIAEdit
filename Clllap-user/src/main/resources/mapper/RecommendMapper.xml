@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.clllap.mapper.RecommendMapper">
+
+    <select id="check_recommend_media" resultType="Recommends">
+        SELECT *
+        FROM recommend
+        WHERE user_id = #{user_id}
+          AND media_id = #{media_id}
+    </select>
+
+    <insert id="recommend_media">
+        INSERT INTO recommend
+            (media_id, user_id)
+        VALUES
+            (#{media_id}, #{user_id})
+    </insert>
+
+    <update id="update_recommend_media" parameterType="Recommends">
+        UPDATE recommend
+        <if test='recommend_check == "y"'>
+            SET recommend_check = 'n'
+        </if>
+        <if test='recommend_check =="n"'>
+            SET recommend_check = 'y'
+        </if>
+        WHERE recommend_id = #{recommend_id}
+    </update>
+
+    <update id="update_recommend_media_count" parameterType="Recommends">
+        UPDATE media
+        <if test='recommend_check == "y"'>
+            SET media_recommend_count = media_recommend_count - 1
+        </if>
+        <if test='recommend_check =="n"'>
+            SET media_recommend_count = media_recommend_count + 1
+        </if>
+        WHERE media_id = #{media_id}
+    </update>
+
+</mapper>

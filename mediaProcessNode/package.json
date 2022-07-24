@@ -1,0 +1,25 @@
+{
+  "name": "s",
+  "version": "1.0.0",
+  "description": "ss",
+  "main": "awsupload.js",
+  "scripts": {
+    "test": "ss"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "aws-sdk": "^2.1036.0",
+    "canvas": "^2.8.0",
+    "cors": "^2.8.5",
+    "ejs": "^3.1.6",
+    "express": "^4.17.1",
+    "express-fileupload": "^1.2.1",
+    "ffmpeg": "^0.0.4",
+    "fluent-ffmpeg": "^2.1.2",
+    "jimp": "^0.16.1",
+    "jsdom": "^18.1.1",
+    "opencv-wasm": "^4.3.0-10",
+    "request": "^2.88.2"
+  }
+}

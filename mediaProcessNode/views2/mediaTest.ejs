@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<!--
+ *  Copyright (c) 2015 The WebRTC project authors. All Rights Reserved.
+ *
+ *  Use of this source code is governed by a BSD-style license
+ *  that can be found in the LICENSE file in the root of the source
+ *  tree.
+-->
+<html>
+<head>
+
+    <meta charset="utf-8">
+    <meta name="description" content="WebRTC code samples">
+    <meta name="viewport" content="width=device-width, user-scalable=yes, initial-scale=1, maximum-scale=1">
+    <meta itemprop="description" content="Client-side WebRTC code samples">
+    <meta itemprop="image" content="../../../images/webrtc-icon-192x192.png">
+    <meta itemprop="name" content="WebRTC code samples">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta id="theme-color" name="theme-color" content="#ffffff">
+
+    <base target="_blank">
+
+    <title>Select audio and video sources</title>
+
+    <link rel="icon" sizes="192x192" href="../../../images/webrtc-icon-192x192.png">
+    <link href="//fonts.googleapis.com/css?family=Roboto:300,400,500,700" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" href="../../../css/main.css">
+
+    <style>
+        div.select {
+            display: inline-block;
+            margin: 0 0 1em 0;
+        }
+
+        p.small {
+            font-size: 0.7em;
+        }
+
+        label {
+            width: 12em;
+            display: inline-block;
+        }
+    </style>
+
+</head>
+<script>
+    window.onload=function(){
+        console.log('문서로드시점:');
+        const videoElement=document.querySelector("video");
+        const audioInputSelect=document.querySelector("select#audioSource");
+        const audioOutputSelect=document.querySelector("select#audioOutput");
+        const videoSelect= document.querySelector("select#videoSource");
+        const selectors=[audioInputSelect,audioOutputSelect,videoSelect];
+
+        function gotDevices(deviceInfos){
+            const values=selectors.map(select=>select.value);
+            console.log('deivciesInfosss:',deviceInfos);
+            console.log('what valuess:',values);
+            console.log('what selectorsss:',selectors);
+            selectors.forEach(select=>{
+                while(select.firstChild){
+                    select.removeChild(select.firstChild);
+                }
+            });
+            
+            for(let i=0; i!==deviceInfos.length; i++){
+                const deviceinfo=deviceInfos[i];
+                const option=document.createElement('option');
+                option.value=deviceinfo.deviceId;
+                console.log('===>forlopp deivcesInfos:',deviceinfo);
+                if(deviceinfo.kind==='audioinput'){
+                    option.text=deviceinfo.label || `microphone ${audioInputSelect.length +1}`;
+                    audioInputSelect.appendChild(option);
+                }else if(deviceinfo.kind === 'audiooutput'){
+                    option.text=deviceinfo.label || `speaker ${audioOutputSelect.length +1}`;
+                    audioOutputSelect.appendChild(option);
+                }else if(deviceinfo.kind === 'videoinput'){
+                    option.text=deviceinfo.label || `camera ${videoSelect.length +1}`;
+                    videoSelect.appendChild(option);
+                }else{
+                    console.log('some other kind of source/device:',deviceinfo);
+                }
+            }
+            selectors.forEach((select,selectorIndex)=>{
+                console.log('selectors,valuess:',select,selectorIndex);
+                console.log('cihldsnodess:',select.childNodes,Array.prototype.slice.call(select.childNodes));
+                if(Array.prototype.slice.call(select.childNodes).some(n=> n.value===values[selectorIndex])){
+                    select.value=values[selectorIndex];
+                }
+            })
+        }
+        navigator.mediaDevices.enumerateDevices().then(gotDevices).catch(handleError);
+
+        function attachSinkId(element,sinkId){
+            if(typeof element.sinkId !== 'undefined'){
+                element.setSinkId(sinkId)
+                .then(()=>{
+                    console.log(`success audio output device attached:${sinkId}`);
+                })
+                .catch(error=>{
+                    let errorMessage=error;
+                    if(error.name==='SecurityError'){
+                        errorMessage=`you need to use https for selecting audi ooutput deives:${error}`;
+                    }
+                    console.error(errorMessage);
+                    audioOutputSelect.selectIndex=0;
+                });
+            }else{
+                console.warn('Browser does not supprot output device selection.');
+            }
+        }
+        function changeAudioDestination(){
+            const audioDestination=audioOutputSelect.value;
+            attachSinkId(videoElement,audioDestination);
+        }
+
+        function gotStream(stream){
+            window.stream=stream;
+            videoElement.srcObject=stream;
+            return navigator.mediaDevices.enumerateDevices();
+        }
+        function handleError(error){
+            console.log('navigator.mediaDevices.getUsermeida erorr:',error.message,error.name);
+        }
+        function start(){
+            if(window.stream){
+                console.log('getTrachsss:',window.stream.getTracks());
+                alert(window.stream.getTracks());
+                window.stream.getTracks().forEach(track=>{
+                    track.stop();
+                });
+            }
+            const audioSource=audioInputSelect.value;
+            const videoSource=videoSelect.value;
+            alert(videoSource);
+            const constraints={
+                audio:false,
+                video:{
+                    width: {min:640, ideal: 1280},
+                    height: {min:360, ideal: 720},
+                    //aspectRatio: 1.7777777778,
+                     /*deviceId: videoSource ? {exact:videoSource}:undefined}*/
+                    facingMode : {exact:"user"}
+                }
+            };
+            navigator.mediaDevices.getUserMedia(constraints).then(gotStream).then(gotDevices).catch(handleError);
+        }
+        audioInputSelect.onchange=start;
+        audioOutputSelect.onchange=changeAudioDestination;
+
+        videoSelect.onchange=start;
+
+        start();
+    }
+    
+</script>
+<body>
+<div id="container">
+
+    <h1><a href="//webrtc.github.io/samples/" title="WebRTC samples homepage">WebRTC samples</a><span>Select sources &amp; outputs</span>
+    </h1>
+
+    <p>Get available audio, video sources and audio output devices from <code>mediaDevices.enumerateDevices()</code>
+        then set the source for <code>getUserMedia()</code> using a <code>deviceId</code> constraint.</p>
+    <p><b>Note:</b> without permission, the browser will restrict the available devices to at most one per type.</p>
+
+    <div class="select">
+        <label for="audioSource">Audio input source: </label><select id="audioSource"></select>
+    </div>
+
+    <div class="select">
+        <label for="audioOutput">Audio output destination: </label><select id="audioOutput"></select>
+    </div>
+
+    <div class="select">
+        <label for="videoSource">Video source: </label><select id="videoSource"></select>
+    </div>
+
+    <video id="video" playsinline autoplay></video>
+
+    <p><b>Note:</b> If you hear a reverb sound your microphone is picking up the output of your
+        speakers/headset, lower the volume and/or move the microphone further away from your speakers/headset.</p>
+
+    <a href="https://github.com/webrtc/samples/tree/gh-pages/src/content/devices/input-output"
+       title="View source for this page on GitHub" id="viewSource">View source on GitHub</a>
+</div>
+<script src="https://webrtc.github.io/adapter/adapter-latest.js"></script>
+
+
+<script src="../../../js/lib/ga.js"></script>
+</body>
+</html>

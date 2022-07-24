@@ -1,0 +1,745 @@
+<script type="text/javascript">
+	$('#today').click(function(){
+		document.getElementById('start_date').valueAsDate = new Date();
+		document.getElementById('end_date').valueAsDate = new Date();
+	});
+	
+	function getDateStr(myDate){
+		var myMonth = myDate.getMonth() + 1;
+		var month = myMonth >= 10 ? myMonth : '0' + myMonth;
+		var fake_day = myDate.getDate(); 
+		var day = fake_day >= 10 ? fake_day : '0' + fake_day;
+		return (myDate.getFullYear() + '-' + month + '-' + day);
+	}
+	
+	function lastYesterday() {
+		 var d = new Date();
+		  var dayOfMonth = d.getDate();
+		  d.setDate(dayOfMonth - 1);
+		  return getDateStr(d);
+	}
+	
+	$('#yesterday').click(function(){
+		$("#start_date").val(lastYesterday());
+		document.getElementById('end_date').valueAsDate = new Date();
+	});
+	
+	function lastWeek() {
+	  var d = new Date();
+	  var dayOfMonth = d.getDate();
+	  d.setDate(dayOfMonth - 7);
+	  return getDateStr(d);
+	}
+	
+	$('#week').click(function(){
+		$("#start_date").val(lastWeek());
+		document.getElementById('end_date').valueAsDate = new Date();
+	});
+	
+	function lastMonth() {
+	  var d = new Date();
+	  var monthOfYear = d.getMonth();
+	  d.setMonth(monthOfYear - 1);
+	  return getDateStr(d);
+	}
+	
+	$('#month').click(function(){
+		$("#start_date").val(lastMonth());
+		document.getElementById('end_date').valueAsDate = new Date();
+	});
+	
+	function last3Month() {
+	  var d = new Date();
+	  var monthOfYear = d.getMonth();
+	  d.setMonth(monthOfYear - 3);
+	  return getDateStr(d);
+	}
+	
+	$('#3month').click(function(){
+		$("#start_date").val(last3Month());
+		document.getElementById('end_date').valueAsDate = new Date();
+	});
+	
+	function last6Month() {
+	  var d = new Date();
+	  var monthOfYear = d.getMonth();
+	  d.setMonth(monthOfYear - 6);
+	  return getDateStr(d);
+	}
+	
+	$('#6month').click(function(){
+		$("#start_date").val(last6Month());
+		document.getElementById('end_date').valueAsDate = new Date();
+	});
+
+
+
+	function finish_mog() {
+		var checkArray = [];
+		$('.list-checkBox:checked').each(function(i) {
+			checkArray.push($('.list-checkBox:checked:eq('+i+')').val());
+		});
+		
+		console.log(checkArray);
+		if (confirm('�꽑�깮�맂 紐⑸줉�뱾�쓣 寃곗젣 �셿猷뚮줈 �쟾�솚�븯寃좎뒿�땲源�?') == true) {
+			$.ajax({
+	  			url : 'changeosf',
+	  			type : 'POST',
+	  			dataType : 'json',
+	  			data : {
+	  				'checkedData' : checkArray
+	  				},
+	  			success : function(data) {
+	  				location.reload();
+	  			}
+	  		});
+		} else {
+			return false;
+		}
+	}
+	
+	function readytoship() {
+		var checkArray = [];
+		$('.list-checkBox:checked').each(function(i) {
+			checkArray.push($('.list-checkBox:checked:eq('+i+')').val());
+		});
+		
+		console.log(checkArray);
+		if (confirm('�꽑�깮�맂 紐⑸줉�뱾�쓣 諛곗넚 以�鍮꾨줈 �쟾�솚�븯寃좎뒿�땲源�?') == true) {
+			$.ajax({
+	  			url : 'changeossr',
+	  			type : 'POST',
+	  			dataType : 'json',
+	  			data : {
+	  				'checkedData' : checkArray
+	  				},
+	  			success : function(data) {
+	  				location.reload();
+	  			}
+	  		});
+		} else {
+			return false;
+		}
+	}
+	
+	function cancel_txn() {
+		var checkArray = [];
+		$('.list-checkBox:checked').each(function(i) {
+			checkArray.push($('.list-checkBox:checked:eq('+i+')').val());
+		});
+		
+		console.log(checkArray);
+		if (confirm('�꽑�깮�맂 紐⑸줉�뱾�쓣 寃곗젣 痍⑥냼�븯�떆寃좎뒿�땲源�?') == true) {
+			$.ajax({
+	  			url : 'changeostc',
+	  			type : 'POST',
+	  			dataType : 'json',
+	  			data : {
+	  				'checkedData' : checkArray
+	  				},
+	  			success : function(data) {
+	  				location.reload();
+	  			}
+	  		});
+		} else {
+			return false;
+		}
+	}
+	
+	function cancel_order() {
+		var checkArray = [];
+		$('.list-checkBox:checked').each(function(i) {
+			checkArray.push($('.list-checkBox:checked:eq('+i+')').val());
+		});
+		
+		for (var i=0; i<checkArray.length; i++) {
+			
+			var val = $('#hidden_status'+ checkArray[i] +'').parent('td').find('input').eq(2).val();
+			
+			console.log("val : " + val);
+			
+			if (val == 30 || val == 41) {
+				alert("선택된 항목 중 발송처리 불가 항목이 포함되어있습니다.");
+				return;
+			}
+			
+		}
+		
+		console.log(checkArray);
+		if (confirm('해당 목록을 강제 취소하시겠습니까?') == true) {
+			$.ajax({
+	  			url : 'changeosoc',
+	  			type : 'POST',
+	  			dataType : 'json',
+	  			data : {
+	  				'checkedData' : checkArray
+	  				},
+	  			success : function(data) {
+	  				location.reload();
+	  			}
+	  		});
+		} else {
+			return false;
+		}
+	}
+	
+	
+	// 방문 수령
+	function finish_ship() {
+		var checkArray = [];
+		$('.list-checkBox:checked').each(function(i) {
+			checkArray.push($('.list-checkBox:checked:eq('+i+')').val());
+		});
+		
+// 		for (var i=0; i<checkArray.length; i++) {
+			
+// 			var val = $('#hidden_status'+ checkArray[i] +'').parent('td').find('input').eq(2).val();
+			
+// 			if (val == 30 || val == 41) {
+// 				alert("선택된 항목 중 배송완료 처리 불가 항목이 포함되어있습니다.");
+// 				return;
+// 			}
+			
+// 		}
+		
+		console.log(checkArray);
+		if (confirm('선택하신 항목을 배송 완료로 변경하시겠습니까?') == true) {
+			$.ajax({
+	  			url : 'changeossf',
+	  			type : 'POST',
+	  			dataType : 'json',
+	  			data : {
+	  				'checkedData' : checkArray
+	  				},
+	  			success : function(data) {
+	  				location.reload();
+	  			}
+	  		});
+		} else {
+			return false;
+		}
+	}
+	
+	function order_confirm() {
+		var checkArray = [];
+		$('.list-checkBox:checked').each(function(i) {
+			checkArray.push($('.list-checkBox:checked:eq('+i+')').val());
+		});
+		
+		for (var i=0; i<checkArray.length; i++) {
+			
+			var val = $('#hidden_status'+ checkArray[i] +'').parent('td').find('input').eq(2).val();
+			
+			if (val == 30 || val == 41 || val == 42 || val == 43) {
+				alert("선택된 항목 중 발주확인 불가 항목이 포함되어있습니다.");
+				return;
+			}
+			
+		}
+		
+		console.log(checkArray);
+		if (confirm('선택된 목록들을 발주 확인하시겠습니까?') == true) {
+			$.ajax({
+	  			url : 'changeoc',
+	  			type : 'POST',
+	  			dataType : 'json',
+	  			data : {
+	  				'checkedData' : checkArray
+	  				},
+	  			success : function(data) {
+	  				
+	  				console.log("data : " + data);
+	  				
+	  				if (data == 1) {
+	  					
+	  					location.reload();
+		  				alert("발주 확인이 완료되었습니다.");
+		  				
+	  				} else {
+	  					
+	  					alert("선택하신 항목 중 품절 상품이 포함되어있어 발주 확인에 실패했습니다.");
+	  					
+	  				}
+	  				
+	  			}
+	  		});
+		} else {
+			return false;
+		}
+	}
+	
+	function SendOrder() {
+		var checkArray = [];
+		$('.list-checkBox:checked').each(function(i) {
+			checkArray.push($('.list-checkBox:checked:eq('+i+')').val());
+		});
+		
+		for (var i=0; i<checkArray.length; i++) {
+			
+			var val = $('#hidden_status'+ checkArray[i] +'').parent('td').find('input').eq(2).val();
+			
+			if (val == 41 || val == 42 || val == 43) {
+				alert("선택된 항목 중 발송처리 불가 항목이 포함되어있습니다.");
+				return;
+			}
+			
+		}
+		
+		console.log(checkArray);
+		if (confirm('선택하신 항목을 배송중으로 변경하시겠습니까?') == true) {
+			$.ajax({
+	  			url : 'changeso',
+	  			type : 'POST',
+	  			dataType : 'json',
+	  			data : {
+	  				'checkedData' : checkArray
+	  				},
+	  			success : function(data) {
+	  				location.reload();
+	  			}
+	  		});
+		} else {
+			return false;
+		}
+	}
+  
+  
+  function delivery_update(mog_idx) {
+		
+		var mog_delivery_name = $('#delivery_name').val();
+		var mog_delivery_num = $('button[value='+mog_idx+']').parent('span').find('input').val();
+		
+		$.ajax({
+			url : 'changedeliverynum',
+			type : 'POST',
+			dataType : 'json',
+			data : {
+				'mog_delivery_name' : mog_delivery_name,
+				'mog_delivery_num' : mog_delivery_num,
+				'mog_idid' : mog_idx
+			},
+			success : function(data) {
+				if (data == 1) {
+					alert("송장번호가 갱신되었습니다.");
+	  				location.reload();	
+				}
+			}
+		});
+	}
+  
+  
+  	function ChangeAllShipNumber() {
+  		var checkArray = [];
+		$('.list-checkBox:checked').each(function(i) {
+			checkArray.push($('.list-checkBox:checked:eq('+i+')').val());
+		});
+		
+		var num = $('#checked-shipnumber').val();
+		
+		console.log(checkArray);
+		if (confirm('선택하신 항목의 송장번호를 일괄 변경하시겠습니까?') == true) {
+			$.ajax({
+	  			url : 'changeallshipnum',
+	  			type : 'POST',
+	  			dataType : 'json',
+	  			data : {
+	  				'checkedData' : checkArray,
+	  				'num' : num
+	  				},
+	  			success : function(data) {
+	  				location.reload();
+	  			}
+	  		});
+		} else {
+			return false;
+		}
+  	}
+  	
+	function cancel_completed() {
+		var checkArray = [];
+		$('.list-checkBox:checked').each(function(i) {
+			checkArray.push($('.list-checkBox:checked:eq('+i+')').val());
+		});
+		
+		console.log(checkArray);
+		if (confirm('선택하신 항목을 주문 취소하시겠습니까?') == true) {
+			$.ajax({
+	  			url : 'changecc',
+	  			type : 'POST',
+	  			dataType : 'json',
+	  			data : {
+	  				'checkedData' : checkArray
+	  				},
+	  			success : function(data) {
+	  				location.reload();
+	  			}
+	  		});
+		} else {
+			return false;
+		}
+	}
+ 
+	function cancel_reject() {
+		var checkArray = [];
+		$('.list-checkBox:checked').each(function(i) {
+			checkArray.push($('.list-checkBox:checked:eq('+i+')').val());
+		});
+		
+		console.log(checkArray);
+		if (confirm('선택하신 항목의 취소 요청을 거부하시겠습니까?') == true) {
+			$.ajax({
+	  			url : 'changecr',
+	  			type : 'POST',
+	  			dataType : 'json',
+	  			data : {
+	  				'checkedData' : checkArray
+	  				},
+	  			success : function(data) {
+	  				location.reload();
+	  			}
+	  		});
+		} else {
+			return false;
+		}
+	}
+	
+	function refund_confirm() {
+		var checkArray = [];
+		$('.list-checkBox:checked').each(function(i) {
+			checkArray.push($('.list-checkBox:checked:eq('+i+')').val());
+		});
+		
+		console.log(checkArray);
+		if (confirm('선택하신 항목을 수거접수처리 하시겠습니까?') == true) {
+			$.ajax({
+	  			url : 'changeReturnConfirm',
+	  			type : 'POST',
+	  			dataType : 'json',
+	  			data : {
+	  				'checkedData' : checkArray
+	  				},
+	  			success : function(data) {
+	  				location.reload();
+	  			}
+	  		});
+		} else {
+			return false;
+		}
+	}
+	
+	function returning() {
+		var checkArray = [];
+		$('.list-checkBox:checked').each(function(i) {
+			checkArray.push($('.list-checkBox:checked:eq('+i+')').val());
+		});
+		
+		console.log(checkArray);
+		if (confirm('선택하신 항목을 수거중처리로 변경하시겠습니까?') == true) {
+			$.ajax({
+	  			url : 'changeReturning',
+	  			type : 'POST',
+	  			dataType : 'json',
+	  			data : {
+	  				'checkedData' : checkArray
+	  				},
+	  			success : function(data) {
+	  				location.reload();
+	  			}
+	  		});
+		} else {
+			return false;
+		}
+	}
+	
+	function collection() {
+		var checkArray = [];
+		$('.list-checkBox:checked').each(function(i) {
+			checkArray.push($('.list-checkBox:checked:eq('+i+')').val());
+		});
+		
+		console.log(checkArray);
+		if (confirm('선택하신 항목을 수거완료처리 하시겠습니까?') == true) {
+			$.ajax({
+	  			url : 'changeCollection',
+	  			type : 'POST',
+	  			dataType : 'json',
+	  			data : {
+	  				'checkedData' : checkArray
+	  				},
+	  			success : function(data) {
+	  				location.reload();
+	  			}
+	  		});
+		} else {
+			return false;
+		}
+	}
+	
+	function refund_completed() {
+		var checkArray = [];
+		$('.list-checkBox:checked').each(function(i) {
+			checkArray.push($('.list-checkBox:checked:eq('+i+')').val());
+		});
+		
+		console.log(checkArray);
+		if (confirm('선택하신 항목을 반품완료처리 하시겠습니까?') == true) {
+			$.ajax({
+	  			url : 'changeRefundCompleted',
+	  			type : 'POST',
+	  			dataType : 'json',
+	  			data : {
+	  				'checkedData' : checkArray
+	  				},
+	  			success : function(data) {
+	  				location.reload();
+	  			}
+	  		});
+		} else {
+			return false;
+		}
+	}
+	
+	function refund_reject() {
+		var checkArray = [];
+		$('.list-checkBox:checked').each(function(i) {
+			checkArray.push($('.list-checkBox:checked:eq('+i+')').val());
+		});
+		
+		console.log(checkArray);
+		if (confirm('선택하신 항목을 반품 거부하시겠습니까?') == true) {
+			$.ajax({
+	  			url : 'changeRefundReject',
+	  			type : 'POST',
+	  			dataType : 'json',
+	  			data : {
+	  				'checkedData' : checkArray
+	  				},
+	  			success : function(data) {
+	  				location.reload();
+	  			}
+	  		});
+		} else {
+			return false;
+		}
+	}
+	
+	function change_swap_txn() {
+		var checkArray = [];
+		$('.list-checkBox:checked').each(function(i) {
+			checkArray.push($('.list-checkBox:checked:eq('+i+')').val());
+		});
+		
+		console.log(checkArray);
+		if (confirm('선택하신 항목을 교환으로 변경하시겠습니까?') == true) {
+			$.ajax({
+	  			url : 'changeSwap',
+	  			type : 'POST',
+	  			dataType : 'json',
+	  			data : {
+	  				'checkedData' : checkArray
+	  				},
+	  			success : function(data) {
+	  				location.reload();
+	  			}
+	  		});
+		} else {
+			return false;
+		}
+	}
+	
+	function swap_confirm() {
+		var checkArray = [];
+		$('.list-checkBox:checked').each(function(i) {
+			checkArray.push($('.list-checkBox:checked:eq('+i+')').val());
+		});
+		
+		console.log(checkArray);
+		if (confirm('선택하신 항목을 교환접수 하시겠습니까?') == true) {
+			$.ajax({
+	  			url : 'changeSwapConfirm',
+	  			type : 'POST',
+	  			dataType : 'json',
+	  			data : {
+	  				'checkedData' : checkArray
+	  				},
+	  			success : function(data) {
+	  				location.reload();
+	  			}
+	  		});
+		} else {
+			return false;
+		}
+	}
+	
+	function changeKeepSwap() {
+		var checkArray = [];
+		$('.list-checkBox:checked').each(function(i) {
+			checkArray.push($('.list-checkBox:checked:eq('+i+')').val());
+		});
+		
+		console.log(checkArray);
+		if (confirm('선택하신 항목을 수거중으로 변경하시겠습니까?') == true) {
+			$.ajax({
+	  			url : 'changeKeepSwap',
+	  			type : 'POST',
+	  			dataType : 'json',
+	  			data : {
+	  				'checkedData' : checkArray
+	  				},
+	  			success : function(data) {
+	  				location.reload();
+	  			}
+	  		});
+		} else {
+			return false;
+		}
+	}
+	
+	function changeSwapCollection() {
+		var checkArray = [];
+		$('.list-checkBox:checked').each(function(i) {
+			checkArray.push($('.list-checkBox:checked:eq('+i+')').val());
+		});
+		
+		console.log(checkArray);
+		if (confirm('선택하신 항목을 수거완료로 변경하시겠습니까?') == true) {
+			$.ajax({
+	  			url : 'changeSwapCollection',
+	  			type : 'POST',
+	  			dataType : 'json',
+	  			data : {
+	  				'checkedData' : checkArray
+	  				},
+	  			success : function(data) {
+	  				location.reload();
+	  			}
+	  		});
+		} else {
+			return false;
+		}
+	}
+	
+	function swap_completed() {
+		var checkArray = [];
+		$('.list-checkBox:checked').each(function(i) {
+			checkArray.push($('.list-checkBox:checked:eq('+i+')').val());
+		});
+		
+		console.log(checkArray);
+		if (confirm('선택하신 항목을 교환완료로 변경하시겠습니까?') == true) {
+			$.ajax({
+	  			url : 'changeSwapCompleted',
+	  			type : 'POST',
+	  			dataType : 'json',
+	  			data : {
+	  				'checkedData' : checkArray
+	  				},
+	  			success : function(data) {
+	  				location.reload();
+	  			}
+	  		});
+		} else {
+			return false;
+		}
+	}
+	
+	function swap_reject() {
+		var checkArray = [];
+		$('.list-checkBox:checked').each(function(i) {
+			checkArray.push($('.list-checkBox:checked:eq('+i+')').val());
+		});
+		
+		console.log(checkArray);
+		if (confirm('선택하신 항목을 교환 거부하시겠습니까?') == true) {
+			$.ajax({
+	  			url : 'changeSwapReject',
+	  			type : 'POST',
+	  			dataType : 'json',
+	  			data : {
+	  				'checkedData' : checkArray
+	  				},
+	  			success : function(data) {
+	  				location.reload();
+	  			}
+	  		});
+		} else {
+			return false;
+		}
+	}
+	
+	function change_return_txn() {
+		var checkArray = [];
+		$('.list-checkBox:checked').each(function(i) {
+			checkArray.push($('.list-checkBox:checked:eq('+i+')').val());
+		});
+		
+		console.log(checkArray);
+		if (confirm('선택하신 항목을 반품요청으로 변경하시겠습니까?') == true) {
+			$.ajax({
+	  			url : 'changeTypeReturn',
+	  			type : 'POST',
+	  			dataType : 'json',
+	  			data : {
+	  				'checkedData' : checkArray
+	  				},
+	  			success : function(data) {
+	  				location.reload();
+	  			}
+	  		});
+		} else {
+			return false;
+		}
+	}
+	
+	function final_returning() {
+		var checkArray = [];
+		$('.list-checkBox:checked').each(function(i) {
+			checkArray.push($('.list-checkBox:checked:eq('+i+')').val());
+		});
+		
+		console.log(checkArray);
+		if (confirm('선택하신 항목을 반품중으로 변경하시겠습니까?') == true) {
+			$.ajax({
+	  			url : 'finalReturning',
+	  			type : 'POST',
+	  			dataType : 'json',
+	  			data : {
+	  				'checkedData' : checkArray
+	  				},
+	  			success : function(data) {
+	  				location.reload();
+	  			}
+	  		});
+		} else {
+			return false;
+		}
+	}
+	
+	function final_swap() {
+		var checkArray = [];
+		$('.list-checkBox:checked').each(function(i) {
+			checkArray.push($('.list-checkBox:checked:eq('+i+')').val());
+		});
+		
+		console.log(checkArray);
+		if (confirm('선택하신 항목을 교환중으로 변경하시겠습니까?') == true) {
+			$.ajax({
+	  			url : 'finalSwap',
+	  			type : 'POST',
+	  			dataType : 'json',
+	  			data : {
+	  				'checkedData' : checkArray
+	  				},
+	  			success : function(data) {
+	  				location.reload();
+	  			}
+	  		});
+		} else {
+			return false;
+		}
+	}
+	
+	 $(".check-all").click(function() {
+			$(".list-checkBox").prop('checked', this.checked); 
+	 });
+  </script>

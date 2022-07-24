@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>Clllap 관리자</title>
+
+    <!-- Custom fonts for this template -->
+    <link href="../../vendor/fontawesome-free/css/all.min.css"
+          rel="stylesheet" type="text/css">
+
+    <link
+            href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
+            rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="../../css/sb-admin-2.min.css" rel="stylesheet">
+
+    <!-- Custom styles for this page -->
+    <link href="../../vendor/datatables/dataTables.bootstrap4.min.css"
+          rel="stylesheet">
+
+
+</head>
+
+<body id="page-top">
+
+<!-- Page Wrapper -->
+<div id="wrapper">
+
+    <th:block th:replace="/../hf/sidebar.html"></th:block>
+
+    <!-- Content Wrapper -->
+    <div id="content-wrapper" class="d-flex flex-column">
+
+        <!-- Main Content -->
+        <div id="content">
+            <th:block th:replace="/../hf/header.html"></th:block>
+
+            <!-- Begin Page Content -->
+            <div class="container-fluid">
+                <div class="dash_board">
+                    <!-- 위 현황관련 데이터 -->
+                    <div class="dash_board_box dash_board_top">
+                        <h1 class="text-gray-800" th:text="|동영상 업로드 카운트 : ${uploadMediaCount} 개|">업로드 카운트</h1>
+                        <!-- 주문현황 -->
+                        <div class="card shadow mb-4">
+                            <h1 class="text-gray-800 dash_title">국가 비율</h1>
+                            <div class="card-body">
+                                <div class="data_area">
+                                    <div class="flex data" th:each="country : ${countryPercentList}">
+                                        <span th:text="${country.user_country}">국가명</span>
+                                        <span id="allSpace_count" class="font_wg_bold" th:text="${country.country_percent} + '%'"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card shadow mb-4">
+                            <h1 class="text-gray-800 dash_title">성별 비율</h1>
+                            <div class="card-body">
+                                <div class="data_area">
+                                    <div class="flex data" th:each="gender : ${genderPercentList}">
+                                        <span th:text="${gender.user_gender}">성별</span>
+                                        <span id="delveryShop_count" class="font_wg_bold" th:text="${gender.gender_percent} + '%'"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card shadow mb-4">
+                            <h1 class="text-gray-800 dash_title">연령대 비율</h1>
+                            <div class="card-body">
+                                <div class="data_area">
+                                    <div class="flex data" th:each="age : ${agePercentList}">
+                                        <span th:text="${age.user_age}">성별</span>
+                                        <span id="delveryShop_count" class="font_wg_bold" th:text="${age.age_percent} + '%'"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="sticky-footer bg-white">
+            <div class="container my-auto">
+                <div class="copyright text-center my-auto">
+                    <span>Copyright &copy; Clllap 2021</span>
+                </div>
+            </div>
+        </footer>
+        <!-- End of Footer -->
+
+    </div>
+
+</div>
+<!-- End of Page Wrapper -->
+
+<!-- Scroll to Top Button-->
+<a class="scroll-to-top rounded" href="#page-top"> <i
+        class="fas fa-angle-up"></i>
+</a>
+
+<!-- Bootstrap core JavaScript-->
+<!-- Bootstrap core JavaScript-->
+<script src="vendor/jquery/jquery.min.js"></script>
+<script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+<!-- Core plugin JavaScript-->
+<script src="vendor/jquery-easing/jquery.easing.min.js"></script>
+
+<!-- Custom scripts for all pages-->
+<script src="js/sb-admin-2.min.js"></script>
+
+
+<!-- Page level custom scripts -->
+<script src="js/demo/datatables-demo.js"></script>
+
+<script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+<script src="https://cdn.datatables.net/1.10.24/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/1.7.0/js/dataTables.buttons.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
+<script src="https://cdn.datatables.net/buttons/1.7.0/js/buttons.html5.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/1.7.0/js/buttons.print.min.js"></script>
+<!-- Page level plugins -->
+<script src="vendor/datatables/dataTables.bootstrap4.min.js"></script>
+
+
+<!-- Page level custom scripts -->
+<script src="../../js/demo/datatables-demo.js"></script>
+<script type="text/javascript"
+        src="https://www.gstatic.com/charts/loader.js"></script>
+<script>
+    google.charts.load('current', {packages: ['corechart', 'bar']});
+    google.charts.setOnLoadCallback(drawChart);
+
+    function drawChart() {
+        var data = google.visualization.arrayToDataTable([
+            ["Element", "", {role: "style"}],
+            ["공유주방", parseInt($('#allSpace_count').html()), "grey"],
+            ["배달 아이템", parseInt($('#delveryShop_count').html()), "sky"],
+            ["무인 판매", parseInt($('#autoShop_count').html()), "green"],
+            ["통산 회원", parseInt($('#user_count').html()), "color: pink"]
+        ]);
+
+        var view = new google.visualization.DataView(data);
+        view.setColumns([0, 1,
+            {
+                calc: "stringify",
+                sourceColumn: 1,
+                type: "string",
+                role: "annotation"
+            },
+            2]);
+
+        var options = {
+            title: "",
+            width: 900,
+            height: 400,
+            bar: {groupWidth: "50%"},
+            legend: {position: "none"},
+        };
+        var chart = new google.visualization.ColumnChart(document.getElementById("chart_div"));
+        chart.draw(view, options);
+    }
+
+    $('.qnaList').on('click', function () {
+        let category = $(this).children().attr('id')
+        let html = ''
+        if (category == 'question') {
+            $('.qnaList').removeClass('on')
+            $(this).addClass('on')
+
+            $.ajax({
+                type: 'post',
+                url: '/allQuestion',
+                contentType: 'application/x-www-form-urlencoded;charset=utf-8',
+                success: (data) => {
+                    $('#dataTable').children().remove()
+                    html += '<thead><tr><td>제목</td><td>날짜</td></tr></thead>'
+                    html += '<tbody id="dashboard_list">'
+                    for (let i = 0; i < data.length; i++) {
+                        html += '<tr>'
+                        html += '<td>'
+                        html += '<a>' + data[i].qs_content + '</a>'
+                        html += '</td>'
+                        html += '<td>' + data[i].qs_create_date + '</td>'
+                        html += '</tr>'
+                    }
+                    html += '</tbody>'
+                    $('#dataTable').append(html)
+                }, error: (err) => {
+                    alert('유저 문의사항 조회 실패')
+                    console.log(err)
+                }
+            })
+
+        } else if (category == 'declare') {
+            $('.qnaList').removeClass('on')
+            $(this).addClass('on')
+
+            $.ajax({
+                type: 'post',
+                url: '/all_declare',
+                contentType: 'application/x-www-form-urlencoded;charset=utf-8',
+                success: (data) => {
+                    $('#dataTable').children().remove()
+                    html += '<thead><tr><td>공간 & 샵 번호</td><td>날짜</td></tr></thead>'
+                    html += '<tbody id="dashboard_list">'
+                    for (let i = 0; i < data.length; i++) {
+                        html += '<tr>'
+                        html += '<td>'
+                        if (data[i].share_id == 0) {
+                            html += '<a>' + data[i].shop_id + '</a>'
+                        }
+                        if (data[i].shop_id == 0) {
+                            html += '<a>' + data[i].share_id + '</a>'
+                        }
+                        html += '</td>'
+                        html += '<td>' + data[i].dc_create_date + '</td>'
+                        html += '</tr>'
+                    }
+                    html += '</tbody>'
+                    $('#dataTable').append(html)
+                }, error: (err) => {
+                    alert('유저 신고사항 조회 실패')
+                    console.log(err)
+                }
+            })
+        }
+    })
+</script>
+</body>
+
+</html>

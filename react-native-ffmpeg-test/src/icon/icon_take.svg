@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="40.51" height="25.84" viewBox="0 0 40.51 25.84">
+  <defs>
+    <filter id="패스_876" x="0" y="0" width="40.51" height="25.84" filterUnits="userSpaceOnUse">
+      <feOffset input="SourceAlpha"/>
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feFlood flood-opacity="0.345"/>
+      <feComposite operator="in" in2="blur"/>
+      <feComposite in="SourceGraphic"/>
+    </filter>
+  </defs>
+  <g transform="matrix(1, 0, 0, 1, 0, 0)" filter="url(#패스_876)">
+    <path id="패스_876-2" data-name="패스 876" d="M-7.955.1V-6.59h2.03V-7.74h-5.43v1.15h2.02V.1Zm5.25-7.84h-1.46L-6.4.1h1.36l.5-1.87h2.2l.5,1.87h1.37Zm-.72,1.82.79,2.99h-1.59Zm3.7-1.82V.1h1.38V-3.36L4.015.1h1.71L2.845-4.01l2.73-3.73H3.9L1.655-4.59V-7.74Zm6.47,0a.324.324,0,0,0-.37.37v5.96a.869.869,0,0,0,.26.75l.43.46A.779.779,0,0,0,7.8.1h3.36V-1.05H8.265a.3.3,0,0,1-.22-.09l-.19-.22a.307.307,0,0,1-.1-.26V-3.46h2.17V-4.6H7.755V-6.59h3.4V-7.74Z" transform="translate(20.36 16.74)" fill="#fff"/>
+  </g>
+</svg>

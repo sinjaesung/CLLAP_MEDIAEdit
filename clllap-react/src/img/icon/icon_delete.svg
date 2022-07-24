@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 26 26">
+  <g id="그룹_4215" data-name="그룹 4215" transform="translate(-387 -878)">
+    <g id="타원_296" data-name="타원 296" transform="translate(387 878)" fill="#281755" stroke="#f4f4fc" stroke-width="2">
+      <circle cx="13" cy="13" r="13" stroke="none"/>
+      <circle cx="13" cy="13" r="12" fill="none"/>
+    </g>
+    <path id="iconmonstr-x-mark-thin" d="M5.668,5.368,10.036,1l.3.3L5.968,5.668l4.368,4.368-.3.3L5.668,5.968,1.3,10.336l-.3-.3L5.368,5.668,1,1.3,1.3,1,5.668,5.368Z" transform="translate(394.332 885.332)" fill="#fff" stroke="#fff" stroke-width="1" fill-rule="evenodd"/>
+  </g>
+</svg>

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+
+        #canvasOutput{
+            background-color:#808080
+        }
+        #imagesrc{
+            outline:1px solid black; width:400px;height:400px;display:block;
+        }
+    </style>
+</head>
+<body>
+<h2>HELLO OEPNCV.JS</h2>
+<p id='status'>OPENCV IS JIS LOADING....</p>
+<div>
+    <p>Inputoutput</p>
+    <div class='inputoutput'>
+        <img id='imagesrc' alt='no image'/>
+        <div class='caption'>imagesrc <input type='file' id='fileInput' name='file'/></div>
+    </div>
+    <div class='inputoutput'>
+        
+        <div class='caption'>canvasOutput</div>
+        <canvas id='canvasOutput'></canvas>
+    </div>
+</div>
+<script>
+let imgElement = document.getElementById('imagesrc');
+let inputElement=document.getElementById('fileInput');
+inputElement.addEventListener('change',(e) => {
+    console.log('파일변화 이벤트 발생::',e);
+    console.log(window.URL);
+    imgElement.src = URL.createObjectURL(e.target.files[0]);
+},false);
+
+imgElement.onload = function() {
+    console.log('imgElement자원요소가 모두 로드되었을시에::',cv);
+    let mat = cv.imread(imgElement);
+    cv.imshow('canvasOutput',mat);
+    console.log('imgshow mat elemtnssnso datasss:',mat);
+    mat.delete();
+};
+function onOpenCvReady(){
+    document.getElementById('status').innerHTML ='OPENCV,.JS IS REaday';
+}
+</script>
+<script async src='public/opencv.js' onload='onOpenCvReady()'></script>
+</body>
+</html>

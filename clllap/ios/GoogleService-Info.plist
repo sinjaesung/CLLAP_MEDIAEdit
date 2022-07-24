@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>84383750643-k2hfir19cer4an0059pktr77su7l9ctv.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.84383750643-k2hfir19cer4an0059pktr77su7l9ctv</string>
+	<key>API_KEY</key>
+	<string>AIzaSyBBgNbAp-1ecM3w3dMavo3eXIvc0jmv_J0</string>
+	<key>GCM_SENDER_ID</key>
+	<string>84383750643</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>kr.martclubs.mart_136</string>
+	<key>PROJECT_ID</key>
+	<string>Mart_136-e2096</string>
+	<key>STORAGE_BUCKET</key>
+	<string>Mart_136-e2096.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:84383750643:ios:5694e8b52ab1df398eda86</string>
+</dict>
+</plist>

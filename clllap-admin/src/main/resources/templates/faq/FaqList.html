@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <title>용된다 관리자</title>
+
+  <!-- Custom fonts for this template -->
+  <link href="vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">
+
+  <!-- Custom styles for this template -->
+  <link href="css/sb-admin-2.min.css" rel="stylesheet">
+
+  <!-- Custom styles for this page -->
+  <link href="vendor/datatables/dataTables.bootstrap4.min.css" rel="stylesheet">
+
+</head>
+
+<body id="page-top">
+
+  <!-- Page Wrapper -->
+  <div id="wrapper">
+
+    <th:block th:replace="/../hf/sidebar.html"></th:block>
+
+    <!-- Content Wrapper -->
+    <div id="content-wrapper" class="d-flex flex-column">
+
+      <!-- Main Content -->
+      <div id="content"> <th:block th:replace="/../hf/header.html"></th:block>
+
+        <!-- Begin Page Content -->
+        <div class="container-fluid">
+
+          <!-- Page Heading -->
+          <h1 class="text-gray-800 head_title">자주묻는질문 관리</h1>
+
+          <!-- DataTales Example -->
+          <div class="card shadow mb-4">
+          	<div class="card-header py-3 tab_btn_list" style="margin:0 auto;">
+            	<th:block th:each="fc : ${savefaqcat}">
+            		<div class="list"><a th:href="@{/faqlist(faq_cat_id=${fc.faq_cat_parent})}"><span th:text="${fc.faq_cat_name}"></span></a></div>
+            	</th:block>
+            </div>
+          	
+            <div class="card-header py-3 flex-between">
+              <div>
+	              <a th:href="insertfaqcat" class="btn btn-primary">카테고리 등록</a>
+	              <a th:href="insertfaq" class="btn btn-primary">FAQ 등록</a>
+              </div>
+              <div>
+	              <a th:href="faqlist" class="btn gray_btn">초기화</a>
+	              <button type="button" onclick="delete_target()" class="btn delete_btn">X 선택항목 삭제</button>
+              </div>
+            </div>
+            <!--
+            <div class="card-header py-3">
+            	<th:block th:each="fc : ${savefaqcat}">
+            		<a th:href="@{/faqlist(faq_cat_id=${fc.faq_cat_parent})}" style="margin-left:14px;"><span th:text="${fc.faq_cat_name}"></span></a>
+            	</th:block>
+            </div>
+            -->
+            <div class="card-body">
+              <div class="table-responsive">
+                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                  <thead>
+                    <tr>
+                      <th><input type="checkbox" id="txn-checkbox" class="check-all"></th>
+                      <th>#</th>
+                      <th>질문</th>
+                      <th>답변</th>
+                      <th>작성자</th>
+                      <th>작성일</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                     <tr th:each="sf : ${savefaq}">
+                     	<td style="width:4%"><input type="checkbox" name="faq_id" id="txn-checkbox" class="list-checkBox" th:value="${sf.faq_id}"></td>
+          				<td style="width:4%"><span th:text="${sf.faq_id}"></span></td>
+         	 			<td><a th:href="'/faqdetail?faq_id=' + ${sf.faq_id}"><span th:text="${sf.faq_name}"></span></a></td>
+          				<td><span th:text="${sf.faq_content}"></span></td>
+          				<td style="width:8%"><span th:text="${sf.faq_writer}"></span></td>
+          				<td style="width:10%"><span th:text="${sf.faq_update_date}"></span></td>
+          			</tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+        </div>
+        <!-- /.container-fluid -->
+
+      </div>
+      <!-- End of Main Content -->
+
+      <!-- Footer -->
+      <footer class="sticky-footer bg-white">
+        <div class="container my-auto">
+          <div class="copyright text-center my-auto">
+            <span>Copyright &copy; Yongdeanda 2020</span>
+          </div>
+        </div>
+      </footer>
+      <!-- End of Footer -->
+
+    </div>
+    <!-- End of Content Wrapper -->
+
+  </div>
+  <!-- End of Page Wrapper -->
+
+  <!-- Scroll to Top Button-->
+  <a class="scroll-to-top rounded" href="#page-top">
+    <i class="fas fa-angle-up"></i>
+  </a>
+
+  <!-- Logout Modal-->
+  <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Ready to Leave?</h5>
+          <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">×</span>
+          </button>
+        </div>
+        <div class="modal-body">Select "Logout" below if you are ready to end your current session.</div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+          <a class="btn btn-primary" href="login.html">Logout</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap core JavaScript-->
+  <script src="vendor/jquery/jquery.min.js"></script>
+  <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+  <!-- Core plugin JavaScript-->
+  <script src="vendor/jquery-easing/jquery.easing.min.js"></script>
+
+  <!-- Custom scripts for all pages-->
+  <script src="js/sb-admin-2.min.js"></script>
+
+  <!-- Page level plugins -->
+  <script src="vendor/datatables/jquery.dataTables.min.js"></script>
+  <script src="vendor/datatables/dataTables.bootstrap4.min.js"></script>
+
+  <!-- Page level custom scripts -->
+  <script src="js/demo/datatables-demo.js"></script>
+  
+  <script>
+  //체크 항목 삭제
+  function delete_target() {
+		var checkArray = [];
+		$('.list-checkBox:checked').each(function(i) {
+			checkArray.push($('.list-checkBox:checked:eq('+i+')').val());
+		});
+		
+		console.log(checkArray);
+		if (confirm('선택된 FAQ 항목을 삭제하시겠습니까?') == true) {
+			$.ajax({
+	  			url : 'deletefaqajax',
+	  			type : 'POST',
+	  			dataType : 'json',
+	  			data : {
+	  				'checkedData' : checkArray
+	  				},
+	  			success : function(data) {
+	  				location.reload();
+	  			}
+	  		});
+		} else {
+			return false;
+		}
+	}
+  
+  
+  
+  $(".check-all").click(function() {
+	$(".list-checkBox").prop('checked', this.checked); 
+  });
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "825143261433",
+    "project_id": "kr-martclubs-mart-136",
+    "storage_bucket": "kr-martclubs-mart-136.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:825143261433:android:11d852166508497b8e0a28",
+        "android_client_info": {
+          "package_name": "kr.martclubs.mart_136"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "825143261433-0t4ij5hjjjhm7g5eb6qkf1s44lkcu68s.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC-8MZxI59Sjd5YqiFMP6WzEnF_noRq8Kc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "825143261433-0t4ij5hjjjhm7g5eb6qkf1s44lkcu68s.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
